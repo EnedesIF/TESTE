@@ -924,6 +924,7 @@ function getTeam(){if(!currentClass||!currentTeamId)return null;
   return mem||loadTeamRecord(currentClass,currentTeamId);}
 async function persistStudent(){
   if(!currentUser||currentUser.type!=='student')return;
+  if(!gameData||Object.keys(gameData).length===0)return; // nunca grava vazio por cima
   let team=getTeam();if(!team)return;
   team.data=gameData;team.score=gameData.finalScore||team.score||0;team.completed=!!gameData.completed;team.currentStep=currentStep;team.lastActive=new Date().toISOString();
   DATABASE.classes[currentClass]=DATABASE.classes[currentClass]||{name:'Turma '+currentClass,teams:{}};
@@ -947,14 +948,26 @@ document.addEventListener('DOMContentLoaded',()=>{
   const saved=localStorage.getItem('testeUser');
   if(saved){currentUser=JSON.parse(saved);currentClass=currentUser.classCode;
     if(currentUser.type==='student'){currentTeamId=currentUser.teamId;currentTeamName=currentUser.teamName;currentClassPass=currentUser.pass||null;
-      const t=loadTeamRecord(currentClass,currentTeamId);
-      if(t){DATABASE.classes[currentClass]=DATABASE.classes[currentClass]||{name:'Turma '+currentClass,teams:{}};DATABASE.classes[currentClass].teams=DATABASE.classes[currentClass].teams||{};DATABASE.classes[currentClass].teams[currentTeamId]=t;}
-      startGame();}
+      if(supa&&currentClassPass){resumeStudentFromServer();}
+      else{const t=loadTeamRecord(currentClass,currentTeamId);
+        if(t){DATABASE.classes[currentClass]=DATABASE.classes[currentClass]||{name:'Turma '+currentClass,teams:{}};DATABASE.classes[currentClass].teams=DATABASE.classes[currentClass].teams||{};DATABASE.classes[currentClass].teams[currentTeamId]=t;}
+        startGame();}}
     else{currentProfPass=currentUser.profPass||null;showDashboard();}}
   setInterval(()=>{if(currentUser&&currentUser.type==='student')autoSave();},12000);
 });
 
 /* ============================ LOGIN ============================ */
+async function resumeStudentFromServer(){
+  try{
+    const {data,error}=await supa.rpc('carregar_equipe',{p_codigo:currentClass,p_senha_aluno:currentClassPass,p_equipe_id:currentTeamId});
+    if(error)throw error;
+    const row=Array.isArray(data)?data[0]:data;
+    const team={id:currentTeamId,name:(row&&row.equipe_nome)||currentTeamName,members:(row&&row.membros)||[],data:(row&&row.dados)||{},completed:!!(row&&row.completo),score:(row&&row.score)||0,currentStep:(row&&row.etapa)||0,lastActive:(row&&row.atualizado_em)||new Date().toISOString()};
+    DATABASE.classes[currentClass]={name:'Turma '+currentClass,teams:{}};DATABASE.classes[currentClass].teams[currentTeamId]=team;
+    currentTeamName=team.name;
+  }catch(e){console.warn('resume falhou',e);}
+  startGame();
+}
 function switchTab(t){document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x.dataset.tab===t));if(t==='student')ensureMembers();
   document.getElementById('studentForm').classList.toggle('active',t==='student');
   document.getElementById('teacherForm').classList.toggle('active',t==='teacher');}
@@ -987,6 +1000,17 @@ async function loginStudent(){
   const mName=members[0].nome,mEmail=members[0].email;
   if(supa){
     try{
+      // Verifica se a equipe já existe (evita criar vazia por erro de digitação)
+      let existentes=[];
+      try{const {data:lst,error:le}=await supa.rpc('listar_equipes_aluno',{p_codigo:cc,p_senha_aluno:pass});
+        if(le)throw le;existentes=lst||[];}
+      catch(le){const em=(le&&le.message)||'';if(/SENHA/i.test(em))return alert('Senha da turma inválida.');/* se a função não existir ainda, segue o fluxo normal */}
+      const jaExiste=existentes.some(e=>e.equipe_id===teamIdS);
+      if(existentes.length && !jaExiste){
+        const nomes=existentes.map(e=>'• '+e.equipe_nome).join('\n');
+        const ok=confirm('Não existe a equipe "'+teamName+'" nesta turma.\n\nEquipes já cadastradas:\n'+nomes+'\n\nConfira o nome. Deseja CRIAR uma nova equipe "'+teamName+'"?');
+        if(!ok)return;
+      }
       let row=null;
       for(const mem of members){
         const {data,error}=await supa.rpc('entrar_equipe',{p_codigo:cc,p_senha_aluno:pass,p_equipe_id:teamIdS,p_equipe_nome:teamName,p_membro:mem});
