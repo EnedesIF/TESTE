@@ -1,0 +1,1851 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TESTE — Inteligência de Mercado e Comportamento do Consumidor Imobiliário</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<!-- Supabase (opcional): descomente para persistência multiusuário real
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script> -->
+<style>
+:root{
+  --brand:#1A6B3C; --brand-2:#2E75B6;
+  --ink:#1f2733; --muted:#5b6572; --line:#e5e9ef; --bg:#f4f6f9; --card:#fff;
+  --t:#8e44ad; --e1:#2E75B6; --s:#e84393; --t2:#d35400; --e2:#1A6B3C;
+  --ok:#1A6B3C; --warn:#d35400; --bad:#c0392b;
+  --shadow:0 8px 30px rgba(20,40,60,.08); --radius:16px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--ink);line-height:1.5}
+.container{max-width:1180px;margin:0 auto;padding:24px}
+h1,h2,h3,h4{line-height:1.2}
+button,textarea,input,select{font-family:inherit}
+.hidden{display:none!important}
+
+.topbar{position:sticky;top:0;z-index:900;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:12px 24px}
+.brand-mark{display:flex;align-items:center;gap:12px;font-weight:800;color:var(--brand)}
+.brand-mark .dot{width:14px;height:14px;border-radius:4px;background:linear-gradient(135deg,var(--brand),var(--brand-2))}
+.brand-mark small{display:block;font-weight:600;color:var(--muted);font-size:11px;letter-spacing:.03em}
+.userchip{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--muted)}
+.logout-btn{background:#fff;color:var(--bad);border:1px solid var(--line);padding:6px 14px;border-radius:20px;cursor:pointer;font-size:13px;font-weight:600}
+.logout-btn:hover{background:#fdf2f2}
+
+.banner{background:#fff4e5;border:1px solid #f2c98a;color:#8a5a00;padding:10px 16px;border-radius:12px;font-size:13px;margin-bottom:18px;display:flex;gap:10px;align-items:flex-start}
+.banner strong{color:#6b4600}
+
+.login-wrap{max-width:520px;margin:70px auto}
+.login-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:40px 34px}
+.login-card h2{color:var(--brand);font-size:1.7em;margin-bottom:6px}
+.login-card .lead{color:var(--muted);font-size:14px;margin-bottom:26px}
+.tabs{display:flex;gap:8px;margin-bottom:24px;background:#f0f3f7;padding:5px;border-radius:12px}
+.tab{flex:1;padding:11px;border:none;background:transparent;color:var(--muted);border-radius:9px;cursor:pointer;font-weight:600;font-size:14px}
+.tab.active{background:#fff;color:var(--brand);box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.form{display:none}.form.active{display:block}
+.fg{margin-bottom:16px}
+.fg label{display:block;margin-bottom:6px;font-weight:600;font-size:14px}
+.fg input{width:100%;padding:13px;border:1px solid var(--line);border-radius:10px;font-size:15px}
+.fg input:focus{outline:none;border-color:var(--brand-2);box-shadow:0 0 0 3px rgba(46,117,182,.12)}
+.primary-btn{width:100%;background:var(--brand);color:#fff;border:none;padding:14px;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;transition:.2s}
+.primary-btn:hover{background:#155230}
+.demo{margin-top:18px;padding:14px;background:#eef7f1;border-radius:12px;border:1px solid #cfe6d9}
+.demo h4{color:var(--brand);font-size:13px;margin-bottom:8px}
+.demo-btn{background:#fff;color:var(--brand);border:1px solid #bfe0cd;padding:7px 14px;border-radius:16px;cursor:pointer;margin:3px;font-size:13px;font-weight:600}
+
+.page{display:none}.page.active{display:block;animation:fade .4s ease}
+@keyframes fade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:34px}
+
+.hero{background:linear-gradient(135deg,var(--brand),var(--brand-2));color:#fff;border-radius:var(--radius);padding:64px 40px;text-align:center;box-shadow:var(--shadow)}
+.hero .eyebrow{font-size:13px;letter-spacing:.18em;text-transform:uppercase;opacity:.85;font-weight:600}
+.hero h1{font-size:2.6em;font-weight:900;margin:16px auto;max-width:14ch}
+.hero p{font-size:1.1em;opacity:.92;max-width:60ch;margin:0 auto 30px}
+.hero .start-btn{background:#fff;color:var(--brand);border:none;padding:16px 40px;border-radius:40px;font-size:1.05em;font-weight:800;cursor:pointer;transition:.2s}
+.hero .start-btn:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(0,0,0,.2)}
+.hero .meta{margin-top:26px;font-size:13px;opacity:.8}
+
+.section-title{font-size:1.9em;margin-bottom:6px}
+.section-sub{color:var(--muted);margin-bottom:28px;font-size:15px}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+.grid-3{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:18px}
+
+.field label{display:block;font-weight:700;margin-bottom:6px;font-size:14px}
+.field .hint{font-size:12.5px;color:var(--muted);margin-bottom:8px}
+.field textarea,.field input,.field select{width:100%;padding:12px;border:1px solid var(--line);border-radius:10px;font-size:15px}
+.field textarea{min-height:90px;resize:vertical}
+.field textarea:focus,.field input:focus,.field select:focus{outline:none;border-color:var(--brand-2);box-shadow:0 0 0 3px rgba(46,117,182,.12)}
+
+.block{border:1px solid var(--line);border-radius:14px;padding:22px;margin-bottom:22px}
+.block > h3{font-size:1.15em;margin-bottom:4px;color:var(--brand)}
+.block > .desc{color:var(--muted);font-size:13.5px;margin-bottom:18px}
+.block-fields{display:flex;flex-direction:column;gap:16px}
+
+.nav{display:flex;justify-content:space-between;align-items:center;margin-top:24px;gap:12px}
+.nav-btn{background:var(--brand);color:#fff;border:none;padding:12px 26px;border-radius:26px;font-size:15px;font-weight:700;cursor:pointer;transition:.2s}
+.nav-btn:hover{background:#155230}
+.nav-btn.ghost{background:#fff;color:var(--brand);border:1px solid var(--line)}
+.nav-btn.ghost:hover{background:#f4faf6}
+.nav-btn:disabled{background:#cfd6de;cursor:not-allowed}
+
+.method .letter-row{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin:26px 0}
+.method .lcard{border-radius:14px;padding:18px 14px;color:#fff;text-align:center}
+.method .lcard .big{font-size:2.2em;font-weight:900;display:block}
+.method .lcard small{opacity:.9;font-weight:700;letter-spacing:.05em}
+.lc-t{background:var(--t)}.lc-e1{background:var(--e1)}.lc-s{background:var(--s)}.lc-t2{background:var(--t2)}.lc-e2{background:var(--e2)}
+.method .explain{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.method .exp{border:1px solid var(--line);border-radius:12px;padding:18px}
+.method .exp h4{color:var(--brand);margin-bottom:8px;font-size:1.02em}
+.method .exp p{font-size:13.5px;color:var(--muted)}
+.method .core{grid-column:1/-1;background:linear-gradient(135deg,var(--brand),var(--brand-2));color:#fff;border-radius:12px;padding:22px;text-align:center;font-weight:700;font-size:1.15em}
+
+.progress{background:#eceff3;height:8px;border-radius:5px;overflow:hidden;margin-bottom:22px}
+.progress > i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--brand),var(--brand-2));transition:width .4s}
+.steps{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:28px}
+.step-tab{position:relative;text-align:center;padding:16px 6px;border-radius:12px;color:#fff;cursor:pointer;opacity:.55;transition:.2s;border:none}
+.step-tab .l{font-size:1.9em;font-weight:900;display:block}
+.step-tab .n{font-size:11.5px;font-weight:700;letter-spacing:.04em}
+.step-tab.active{opacity:1;transform:translateY(-2px);box-shadow:0 8px 20px rgba(0,0,0,.18)}
+.step-tab.done{opacity:1}
+.step-tab.done::after{content:'✓';position:absolute;top:-6px;right:-6px;width:22px;height:22px;border-radius:50%;background:var(--ok);color:#fff;font-size:12px;display:flex;align-items:center;justify-content:center;border:2px solid #fff}
+.st-0{background:var(--t)}.st-1{background:var(--e1)}.st-2{background:var(--s)}.st-3{background:var(--t2)}.st-4{background:var(--e2)}
+
+.step-body{display:none}.step-body.active{display:block;animation:fade .35s}
+.step-body > h3{font-size:1.4em;margin-bottom:4px}
+.step-body > .goal{color:var(--muted);font-size:14px;margin-bottom:16px}
+
+.framework{border:1px solid #d9e6f2;background:#f2f8fd;border-radius:12px;padding:14px 16px;margin-bottom:20px}
+.framework summary{cursor:pointer;font-weight:700;color:var(--brand-2);font-size:14px;list-style:none;display:flex;align-items:center;gap:8px}
+.framework summary::-webkit-details-marker{display:none}
+.framework summary::before{content:'▸';transition:.2s}
+.framework[open] summary::before{transform:rotate(90deg)}
+.framework .fw-inner{margin-top:12px;font-size:13.5px;color:#33475b}
+.framework .fw-inner ul{margin:6px 0 0 18px}
+.framework .fw-inner li{margin-bottom:5px}
+
+/* Perfil psicográfico */
+.psycho{border:1px solid #e2d4ef;background:linear-gradient(135deg,#faf6ff,#f3f8fd);border-radius:14px;padding:22px;margin-bottom:22px}
+.psycho h4{color:var(--t);font-size:1.15em;margin-bottom:4px}
+.psycho .pdesc{font-size:13px;color:var(--muted);margin-bottom:18px}
+.axes{display:flex;flex-direction:column;gap:16px;margin-bottom:16px}
+.axis-name{font-size:12px;font-weight:700;color:var(--ink);margin-bottom:6px;letter-spacing:.02em}
+.axis{display:grid;grid-template-columns:120px 1fr 120px;align-items:center;gap:10px}
+.axis .ax-l,.axis .ax-r{font-size:12px;color:var(--muted)}
+.axis .ax-r{text-align:right}
+.axis input[type=range]{width:100%;accent-color:var(--t)}
+.psico-out{margin-top:6px}
+.pp-card{background:#fff;border:1px solid #e2d4ef;border-radius:12px;padding:18px;margin-top:6px}
+.pp-card .pp-title{font-size:1.1em;font-weight:800;color:var(--t);margin-bottom:8px}
+.pp-card .pp-desc{font-size:13.5px;color:#3a4552;margin-bottom:14px}
+.pp-row{margin-bottom:10px;font-size:13px}
+.pp-row b{display:block;color:var(--t);font-size:12px;text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px}
+.pp-tags{display:flex;flex-wrap:wrap;gap:6px}
+.pp-tag{background:#f6f0fb;border:1px solid #e2d4ef;color:var(--t);font-size:12px;font-weight:600;padding:3px 10px;border-radius:14px}
+
+.q{background:#fafbfc;border:1px solid var(--line);border-radius:12px;padding:18px;margin-bottom:14px}
+.q .qhead{display:flex;justify-content:space-between;gap:12px;align-items:baseline;margin-bottom:4px}
+.q label{font-weight:700;font-size:14.5px}
+.q .opt{font-weight:600;font-size:11px;color:var(--muted);margin-left:6px}
+.q .hint{font-size:12.5px;color:var(--muted);margin-bottom:12px}
+.q .count{font-size:11.5px;color:var(--muted);white-space:nowrap;font-weight:600}
+.q.filled{border-color:#bfe0cd;background:#f6fbf8}
+
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip-opt{border:1px solid var(--line);background:#fff;color:var(--ink);padding:8px 14px;border-radius:20px;cursor:pointer;font-size:13.5px;font-weight:600;transition:.12s}
+.chip-opt:hover{border-color:var(--brand-2)}
+.chip-opt.sel{background:var(--brand);color:#fff;border-color:var(--brand)}
+.other-add{display:flex;gap:6px;margin-top:10px}
+.other-add input{flex:1;padding:9px 11px;border:1px dashed #c7cfd9;border-radius:9px;font-size:13px}
+.other-add button{border:1px solid var(--brand);background:#fff;color:var(--brand);border-radius:9px;padding:0 14px;font-weight:700;cursor:pointer;font-size:13px}
+.q-select{width:100%;padding:11px;border:1px solid var(--line);border-radius:9px;font-size:15px;background:#fff}
+.q-text{width:100%;min-height:78px;padding:12px;border:1px solid var(--line);border-radius:9px;font-size:15px;resize:vertical}
+.q-select:focus,.q-text:focus{outline:none;border-color:var(--brand-2);box-shadow:0 0 0 3px rgba(46,117,182,.12)}
+.reason{margin-top:16px}
+.reason label{display:block;font-weight:700;font-size:13.5px;margin-bottom:6px;color:var(--muted)}
+.reason textarea{width:100%;min-height:70px;padding:12px;border:1px solid var(--line);border-radius:9px;font-size:14.5px;resize:vertical;background:#fff}
+.reason textarea:focus{outline:none;border-color:var(--brand-2);box-shadow:0 0 0 3px rgba(46,117,182,.12)}
+
+.chip-view{display:inline-block;font-size:11px;font-weight:700;padding:2px 9px;border-radius:12px;background:#eef2f7;color:var(--muted);margin-left:6px}
+
+.diag-head{text-align:center;margin-bottom:24px}
+.diag-head h2{color:var(--brand);font-size:2em}
+.scorebox{background:linear-gradient(135deg,var(--brand),var(--brand-2));color:#fff;border-radius:var(--radius);padding:28px;text-align:center;margin-bottom:14px}
+.scorebox .big{font-size:3.4em;font-weight:900;line-height:1}
+.scorebox .lbl{opacity:.9;margin-top:4px}
+.scorebox .tier{margin-top:8px;font-size:13px;background:rgba(255,255,255,.18);display:inline-block;padding:4px 14px;border-radius:14px}
+.diag-note{font-size:12.5px;color:var(--muted);text-align:center;margin-bottom:22px}
+
+.proposal{border:1px solid #cfe6d9;background:#f2faf5;border-radius:14px;padding:22px;margin-bottom:22px}
+.proposal h3{color:var(--brand);margin-bottom:6px}
+.proposal .psub{font-size:12.5px;color:var(--muted);margin-bottom:14px}
+.proposal .pblock{margin-bottom:12px;font-size:14px}
+.proposal .pblock b{color:var(--brand)}
+.proposal .ptags{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.proposal .ptag{background:#fff;border:1px solid #cfe6d9;color:var(--brand);font-size:12px;font-weight:600;padding:3px 10px;border-radius:14px}
+.proposal .none{color:var(--muted);font-style:italic;font-size:13px}
+
+.eval{border:1px solid var(--line);border-left:5px solid var(--brand);border-radius:12px;padding:18px;margin-bottom:14px}
+.eval h4{color:var(--brand);margin-bottom:10px}
+.eval .bar{display:flex;align-items:center;gap:12px;margin-bottom:8px}
+.eval .track{flex:1;height:8px;background:#eceff3;border-radius:5px;overflow:hidden}
+.eval .fill{height:100%;background:linear-gradient(90deg,var(--brand),var(--brand-2))}
+.eval .sc{font-weight:800;font-size:13px;min-width:56px;text-align:right}
+.eval p{font-size:13.5px;color:#3a4552}
+
+.export{margin-top:24px;padding:24px;background:#f4f6f9;border-radius:14px;text-align:center}
+.export .export-btn{background:var(--brand-2);color:#fff;border:none;padding:13px 26px;border-radius:24px;font-size:15px;font-weight:700;cursor:pointer;margin:6px}
+.export .restart{background:#fff;color:var(--muted);border:1px solid var(--line);padding:12px 22px;border-radius:24px;font-weight:700;cursor:pointer;margin:6px}
+
+.dash-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px;flex-wrap:wrap;gap:12px}
+.dash-head h2{color:var(--brand)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-bottom:22px}
+.stat{background:linear-gradient(135deg,var(--brand),var(--brand-2));color:#fff;border-radius:14px;padding:22px;text-align:center}
+.stat .num{font-size:2.4em;font-weight:900}
+.stat .cap{opacity:.9;font-size:13px}
+.agg{border:1px solid var(--line);border-radius:14px;padding:20px;margin-bottom:22px;background:#fafbfc}
+.agg h3{color:var(--brand);font-size:1.05em;margin-bottom:4px}
+.agg .asub{font-size:12.5px;color:var(--muted);margin-bottom:16px}
+.agg-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px}
+.agg-col h4{font-size:13px;margin-bottom:10px;color:var(--ink)}
+.agg-row{display:flex;align-items:center;gap:10px;margin-bottom:7px;font-size:12.5px}
+.agg-row .aname{flex:1;color:#3a4552}
+.agg-row .atrack{width:90px;height:7px;background:#eceff3;border-radius:5px;overflow:hidden}
+.agg-row .afill{height:100%;background:linear-gradient(90deg,var(--brand),var(--brand-2))}
+.agg-row .acount{font-weight:800;color:var(--brand);min-width:20px;text-align:right}
+.students{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+.scard{background:#fafbfc;border:1px solid var(--line);border-left:5px solid var(--brand);border-radius:12px;padding:18px;cursor:pointer;transition:.2s}
+.scard:hover{box-shadow:var(--shadow);transform:translateY(-2px)}
+.scard .sn{font-weight:800;margin-bottom:8px}
+.dots{display:flex;gap:5px;margin:8px 0}
+.dot{width:24px;height:24px;border-radius:50%;background:#dde3ea;color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center}
+.dot.done{background:var(--ok)}.dot.cur{background:var(--brand-2)}
+.scard .stt{font-size:12.5px;color:var(--muted)}
+.empty{grid-column:1/-1;text-align:center;padding:40px;color:var(--muted);border:2px dashed var(--line);border-radius:14px}
+
+/* Central de consulta (drawer) */
+.consult-fab{position:fixed;right:22px;bottom:22px;z-index:940;background:var(--brand-2);color:#fff;border:none;border-radius:30px;padding:13px 20px;font-weight:800;font-size:14px;cursor:pointer;box-shadow:0 10px 24px rgba(46,117,182,.35)}
+.consult-fab:hover{background:#245e93}
+.overlay{position:fixed;inset:0;background:rgba(15,25,40,.35);z-index:950;opacity:0;pointer-events:none;transition:.25s}
+.overlay.open{opacity:1;pointer-events:auto}
+.drawer{position:fixed;top:0;right:0;height:100%;width:min(560px,92vw);background:#fff;z-index:960;box-shadow:-8px 0 30px rgba(0,0,0,.15);transform:translateX(100%);transition:.28s;display:flex;flex-direction:column}
+.drawer.open{transform:none}
+.drawer-head{padding:18px 22px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}
+.drawer-head h3{color:var(--brand);font-size:1.15em}
+.drawer-close{background:#f0f3f7;border:none;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:16px;color:var(--muted)}
+.drawer-tabs{display:flex;gap:6px;padding:12px 22px 0}
+.dtab{padding:9px 16px;border:none;background:#f0f3f7;color:var(--muted);border-radius:9px 9px 0 0;cursor:pointer;font-weight:700;font-size:13.5px}
+.dtab.active{background:#fff;color:var(--brand);box-shadow:0 -2px 0 var(--brand) inset}
+.drawer-body{flex:1;overflow-y:auto;padding:18px 22px}
+.ins{border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:12px}
+.ins .itag{display:inline-block;font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--brand-2);background:#eaf2fb;padding:2px 9px;border-radius:10px;margin-bottom:8px}
+.ins h4{font-size:1.02em;margin-bottom:8px;color:var(--ink)}
+.ins .ibody{font-size:13.5px;color:#3a4552}
+.ins .ibody ul{margin:6px 0 0 18px}
+.ins .ibody li{margin-bottom:4px}
+.casecard{border:1px solid var(--line);border-radius:12px;padding:18px;margin-bottom:14px}
+.casecard h4{color:var(--brand);font-size:1.1em}
+.casecard .csub{font-size:12.5px;color:var(--muted);margin-bottom:10px;font-style:italic}
+.casecard .cbody{font-size:13.5px;color:#3a4552;margin-bottom:10px}
+.casecard .clabel{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;color:var(--brand-2);margin:10px 0 4px}
+.casecard ul{margin:0 0 6px 18px;font-size:13px;color:#3a4552}
+.casecard li{margin-bottom:4px}
+.casecard .csrc{font-size:11.5px;color:var(--muted);margin-top:10px;border-top:1px dashed var(--line);padding-top:8px}
+.casecard .csrc a{color:var(--brand-2)}
+.case-note{background:#fff4e5;border:1px solid #f2c98a;color:#8a5a00;border-radius:10px;padding:10px 14px;font-size:12.5px;margin-bottom:14px}
+
+@media(max-width:820px){
+  .grid-2,.method .explain{grid-template-columns:1fr}
+  .steps,.method .letter-row{grid-template-columns:repeat(3,1fr)}
+  .hero h1{font-size:2em}
+  .axis{grid-template-columns:90px 1fr 90px}
+}
+/* ===== v4: apostas, rubrica, matriz, super dashboard ===== */
+.bets{margin-top:12px;display:flex;flex-direction:column;gap:10px}
+.bet{border:1px solid #e3e8ef;border-left:4px solid var(--brand-2);border-radius:10px;padding:12px 14px;background:#fff}
+.bet.miss{border-left-color:var(--warn);background:#fffaf3}
+.bet .betlabel{font-weight:700;font-size:13.5px;margin-bottom:8px;display:flex;justify-content:space-between;gap:8px;align-items:center}
+.bet .betlabel .miss-tag{font-size:10.5px;font-weight:700;color:var(--warn);background:#fff0e0;border-radius:8px;padding:2px 8px;white-space:nowrap}
+.bet textarea{width:100%;min-height:52px;padding:9px 10px;border:1px solid var(--line);border-radius:8px;font-size:13px;resize:vertical}
+.bet textarea:focus{outline:none;border-color:var(--brand-2);box-shadow:0 0 0 3px rgba(46,117,182,.1)}
+.scales{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:10px}
+.scale label{font-size:11.5px;font-weight:700;color:var(--muted);display:flex;justify-content:space-between;margin-bottom:2px}
+.scale input[type=range]{width:100%;accent-color:var(--brand-2)}
+.scale .sv{font-weight:800;color:var(--brand-2)}
+.eixos{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:8px 0 18px}
+.eixo{background:#fafbfc;border:1px solid var(--line);border-radius:12px;padding:14px}
+.eixo .en{font-size:12.5px;font-weight:700;color:var(--ink);display:flex;justify-content:space-between}
+.eixo .etrack{height:9px;background:#eceff3;border-radius:5px;overflow:hidden;margin-top:8px}
+.eixo .efill{height:100%;background:linear-gradient(90deg,var(--brand),var(--brand-2))}
+.eixo .ed{font-size:11.5px;color:var(--muted);margin-top:6px}
+.matrixwrap{border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:18px;background:#fff;text-align:center}
+.matrixwrap h4{color:var(--brand);margin-bottom:4px;text-align:left}
+.matrixwrap .mnote{font-size:12px;color:var(--muted);margin-bottom:10px;text-align:left}
+.mlegend{display:flex;gap:16px;font-size:11.5px;color:var(--muted);margin-top:8px;justify-content:center}
+.mlegend .dotg{display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--brand);margin-right:5px}
+.mlegend .dotr{display:inline-block;width:10px;height:10px;border-radius:50%;background:#c9a227;margin-right:5px}
+.elos{background:#fff8f0;border:1px solid #f2c98a;border-radius:12px;padding:14px;margin-bottom:18px}
+.elos h4{color:#8a5a00;font-size:.98em;margin-bottom:6px}
+.elos ul{margin-left:18px;font-size:13px;color:#6b4600}
+.elos li{margin-bottom:4px}
+.dvz{border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:16px;background:#fafbfc}
+.dvz h4{color:var(--brand);font-size:1em;margin-bottom:4px}
+.dvz .dsub{font-size:12px;color:var(--muted);margin-bottom:12px}
+.divrow{margin-bottom:12px}
+.divrow .dq{font-size:12.5px;font-weight:700;margin-bottom:4px}
+.divrow .dbar{height:8px;border-radius:5px;background:linear-gradient(90deg,#e84393,#f6a5c8)}
+
+
+/* ===== v5: equipes, instruções, popup ===== */
+.qhead .qright{display:flex;gap:8px;align-items:center}
+.qhelp{width:22px;height:22px;border-radius:50%;border:1px solid var(--brand-2);background:#fff;color:var(--brand-2);font-weight:800;font-size:12px;cursor:pointer;line-height:1;flex-shrink:0}
+.qhelp:hover{background:var(--brand-2);color:#fff}
+.helpmodal{position:fixed;inset:0;background:rgba(15,25,40,.45);z-index:980;display:none;align-items:center;justify-content:center;padding:20px}
+.helpmodal.open{display:flex}
+.helpbox{background:#fff;border-radius:16px;max-width:480px;width:100%;padding:24px;box-shadow:var(--shadow)}
+.helphead{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.helphead h3{color:var(--brand);font-size:1.1em}
+.helphead button{background:#f0f3f7;border:none;width:30px;height:30px;border-radius:50%;cursor:pointer;color:var(--muted);font-size:15px}
+.helpbody{font-size:14px;color:#3a4552}
+.helpbody p{margin-bottom:8px}
+.instr h4{color:var(--brand);margin:14px 0 6px}
+.instr p,.instr li{font-size:13.5px;color:#3a4552}
+.instr ul{margin:4px 0 0 18px}.instr li{margin-bottom:5px}
+.instr .lgpd{background:#eef7f1;border:1px solid #cfe6d9;border-radius:10px;padding:12px;font-size:12.5px;color:#2c5e43;margin-top:10px}
+.consent-row{display:flex;gap:8px;font-size:12.5px;color:var(--muted);margin-bottom:14px;align-items:flex-start}
+.consent-row input{width:auto;margin-top:3px}
+.memblock{border-top:1px solid var(--line);margin:8px 0 14px;padding-top:12px}
+.memblock .mtitle{font-weight:700;font-size:13px;margin-bottom:8px;color:var(--muted)}
+.teixos{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+.tmembers{margin-top:6px;font-size:11.5px;color:var(--muted)}
+
+
+/* ===== v6: robustez ===== */
+.betfb{font-size:11.5px;margin-top:6px;font-weight:600}
+.betfb.ok{color:var(--ok)}.betfb.warn{color:#b8860b}.betfb.bad{color:var(--bad)}.betfb.muted{color:var(--muted)}
+.stepq{border-radius:10px;padding:9px 14px;font-size:12.5px;font-weight:700;margin:0 0 16px}
+.stepq.ok{background:#eef7f1;border:1px solid #cfe6d9;color:#1c6b41}
+.stepq.warn{background:#fff8ec;border:1px solid #f0d091;color:#8a5a00}
+.stepq.bad{background:#fdecec;border:1px solid #f2b8b8;color:#b02a2a}
+.cohbox{border:1px dashed #cfd8e3;background:#f8fafc;border-radius:10px;padding:11px 14px;font-size:12.5px;color:#3a4552;margin-bottom:16px}
+.cohbox .ok{color:var(--ok);font-weight:700}.cohbox .bad{color:var(--bad);font-weight:700}.cohbox .muted{color:var(--muted)}
+.verdict{border-radius:12px;padding:14px 18px;font-weight:800;font-size:1.02em;margin-bottom:18px;text-align:center}
+.verdict.ok{background:#eef7f1;border:1px solid #cfe6d9;color:#1c6b41}
+.verdict.bad{background:#fdecec;border:1px solid #f2b8b8;color:#b02a2a}
+.steptag{font-size:11px;font-weight:800;padding:2px 9px;border-radius:10px;margin-left:8px}
+.steptag.ok{background:#eef7f1;color:#1c6b41}.steptag.bad{background:#fdecec;color:#b02a2a}
+.brief .bnote{background:#fff4e5;border:1px solid #f2c98a;color:#8a5a00;border-radius:10px;padding:10px 14px;font-size:12.5px;margin-bottom:14px}
+.brief .bcard{border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:12px}
+.brief .bcard h4{color:var(--brand);margin-bottom:2px}
+.brief .bcard .bsub{font-size:12px;color:var(--muted);margin-bottom:10px}
+.brief .bcard ul{margin:0 0 0 18px;font-size:13px;color:#3a4552}.brief .bcard li{margin-bottom:4px}
+.tflags{margin-top:6px}
+.tflag{font-size:10.5px;font-weight:800;padding:2px 8px;border-radius:9px;margin-right:5px}
+.tflag.bad{background:#fdecec;color:#b02a2a}.tflag.warn{background:#fff4e5;color:#8a5a00}
+
+
+/* ===== v7: gráficos ===== */
+.chartwrap{border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:18px;background:#fff}
+.chartwrap h4{color:var(--brand);margin-bottom:4px}
+.chartwrap .cdesc{font-size:12px;color:var(--muted);margin-bottom:10px}
+.chartgrid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:760px){.chartgrid{grid-template-columns:1fr}}
+.rk-legend{display:flex;gap:14px;flex-wrap:wrap;font-size:11.5px;color:var(--muted);margin-top:10px}
+.rk-legend span i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:middle}
+.svgscroll{overflow-x:auto}
+
+
+/* ===== v8: persona, matriz numerada, IA ===== */
+.persona{border:1px solid #d9e6f2;background:#f6fafd;border-radius:14px;padding:20px;margin-bottom:22px}
+.persona h4{color:var(--brand-2);font-size:1.12em;margin-bottom:4px}
+.persona .pdesc{font-size:12.5px;color:var(--muted);margin-bottom:16px}
+.pgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.pgrid .pf.full{grid-column:1/-1}
+.pf label{display:block;font-size:12.5px;font-weight:700;margin-bottom:5px}
+.pf input,.pf select{width:100%;padding:10px;border:1px solid var(--line);border-radius:9px;font-size:14px;background:#fff}
+.pf input:focus,.pf select:focus{outline:none;border-color:var(--brand-2);box-shadow:0 0 0 3px rgba(46,117,182,.1)}
+.mxleg{margin:12px 0 0;padding-left:0;list-style:none;columns:2;column-gap:20px;font-size:12px;color:#3a4552}
+.mxleg li{margin-bottom:5px;break-inside:avoid}
+.mxn{display:inline-flex;width:18px;height:18px;border-radius:50%;color:#fff;font-size:10.5px;font-weight:800;align-items:center;justify-content:center;margin-right:6px;vertical-align:middle}
+.mxn.g{background:#1A6B3C}.mxn.a{background:#c9a227}
+@media(max-width:640px){.mxleg{columns:1}.pgrid{grid-template-columns:1fr}}
+.aipanel{border:1px solid #e2d4ef;background:#faf7fd;border-radius:12px;padding:4px 14px;margin-bottom:18px}
+.aipanel summary{cursor:pointer;font-weight:700;color:#7a3fa0;padding:8px 0;list-style:none}
+.aipanel summary::-webkit-details-marker{display:none}
+.aibody{padding:6px 0 12px}
+.aibody p{font-size:12.5px;color:var(--muted);margin-bottom:10px}
+.airow{display:flex;gap:8px;flex-wrap:wrap}
+.airow input{flex:1;min-width:160px;padding:10px;border:1px solid var(--line);border-radius:9px;font-size:13px}
+.aistatus{margin-top:10px;font-size:12.5px;font-weight:600}
+.ai-btn{background:#7a3fa0;color:#fff;border:none;border-radius:16px;padding:6px 12px;font-weight:700;font-size:12px;cursor:pointer;margin-top:8px}
+.ai-btn:hover{background:#653488}
+.aimodal{position:fixed;inset:0;background:rgba(15,25,40,.5);z-index:990;display:none;align-items:center;justify-content:center;padding:20px}
+.aimodal.open{display:flex}
+.aibox{background:#fff;border-radius:16px;max-width:620px;width:100%;max-height:86vh;overflow-y:auto;padding:24px;box-shadow:var(--shadow)}
+.aihead{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.aihead h3{color:#7a3fa0;font-size:1.12em}
+.aihead button{background:#f0f3f7;border:none;width:30px;height:30px;border-radius:50%;cursor:pointer;color:var(--muted)}
+.aiindex{background:#f6f0fb;border:1px solid #e2d4ef;border-radius:10px;padding:10px 14px;font-size:1.05em;color:#7a3fa0;margin-bottom:12px}
+.aitext{white-space:pre-wrap;font-family:inherit;font-size:13.5px;color:#2c3742;line-height:1.5;background:#fafbfc;border:1px solid var(--line);border-radius:10px;padding:14px;margin:0}
+.aidisc{font-size:11.5px;color:var(--muted);margin-top:10px}
+
+</style>
+</head>
+<body>
+
+<div class="topbar hidden" id="topbar">
+  <div class="brand-mark"><span class="dot"></span><div>ENEDES · Metodologia TESTE<small>Inteligência de Mercado · Comportamento do Consumidor Imobiliário</small></div></div>
+  <div class="userchip"><span id="userDisplay"></span><button class="logout-btn" onclick="logout()">Sair</button></div>
+</div>
+
+<div class="container">
+
+  <!-- LOGIN -->
+  <div class="login-wrap" id="loginSection">
+    <div class="login-card">
+      <h2>Metodologia TESTE</h2>
+      <p class="lead">Ferramenta aplicada de inteligência de mercado e comportamento do consumidor para construir soluções estratégicas no mercado imobiliário.</p>
+      <div class="tabs">
+        <button class="tab active" data-tab="student" onclick="switchTab('student')">Aluno(a)</button>
+        <button class="tab" data-tab="teacher" onclick="switchTab('teacher')">Professor(a)</button>
+      </div>
+      <div class="form active" id="studentForm">
+        <div class="fg"><label>Código da turma</label><input id="classCode" placeholder="Ex: MBA2025A" style="text-transform:uppercase"></div>
+        <div class="fg"><label>Nome da equipe</label><input id="teamName" placeholder="Ex: Equipe Alfa"></div><div class="fg"><label>Senha da turma</label><input id="classPass" type="password" placeholder="Senha informada pelo(a) professor(a)"></div>
+        <div class="memblock"><div class="mtitle">Seus dados (membro da equipe)</div>
+          <div class="fg"><label>Nome completo</label><input id="memberName" placeholder="Seu nome"></div>
+          <div class="fg"><label>Telefone</label><input id="memberPhone" placeholder="(61) 90000-0000"></div>
+          <div class="fg"><label>E-mail</label><input id="memberEmail" type="email" placeholder="voce@email.com"></div>
+        </div>
+        <label class="consent-row"><input type="checkbox" id="consent"><span>Autorizo o uso dos meus dados (nome, telefone e e-mail) para a realização desta dinâmica da disciplina, conforme a LGPD. Os dados ficam acessíveis ao(à) professor(a) da turma.</span></label>
+        <button class="primary-btn" onclick="loginStudent()">Entrar na equipe</button>
+        <div class="demo">
+          <h4>Acesso rápido para teste</h4>
+          <button class="demo-btn" onclick="quickJoin('Equipe Alfa','Ana Ferreira','ana@ex.com')">Ana → Equipe Alfa</button>
+          <button class="demo-btn" onclick="quickJoin('Equipe Alfa','Bruno Costa','bruno@ex.com')">Bruno → Equipe Alfa</button>
+        </div>
+      </div>
+      <div class="form" id="teacherForm">
+        <div class="fg"><label>Seu nome</label><input id="teacherName" placeholder="Nome do(a) professor(a)"></div>
+        <div class="fg"><label>Código da turma</label><input id="teacherClassCode" placeholder="Deixe vazio para criar nova"></div>
+        <div class="fg"><label>Senha do professor</label><input id="teacherPass" type="password" placeholder="Sua senha de professor(a)"></div>
+        <div class="fg"><label>Senha dos alunos <span style="font-weight:400;color:var(--muted)">(só ao criar a turma)</span></label><input id="teacherPassAluno" type="password" placeholder="Senha que os alunos usarão"></div>
+        <button class="primary-btn" onclick="loginTeacher()">Acessar dashboard</button>
+        <div class="demo">
+          <h4>Acesso rápido para teste</h4>
+          <button class="demo-btn" onclick="quickTeacherLogin('Profa. Coordenadora','DEMO2025')">Dashboard demo</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div class="page" id="dashboard">
+    <div class="card">
+      <div class="dash-head">
+        <h2>Dashboard · Turma <span id="dashboardClass"></span></h2>
+        <div>
+          <button class="nav-btn ghost" onclick="exportClassData()">Exportar CSV</button>
+          <button class="nav-btn" onclick="updateDashboard()">Atualizar</button>
+        </div>
+      </div>
+      <div id="dashBanner"></div>
+      <details class="aipanel"><summary>🤖 Análise por IA (opcional) — configurar chave</summary>
+        <div class="aibody">
+          <p>A chave fica <b>somente neste navegador</b> (o seu). Cada análise consome tokens (tem custo) e precisa de internet. <b>Remova a chave após a aula.</b></p>
+          <div class="airow">
+            <input type="password" id="aiKey" placeholder="Chave da Anthropic (sk-ant-...)">
+            <input type="text" id="aiModel" placeholder="modelo">
+            <button class="nav-btn" onclick="saveAIKey()">Salvar</button>
+            <button class="nav-btn ghost" onclick="removeAIKey()">Remover</button>
+          </div>
+          <div id="aiStatus" class="aistatus"></div>
+        </div>
+      </details>
+      <div class="stats">
+        <div class="stat"><div class="num" id="totalStudents">0</div><div class="cap">Equipes</div></div>
+        <div class="stat"><div class="num" id="activeStudents">0</div><div class="cap">Online agora</div></div>
+        <div class="stat"><div class="num" id="completedStudents">0</div><div class="cap">Finalizaram</div></div>
+        <div class="stat"><div class="num" id="averageScore">0</div><div class="cap">Média (índice)</div></div>
+      </div>
+      <div class="agg" id="aggPanel"></div>
+      <div class="students" id="studentsGrid"></div>
+    </div>
+  </div>
+
+  <!-- PÁGINA 1 · HERO -->
+  <div class="page" id="page1">
+    <div class="hero">
+      <div class="eyebrow">MBA · Inteligência de Mercado</div>
+      <h1>O que torna o seu lançamento realmente único?</h1>
+      <p>Use a metodologia TESTE para transformar dados de mercado e comportamento do consumidor em uma estratégia defensável de lançamento imobiliário — do público ao pós-venda.</p>
+      <button class="start-btn" onclick="nextPage()">Começar</button>
+      <div class="meta">5 etapas · Target → Explorar → Soluções → Testar → Escalar</div>
+    </div>
+  </div>
+
+  <!-- PÁGINA 2 · CONTEXTO -->
+  <div class="page" id="page2">
+    <div class="card">
+      <h2 class="section-title">Contexto do projeto</h2>
+      <p class="section-sub">Ancore a análise em dados reais. Quanto mais concreto o cenário, mais estratégica será a proposta.</p>
+      <div class="block">
+        <h3>Conceito e posicionamento</h3>
+        <p class="desc">Ancorado nos 3 pilares — Mercado, Cliente e Experiência.</p>
+        <div class="block-fields">
+          <div class="field"><label>Nome do produto / empreendimento</label><input id="nomeProduto" placeholder="Ex: Reserva Parque Sul"></div>
+          <div class="field"><label>Conceito central</label><div class="hint">Em 1–2 frases: o que este empreendimento é e por que existe para este público, neste momento de mercado.</div><textarea id="conceito" placeholder="Ex: Studios compactos de alto padrão para investidores focados em renda de locação por temporada..."></textarea></div>
+        </div>
+      </div>
+      <div class="block">
+        <h3>Ficha do produto imobiliário</h3>
+        <div class="grid-3">
+          <div class="field"><label>Tipo</label>
+            <select id="tipoProduto"><option value="">Selecione...</option><option>Residencial vertical</option><option>Residencial horizontal / casas</option><option>Comercial / salas</option><option>Uso misto</option><option>Loteamento</option><option>Studios / compactos</option></select>
+          </div>
+          <div class="field"><label>Torres / unidades</label><input id="totalUnidades" placeholder="Ex: 2 torres · 180 un."></div>
+          <div class="field"><label>Metragem média (m²)</label><input id="metragem" type="number" placeholder="Ex: 62"></div>
+        </div>
+        <div class="grid-2" style="margin-top:16px">
+          <div class="field"><label>Área de lazer</label><textarea id="areaLazer" placeholder="Piscina, academia, coworking, pet place, rooftop..."></textarea></div>
+          <div class="field"><label>Serviços e facilidades</label><textarea id="servicosFacilidades" placeholder="Portaria 24h, lavanderia, delivery locker, gestão de locação..."></textarea></div>
+        </div>
+      </div>
+      <div class="block">
+        <h3>Inteligência de mercado</h3>
+        <div class="grid-3">
+          <div class="field"><label>Praça / região</label><input id="praca" placeholder="Ex: Águas Claras · DF"></div>
+          <div class="field"><label>Estágio comercial</label>
+            <select id="estagio"><option value="">Selecione...</option><option>Estudo / concepção</option><option>Breve lançamento</option><option>Lançamento</option><option>Em obras / remanescente</option></select>
+          </div>
+          <div class="field"><label>Ticket médio da praça (R$)</label><input id="ticket" placeholder="Ex: 480.000"></div>
+        </div>
+        <div class="grid-3" style="margin-top:16px">
+          <div class="field"><label>VGV alvo (R$)</label><div class="hint">Valor Geral de Vendas.</div><input id="vgv" placeholder="Ex: 86.000.000"></div>
+          <div class="field"><label>Meta de VSO</label><div class="hint">Vendas sobre Oferta no período.</div><input id="vso" placeholder="Ex: 35% em 6 meses"></div>
+          <div class="field"><label>Concorrentes diretos</label><input id="concorrentes" placeholder="Ex: 3 lançamentos na mesma faixa"></div>
+        </div>
+      </div>
+      <div class="nav">
+        <button class="nav-btn ghost" onclick="previousPage()">← Voltar</button>
+        <button class="nav-btn" onclick="validateContext()">Continuar →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PÁGINA 3 · METODOLOGIA -->
+  <div class="page" id="page3">
+    <div class="card method">
+      <h2 class="section-title">Como funciona a metodologia TESTE</h2>
+      <p class="section-sub">Cinco etapas que conectam inteligência de mercado, comportamento do consumidor e experimentação.</p>
+      <div class="letter-row">
+        <div class="lcard lc-t"><span class="big">T</span><small>TARGET</small></div>
+        <div class="lcard lc-e1"><span class="big">E</span><small>EXPLORAR</small></div>
+        <div class="lcard lc-s"><span class="big">S</span><small>SOLUÇÕES</small></div>
+        <div class="lcard lc-t2"><span class="big">T</span><small>TESTAR</small></div>
+        <div class="lcard lc-e2"><span class="big">E</span><small>ESCALAR</small></div>
+      </div>
+      <div class="explain">
+        <div class="exp"><h4>T — Target</h4><p>Defina o público e o comportamento a influenciar. Use o gerador de perfil psicográfico para ir além da demografia.</p></div>
+        <div class="exp"><h4>E — Explorar</h4><p>Mapeie barreiras, dados e a jornada. Onde a experiência tem mais impacto — stand, decorado, tour, portal?</p></div>
+        <div class="core">"Eu quero uma nova experiência com a sua marca."</div>
+        <div class="exp"><h4>S — Soluções</h4><p>Gatilhos, vieses e ativos de experiência que promovem a mudança de comportamento.</p></div>
+        <div class="exp"><h4>T — Testar</h4><p>Monte a hipótese, escolha o método (inclusive do Lab Consumer) e defina o critério de decisão.</p></div>
+        <div class="exp"><h4>E — Escalar</h4><p>Amplie o que funciona com sustentação de longo prazo e gestão de risco.</p></div>
+      </div>
+      <div class="nav">
+        <button class="nav-btn ghost" onclick="previousPage()">← Voltar</button>
+        <button class="nav-btn" onclick="nextPage()">Iniciar o TESTE →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PÁGINA 4 · ETAPAS -->
+  <div class="page" id="page4">
+    <div class="card">
+      <div class="progress"><i id="progressFill"></i></div>
+      <div class="steps" id="stepsTabs"></div>
+      <div id="stepsHost"></div>
+      <div class="nav">
+        <button class="nav-btn ghost" id="prevStepBtn" onclick="previousStep()" disabled>← Anterior</button>
+        <button class="nav-btn" id="nextStepBtn" onclick="nextStep()">Próxima →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PÁGINA 5 · DIAGNÓSTICO + PROPOSTA -->
+  <div class="page" id="page5">
+    <div class="card">
+      <div class="diag-head"><h2>Diagnóstico e proposta</h2><p class="section-sub">Síntese das escolhas na metodologia TESTE.</p></div>
+      <div class="scorebox">
+        <div class="big" id="overallScore">0</div><div class="lbl">Índice de robustez estratégica</div><div class="tier" id="scoreTier"></div>
+      </div>
+      <p class="diag-note">Índice gerado por <strong>rubrica automática</strong> (amplitude das escolhas, uso de dados e profundidade das justificativas). Apoio de revisão — não substitui a avaliação do(a) professor(a).</p>
+      <div class="proposal" id="proposalBox"></div>
+      <div id="evaluationSections"></div>
+      <div class="export">
+        <h3 style="margin-bottom:6px">Exportar relatório</h3>
+        <p class="section-sub" style="margin-bottom:14px">Projeto completo com perfil, escolhas, proposta e diagnóstico.</p>
+        <button class="export-btn" onclick="exportToPDF()">Baixar PDF</button>
+        <button class="restart" onclick="restartGame()">Recomeçar</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- CENTRAL DE CONSULTA -->
+<button class="consult-fab hidden" id="consultFab" onclick="openDrawer('insights')">📚 Consultar</button>
+<div class="overlay" id="overlay" onclick="closeDrawer()"></div>
+<aside class="drawer" id="drawer">
+  <div class="drawer-head"><h3>Central de consulta</h3><button class="drawer-close" onclick="closeDrawer()">✕</button></div>
+  <div class="drawer-tabs">
+    <button class="dtab active" data-dt="instr" onclick="switchDrawerTab('instr')">Instruções</button><button class="dtab" data-dt="insights" onclick="switchDrawerTab('insights')">Insights</button>
+    <button class="dtab" data-dt="cases" onclick="switchDrawerTab('cases')">Cases de mercado</button><button class="dtab" data-dt="brief" onclick="switchDrawerTab('brief')">Briefing</button>
+  </div>
+  <div class="drawer-body" id="drawerBody"></div>
+</aside>
+
+<script>
+/* ============================ CONFIG ============================ */
+const CONFIG={useSupabase:false,supabaseUrl:'',supabaseAnonKey:'',aiEvalEndpoint:'',pisoEtapa:60,pisoGeral:60,aiModelDefault:'claude-3-5-sonnet-latest'};
+/* SQL: create table respostas_teste(id uuid primary key default gen_random_uuid(),
+   turma text, aluno_id text, aluno_nome text, etapa int default 0, completo boolean default false,
+   score int default 0, dados jsonb default '{}', atualizado_em timestamptz default now(),
+   unique(turma,aluno_id)); */
+
+/* ============================ ETAPAS ============================ */
+const STEPS=[
+{
+  id:'target',letter:'T',name:'TARGET',color:'st-0',psycho:true,
+  title:'T — Target · Definir público-alvo e comportamento',
+  goal:'Gere o perfil psicográfico do público e selecione o comportamento de compra a influenciar.',
+  framework:{label:'Frameworks de apoio · Segmentação, Persona e Jobs To Be Done',
+    html:`<ul><li><b>Psicográfico:</b> valores, estilo de vida, aversão a risco, momento de vida — não só idade/renda.</li>
+    <li><b>PF x Investidor:</b> morador decide por uso e emoção; investidor por rentabilidade, liquidez e valorização.</li>
+    <li><b>Jobs To Be Done:</b> que "trabalho" o cliente contrata o imóvel para fazer — funcional, emocional e social.</li></ul>`},
+  questions:[
+    {id:'target_q1',type:'chips',label:'1. Segmento-alvo (primário e secundário)',hint:'Segmentos que o produto atende.',
+      options:['Investidor PF · renda de locação','Investidor · valorização/revenda','Primeira moradia','Upgrade de padrão','Downsize / praticidade','Moradia para filhos / estudantes','Locação por temporada (short stay)','Comprador corporativo']},
+    {id:'target_q2',type:'chips',label:'2. Momento de vida da persona',hint:'Fase de vida predominante.',
+      options:['Jovem solteiro(a)','Casal sem filhos (DINK)','Família com filhos pequenos','Família com filhos adolescentes','Ninho vazio / maduro','Aposentado(a) ativo(a)','Investidor experiente']},
+    {id:'target_q3',type:'select',label:'3. Faixa de renda predominante',hint:'Renda familiar do público-alvo.',
+      options:['Até R$ 5 mil','R$ 5–10 mil','R$ 10–20 mil','R$ 20–40 mil','Acima de R$ 40 mil','Perfil investidor (não se aplica)']},
+    {id:'target_q4',type:'chips',label:'4. Job To Be Done — o que o imóvel resolve',hint:'Funcional, emocional e social.',
+      options:['Funcional: mais espaço/cômodos','Funcional: localização/deslocamento','Funcional: renda de aluguel','Funcional: diversificar patrimônio','Emocional: segurança/estabilidade','Emocional: realização/orgulho','Emocional: tranquilidade','Social: status/reconhecimento','Social: pertencimento/comunidade']},
+    {id:'target_q5',type:'chips',label:'5. Principal dor / barreira de compra',hint:'O que dispara ou trava a decisão.',
+      options:['Preço/parcela alta','Medo do financiamento','Desconfiança na incorporadora','Comprar na planta (entrega futura)','Localização/insegurança','Timing de vida','Concorrência mais barata','Falta de urgência']},
+    {id:'target_q6',type:'chips',label:'6. Indicadores de sucesso',hint:'Como você vai medir.',
+      options:['VSO (velocidade de vendas)','Ticket médio realizado','Conversão visita→venda','ROAS de mídia','Custo por lead (CPL)','NPS de visita','Tempo médio de decisão','Retorno ao stand']}
+  ]
+},
+{
+  id:'explorar',letter:'E',name:'EXPLORAR',color:'st-1',
+  title:'E — Explorar · Barreiras, dados e jornada',
+  goal:'Selecione o que já sabemos, o que precisamos buscar e onde a experiência tem mais impacto.',
+  framework:{label:'Frameworks de apoio · Jornada de decisão e fontes de dados',
+    html:`<ul><li><b>Jornada:</b> descoberta → consideração → visita → negociação → fechamento → pós-venda.</li>
+    <li><b>Fontes:</b> CRM, portais, pesquisa primária e o Lab Consumer (eye-tracking, biometria, emoção).</li>
+    <li><b>Ambiente:</b> stand, decorado, tour 360°, landing e redes influenciam atenção e emoção de formas diferentes.</li></ul>`},
+  questions:[
+    {id:'explorar_q1',type:'chips',label:'1. Barreiras à conversão',hint:'O que impede a decisão de compra.',
+      options:['Aprovação de crédito','Concorrência na praça','Confiança/reputação','Insegurança sobre a entrega','Preço acima do teto psicológico','Falta de urgência','Burocracia/documentação']},
+    {id:'explorar_q2',type:'chips',label:'2. Dados que já temos',hint:'Fontes internas disponíveis.',
+      options:['CRM / histórico de vendas','Pesquisa de mercado anterior','Dados de portais (ZAP/VivaReal)','Perfil de leads da mídia','Lab Consumer (eye-tracking/biometria)','Feedback de corretores']},
+    {id:'explorar_q3',type:'chips',label:'3. Dados a buscar',hint:'O que ainda falta descobrir.',
+      options:['Precificação da concorrência','Absorção da praça','Teste de atenção em materiais','Pesquisa de intenção de compra','Análise de fluxo do stand','Benchmark de condições de pagamento']},
+    {id:'explorar_q4',type:'chips',label:'4. Ambiente de maior impacto',hint:'Onde influenciar atenção e emoção.',
+      options:['Stand de vendas','Apartamento decorado','Tour virtual 360°','Landing page','Redes / tráfego pago','Corretor / atendimento','Portais imobiliários']},
+    {id:'explorar_q5',type:'chips',label:'5. Momentos da verdade na jornada',hint:'Pontos críticos que decidem o cliente.',
+      options:['Primeiro contato / lead','Visita ao stand','Experiência no decorado','Proposta / negociação','Aprovação de crédito','Assinatura','Pós-venda / entrega']}
+  ]
+},
+{
+  id:'solucoes',letter:'S',name:'SOLUÇÕES',color:'st-2',
+  title:'S — Soluções · Estratégia e neuromarketing',
+  goal:'Selecione os gatilhos, a diferenciação e os ativos de experiência que movem a decisão.',
+  framework:{label:'Frameworks de apoio · Gatilhos, vieses e proposta de valor',
+    html:`<ul><li><b>Gatilhos (Cialdini):</b> escassez, prova social, autoridade, reciprocidade, coerência, afinidade.</li>
+    <li><b>Vieses:</b> ancoragem de preço, aversão à perda, enquadramento, prova social de vendas.</li>
+    <li><b>Proposta de valor:</b> por que este produto e não o concorrente na mesma faixa? Atributo → benefício percebido.</li></ul>`},
+  questions:[
+    {id:'solucoes_q1',type:'chips',label:'1. Gatilhos e vieses aplicáveis',hint:'Comportamentais, usados de forma ética.',
+      options:['Escassez (unidades limitadas)','Prova social (% vendido)','Ancoragem de preço','Autoridade (marca/prêmios)','Aversão à perda (condição por tempo)','Reciprocidade (benefício/brinde)','Compromisso/coerência','Afinidade/identificação']},
+    {id:'solucoes_q2',type:'chips',label:'2. Diferenciação / posicionamento',hint:'Onde este produto ganha do concorrente.',
+      options:['Localização','Preço / condição','Plantas / metragem','Área de lazer / serviços','Marca / reputação','Sustentabilidade / eficiência','Tecnologia / smart home','Gestão de locação / renda']},
+    {id:'solucoes_q3',type:'chips',label:'3. Ativos de experiência e comunicação',hint:'Como ativar emoção e projeção de uso.',
+      options:['Decorado imersivo','Tour virtual','Storytelling do empreendimento','Vídeo / aftermovie','Evento de lançamento','Corretor consultivo','Maquete / materiais sensoriais','Realidade aumentada']},
+    {id:'solucoes_q4',type:'chips',label:'4. Resultados esperados',hint:'Metas que a solução deve gerar.',
+      options:['Aumentar VSO','Elevar conversão de visita','Reduzir CPL','Aumentar ticket médio','Melhorar NPS de visita','Reduzir tempo de decisão']}
+  ]
+},
+{
+  id:'testar',letter:'T',name:'TESTAR',color:'st-3',
+  title:'T — Testar · Delinear o experimento',
+  goal:'Monte a hipótese, escolha o método (inclusive do Lab Consumer) e defina o critério de decisão.',
+  framework:{label:'Frameworks de apoio · Experimentação e neurociência do consumidor',
+    html:`<ul><li><b>Hipótese:</b> "SE [mudança], ENTÃO [efeito], PORQUE [mecanismo comportamental]".</li>
+    <li><b>Métodos do Lab Consumer:</b> eye-tracking (atenção visual), biometria/GSR (ativação emocional), codificação facial (valência da emoção), EEG/fNIRS (engajamento), entrevista, survey e análise conjunta (preço).</li>
+    <li><b>Critério de decisão:</b> defina antes o número que valida ou invalida — evita interpretar o resultado depois.</li></ul>`},
+  questions:[
+    {id:'testar_hyp_if',type:'text',label:'1. Hipótese · SE',hint:'A variável que vamos mudar/testar. Ex: "Se destacarmos a renda de locação projetada no material..."'},
+    {id:'testar_hyp_then',type:'text',label:'2. Hipótese · ENTÃO',hint:'O efeito esperado no comportamento/métrica. Ex: "...então a conversão de investidores em visita aumenta."'},
+    {id:'testar_hyp_why',type:'text',label:'3. Hipótese · PORQUE',hint:'O mecanismo comportamental/viés que explica. Ex: "porque reduz a incerteza sobre retorno (aversão à perda)."'},
+    {id:'testar_q1',type:'chips',label:'4. Tipo de experimento',hint:'Como testar as hipóteses.',
+      options:['Teste A/B de comunicação','Teste de conceito','MVP de landing page','Variação de preço/condição','Teste de layout do decorado','Pesquisa com protótipo','Experimento no stand']},
+    {id:'testar_lab',type:'chips',label:'5. Métodos do Lab Consumer',hint:'Instrumentação de neuromarketing e pesquisa.',
+      options:['Eye-tracking (atenção)','Biometria / GSR (ativação)','Codificação facial (emoção)','EEG / fNIRS (engajamento)','Entrevista em profundidade','Survey estruturado','Teste de usabilidade','Análise conjunta (preço)']},
+    {id:'testar_q2',type:'select',label:'6. Amostra do teste',hint:'Quem participa.',
+      options:['Leads atuais da base','Visitantes do stand','Público frio (tráfego pago)','Corretores / parceiros','Painel de consumidores','Clientes de empreendimentos anteriores']},
+    {id:'testar_sample',type:'text',optional:true,label:'7. Tamanho e recrutamento da amostra',hint:'Opcional. Nº aproximado de participantes e como recrutar.'},
+    {id:'testar_q3',type:'chips',label:'8. Métricas do teste',hint:'O que medir para validar.',
+      options:['Taxa de conversão','Tempo no stand','Mapa de atenção (eye-tracking)','Resposta emocional / biometria','NPS de visita','CPL / CAC','Intenção de compra declarada']},
+    {id:'testar_q4',type:'text',label:'9. Critério de decisão',hint:'O número/limite que valida ou invalida. Ex: "conversão ≥ 8% valida a campanha A".'}
+  ]
+},
+{
+  id:'escala',letter:'E',name:'ESCALAR',color:'st-4',
+  title:'E — Escalar · Expandir e sustentar',
+  goal:'Selecione como ampliar o que funciona, com sustentação de longo prazo.',
+  framework:{label:'Frameworks de apoio · Rollout e sustentação',
+    html:`<ul><li><b>Priorização:</b> maior impacto e menor atrito primeiro.</li>
+    <li><b>Sustentação:</b> retenção, indicação, NPS pós-venda e reputação ao longo do ciclo.</li>
+    <li><b>Riscos:</b> o que pode impedir a escala e como mitigar.</li></ul>`},
+  questions:[
+    {id:'escala_q1',type:'chips',label:'1. Alavanca prioritária para escalar',hint:'Onde concentrar a ampliação.',
+      options:['Comunicação / campanha','Experiência do decorado / stand','Precificação / condições','Canal digital / tráfego','Atendimento / corretor','Gestão de locação']},
+    {id:'escala_q2',type:'chips',label:'2. Sustentação de longo prazo',hint:'Como manter o resultado.',
+      options:['Programa de indicação','NPS pós-venda ativo','CRM / relacionamento contínuo','Gestão de locação p/ investidores','Comunidade de moradores','Reforço de marca/reputação']},
+    {id:'escala_q3',type:'chips',label:'3. Riscos da escala',hint:'O que pode dar errado.',
+      options:['Concorrência reage','Custo de escala alto','Perda de exclusividade do gatilho','Cenário econômico / juros','Execução / entrega','Saturação do canal']},
+    {id:'escala_q4',type:'text',label:'4. Próximos passos',hint:'Plano de implementação com prazos e responsáveis.'}
+  ]
+}
+];
+const QMAP={};STEPS.forEach(s=>s.questions.forEach(q=>QMAP[q.id]=q));
+
+/* ============================ PERFIL PSICOGRÁFICO ============================ */
+const PSY_AXES=[
+  {id:'motivacao',name:'Motivação de compra',l:'Uso próprio',r:'Investimento/renda'},
+  {id:'horizonte',name:'Horizonte de decisão',l:'Segurança / longo prazo',r:'Oportunidade / curto prazo'},
+  {id:'status',name:'Sensibilidade a status',l:'Discrição / privacidade',r:'Reconhecimento / status'},
+  {id:'decisao',name:'Estilo de decisão',l:'Racional / analítico',r:'Emocional / intuitivo'},
+  {id:'risco',name:'Apetite a risco',l:'Conservador',r:'Arrojado'},
+  {id:'vinculo',name:'Vínculo social',l:'Autonomia / privacidade',r:'Comunidade / pertencimento'}
+];
+function psyRenderTool(){
+  const rows=PSY_AXES.map(a=>`<div><div class="axis-name">${a.name}</div>
+    <div class="axis"><span class="ax-l">${a.l}</span>
+    <input type="range" min="0" max="100" value="50" id="psico_${a.id}" oninput="onPsico()">
+    <span class="ax-r">${a.r}</span></div></div>`).join('');
+  return `<div class="psycho">
+    <h4>🧠 Gerador de perfil psicográfico</h4>
+    <p class="pdesc">Posicione o público nos eixos e gere um perfil com implicações táticas. Use os gatilhos e canais sugeridos para orientar suas escolhas abaixo.</p>
+    <div class="axes">${rows}</div>
+    <button class="nav-btn" type="button" onclick="generatePsico()">Gerar perfil</button>
+    <div class="psico-out" id="psicoOut"></div>
+  </div>`;
+}
+function personaCard(){
+  const ages=['','18\u201324','25\u201334','35\u201344','45\u201354','55\u201364','65+'];
+  const opt=ages.map(a=>'<option value="'+a+'">'+(a||'\u2014')+'</option>').join('');
+  return `<div class="persona">
+    <h4>\ud83d\udc64 Persona detalhada</h4>
+    <p class="pdesc">Detalhe quem \u00e9 a pessoa por tr\u00e1s do p\u00fablico. Alimenta a proposta e a an\u00e1lise final.</p>
+    <div class="pgrid">
+      <div class="pf"><label>Faixa et\u00e1ria</label><select id="persona_idade" onchange="setPersona('persona_idade')">${opt}</select></div>
+      <div class="pf"><label>Ocupa\u00e7\u00e3o / profiss\u00e3o</label><input id="persona_ocupacao" oninput="setPersona('persona_ocupacao')" placeholder="Ex: servidor(a) p\u00fablico, aut\u00f4nomo(a)"></div>
+      <div class="pf"><label>Estilo de vida</label><input id="persona_estilo" oninput="setPersona('persona_estilo')" placeholder="Ex: rotina, hobbies, prioridades"></div>
+      <div class="pf"><label>Valores</label><input id="persona_valores" oninput="setPersona('persona_valores')" placeholder="Ex: seguran\u00e7a, status, sustentabilidade"></div>
+      <div class="pf full"><label>Canais que frequenta</label><input id="persona_canais" oninput="setPersona('persona_canais')" placeholder="Ex: Instagram, portais, corretor, indica\u00e7\u00e3o"></div>
+    </div>
+  </div>`;
+}
+function setPersona(id){const el=document.getElementById(id);if(el){gameData[id]=el.value;persistStudent();}}
+function onPsico(){gameData.psico=gameData.psico||{};PSY_AXES.forEach(a=>{const el=document.getElementById('psico_'+a.id);if(el)gameData.psico[a.id]=+el.value;});}
+function buildPsicoProfile(v){
+  const hi=x=>x>=60,lo=x=>x<=40;
+  const persona=v.motivacao>=55?'Investidor(a)':v.motivacao<=45?'Morador(a)':'Perfil híbrido (uso + investimento)';
+  const estilo=lo(v.decisao)?'analítico':hi(v.decisao)?'emocional/relacional':'equilibrado';
+  const apet=lo(v.risco)?'conservador':hi(v.risco)?'arrojado':'moderado';
+  const title=persona+' '+estilo+', '+apet;
+  const d=[];
+  d.push(v.motivacao>=55?'Decide olhando rentabilidade, liquidez e valorização.':v.motivacao<=45?'Decide pensando em uso, rotina e qualidade de vida.':'Equilibra uso próprio e potencial de valorização.');
+  d.push(v.horizonte>=60?'Busca oportunidade e ganho de curto prazo.':v.horizonte<=40?'Prioriza segurança e horizonte longo.':'Pondera prazo e segurança.');
+  d.push(v.status>=60?'Valoriza reconhecimento, exclusividade e o que o imóvel comunica.':v.status<=40?'Prefere discrição e privacidade a ostentação.':'É sensível a status de forma moderada.');
+  d.push(v.decisao>=60?'É sensível a narrativa, experiência e emoção.':v.decisao<=40?'Pede dados, comparações e provas concretas.':'Combina razão e emoção na decisão.');
+  d.push(v.risco>=60?'Aceita apostar em lançamentos e teses novas.':v.risco<=40?'Evita incerteza; quer garantias e reputação.':'Tem apetite a risco moderado.');
+  d.push(v.vinculo>=60?'Valoriza convívio, áreas comuns e senso de comunidade.':v.vinculo<=40?'Valoriza autonomia e privacidade.':'Equilibra convívio e privacidade.');
+  const gat=[];
+  if(lo(v.decisao)){gat.push('Ancoragem por dados (R$/m², cap rate)');gat.push('Prova de rentabilidade / ROI');}
+  if(hi(v.decisao)){gat.push('Storytelling e experiência sensorial');gat.push('Prova social e depoimentos');}
+  if(hi(v.status)){gat.push('Exclusividade / escassez');gat.push('Autoridade (marca, arquiteto, prêmios)');}
+  if(lo(v.risco))gat.push('Garantias, reputação e histórico de entrega');
+  if(hi(v.risco))gat.push('Escassez de oportunidade / condição por tempo');
+  if(hi(v.vinculo))gat.push('Pertencimento e comunidade');
+  if(hi(v.motivacao))gat.push('Projeção de renda / valorização');
+  if(lo(v.motivacao))gat.push('Projeção de uso ("me vejo morando aqui")');
+  const can=[];
+  if(hi(v.motivacao)&&lo(v.decisao)){can.push('Corretor consultivo');can.push('LinkedIn / relatórios');can.push('Portais de investimento');}
+  if(lo(v.motivacao)&&hi(v.decisao)){can.push('Instagram / vídeo');can.push('Decorado imersivo');can.push('Tour virtual');}
+  can.push('Landing page');can.push('WhatsApp / corretor');
+  const exp=[];
+  if(hi(v.status))exp.push('Decorado sofisticado, atendimento premium');
+  if(hi(v.vinculo))exp.push('Destaque para áreas comuns e eventos');
+  if(lo(v.decisao))exp.push('Materiais com plantas, números e comparativos');
+  if(hi(v.decisao))exp.push('Ambientação emocional: luz, aroma, história do produto');
+  if(lo(v.risco))exp.push('Provas de solidez: obra, garantias, entregas anteriores');
+  const dedupe=a=>[...new Set(a)];
+  return {title,descricao:d.join(' '),gatilhos:dedupe(gat),canais:dedupe(can),experiencia:dedupe(exp)};
+}
+function generatePsico(silent){
+  onPsico();
+  const v=gameData.psico||{};PSY_AXES.forEach(a=>{if(v[a.id]===undefined)v[a.id]=50;});
+  const p=buildPsicoProfile(v);gameData.psicoProfile=p;gameData.psicoGenerated=true;
+  const tags=a=>a.map(x=>'<span class="pp-tag">'+x+'</span>').join('');
+  document.getElementById('psicoOut').innerHTML=
+    '<div class="pp-card"><div class="pp-title">'+p.title+'</div>'+
+    '<div class="pp-desc">'+p.descricao+'</div>'+
+    '<div class="pp-row"><b>Gatilhos recomendados</b><div class="pp-tags">'+tags(p.gatilhos)+'</div></div>'+
+    '<div class="pp-row"><b>Canais sugeridos</b><div class="pp-tags">'+tags(p.canais)+'</div></div>'+
+    '<div class="pp-row"><b>Experiência / stand</b><div class="pp-tags">'+tags(p.experiencia)+'</div></div></div>';
+  if(!silent)persistStudent();
+}
+
+/* ============================ BRIEFING (DF, ilustrativo) ============================ */
+const BRIEFINGS=[
+ {nome:'\u00c1guas Claras \u00b7 vertical compacto (investidor)',sub:'Pra\u00e7a adensada, forte cultura de investidor PF e loca\u00e7\u00e3o.',
+  dados:['Ticket m\u00e9dio da pra\u00e7a: R$ 420 mil','Absor\u00e7\u00e3o ~30% em 6 meses (lan\u00e7amentos compar\u00e1veis)','3 concorrentes diretos (R$ 390\u2013460 mil)','Leads: 55% investidores \u00b7 30% primeira moradia \u00b7 15% troca','CPL m\u00e9dio R$ 85 \u00b7 cap rate de loca\u00e7\u00e3o ~0,5%/m\u00eas','Pesquisa: 62% citam renda de aluguel; 48% temem vac\u00e2ncia']},
+ {nome:'Noroeste \u00b7 alto padr\u00e3o sustent\u00e1vel (fam\u00edlias)',sub:'Bairro planejado, apelo verde, p\u00fablico alta renda.',
+  dados:['Ticket m\u00e9dio: R$ 1,6 mi','Absor\u00e7\u00e3o ~18% em 6 meses','2 concorrentes (R$ 1,4\u20131,9 mi)','Leads: 70% fam\u00edlias upgrade \u00b7 20% investidor \u00b7 10% permuta','NPS de visita da concorr\u00eancia ~ +40','Pesquisa: 58% valorizam qualidade de vida p/ filhos; 35% status/localiza\u00e7\u00e3o']},
+ {nome:'Ceil\u00e2ndia/Samambaia \u00b7 econ\u00f4mico (primeira moradia)',sub:'Alto volume, forte peso do financiamento.',
+  dados:['Ticket m\u00e9dio: R$ 235 mil','Absor\u00e7\u00e3o ~45% em 6 meses (alta velocidade)','V\u00e1rios concorrentes (R$ 210\u2013260 mil)','Leads: 80% primeira moradia \u00b7 15% investidor \u00b7 5% troca','Barreira principal: cr\u00e9dito (40% dos leads pendentes) \u00b7 CPL R$ 45','Pesquisa: 74% decidem pela parcela; 51% inseguros com documenta\u00e7\u00e3o']}
+];
+/* ============================ INSTRUÇÕES ============================ */
+const INSTRUCOES_HTML=`
+<div class="instr">
+<h4>O que é a metodologia TESTE</h4>
+<p>Um framework de 5 etapas para transformar dados de mercado e comportamento do consumidor em uma estratégia defensável: <b>T</b>arget → <b>E</b>xplorar → <b>S</b>oluções → <b>T</b>estar → <b>E</b>scalar.</p>
+<h4>Como funciona cada escolha (importante!)</h4>
+<p>Cada opção que você seleciona vira uma <b>aposta fundamentada</b>. Para cada escolha, preencha:</p>
+<ul>
+<li><b>Evidência</b> — em que dado do briefing/mercado você se baseia. Ex.: "62% dos leads citam renda de aluguel".</li>
+<li><b>Impacto (1–5)</b> — o quanto isso pesa na decisão de compra.</li>
+<li><b>Confiança (1–5)</b> — o quão seguro você está dessa leitura.</li>
+</ul>
+<p>Escolha <b>sem evidência não pontua</b> e não deixa avançar. Toque no <b>?</b> ao lado de cada pergunta para a orientação específica.</p>
+<h4>O que fazer em cada etapa</h4>
+<ul>
+<li><b>Target</b> — defina o público, gere o perfil psicográfico e o job que o imóvel resolve.</li>
+<li><b>Explorar</b> — mapeie barreiras, dados disponíveis e a jornada de decisão.</li>
+<li><b>Soluções</b> — escolha gatilhos, diferenciação e ativos de experiência.</li>
+<li><b>Testar</b> — monte a hipótese (SE / ENTÃO / PORQUE), o método e o critério de decisão.</li>
+<li><b>Escalar</b> — como ampliar o que funciona, com sustentação e riscos.</li>
+</ul>
+<h4>Como você é avaliado</h4>
+<p>Uma rubrica transparente de 4 eixos: <b>Completude</b>, <b>Fundamentação</b> (citou dado?), <b>Calibração</b> (impacto×confiança coerentes) e <b>Coerência</b> (público → solução → teste conversam).</p>
+<div class="lgpd">Os dados de contato da equipe são usados apenas para a dinâmica da disciplina, conforme a LGPD.</div>
+</div>`;
+/* ============================ INSIGHTS ============================ */
+const INSIGHTS=[
+  {tag:'Gatilhos',title:'Princípios de influência (Cialdini)',body:`<ul>
+    <li><b>Reciprocidade</b> — oferecer valor antes (conteúdo, brinde, condição) cria senso de retribuição.</li>
+    <li><b>Compromisso e coerência</b> — pequenos "sins" (reserva, cadastro) sustentam a decisão maior.</li>
+    <li><b>Prova social</b> — "70% vendido" e depoimentos reduzem incerteza.</li>
+    <li><b>Autoridade</b> — marca, arquiteto assinado, prêmios e especialistas.</li>
+    <li><b>Afinidade</b> — identificação com a persona e o estilo de vida retratado.</li>
+    <li><b>Escassez</b> — unidades ou condição por tempo limitado ativam a aversão à perda.</li></ul>`},
+  {tag:'Vieses',title:'Vieses de decisão na compra de imóvel',body:`<ul>
+    <li><b>Ancoragem</b> — o primeiro preço/tabela vira referência; use "de/por" e comparativos de m².</li>
+    <li><b>Aversão à perda</b> — perder pesa mais que ganhar; enquadre a condição como algo a não perder.</li>
+    <li><b>Enquadramento</b> — "R$ X/dia" soa diferente de "R$ 30 mil/ano".</li>
+    <li><b>Status quo</b> — inércia trava a decisão; reduza fricção e passos.</li>
+    <li><b>Efeito manada</b> — fluxo no stand e "outros investidores já compraram".</li></ul>`},
+  {tag:'Jornada',title:'Jornada de decisão imobiliária',body:`<p>Descoberta → Consideração → Visita (stand/decorado) → Negociação → Fechamento → Pós-venda/entrega.
+  Em cada etapa há um <b>momento da verdade</b>: onde o cliente ganha confiança ou desiste. Mapeie fricções (crédito, dúvidas, timing) e ative gatilhos específicos por etapa.</p>`},
+  {tag:'Métricas',title:'Glossário de métricas do setor',body:`<ul>
+    <li><b>VGV</b> — Valor Geral de Vendas (potencial total do empreendimento).</li>
+    <li><b>VSO</b> — Vendas Sobre Oferta (velocidade de vendas no período).</li>
+    <li><b>Ticket médio</b> — valor médio por unidade vendida.</li>
+    <li><b>CPL / CAC</b> — custo por lead / custo de aquisição do cliente.</li>
+    <li><b>ROAS</b> — retorno sobre investimento em mídia.</li>
+    <li><b>NPS</b> — lealdade/recomendação (visita e pós-venda).</li>
+    <li><b>Cap rate</b> — taxa de retorno da locação sobre o valor do imóvel (investidor).</li></ul>`},
+  {tag:'Neuromarketing',title:'Métodos de pesquisa do consumidor',body:`<ul>
+    <li><b>Eye-tracking</b> — onde a atenção visual se fixa em plantas, anúncios e decorado.</li>
+    <li><b>Biometria / GSR</b> — nível de ativação emocional (condutância da pele).</li>
+    <li><b>Codificação facial</b> — valência da emoção (positiva/negativa) diante do estímulo.</li>
+    <li><b>EEG / fNIRS</b> — engajamento e carga cognitiva.</li>
+    <li><b>Autorrelato</b> — entrevista, survey e análise conjunta (trade-offs de preço/atributos).</li></ul>
+    <p style="margin-top:6px">Combine medida implícita (o que o corpo revela) com explícita (o que a pessoa diz).</p>`},
+  {tag:'Público',title:'Jobs To Be Done aplicado a imóvel',body:`<p>As pessoas "contratam" um imóvel para resolver um trabalho. Descreva-o em três dimensões:
+  <b>funcional</b> (mais espaço, renda, localização), <b>emocional</b> (segurança, orgulho, tranquilidade) e
+  <b>social</b> (status, pertencimento). A comunicação vence quando fala do job, não só do produto.</p>`},
+  {tag:'Público',title:'Segmentação psicográfica',body:`<p>Vai além de idade e renda: agrupa por <b>valores, estilo de vida, motivações e atitudes</b>.
+  Dois compradores de mesma renda podem ter jobs opostos (investidor arrojado x família conservadora).
+  Use o gerador de perfil da etapa Target para traduzir isso em gatilhos e canais.</p>`}
+];
+
+/* ============================ CASES ============================ */
+const CASES=[
+  {title:'Cidade Matarazzo (São Paulo)',
+   sub:'Reposicionamento de ultraluxo por patrimônio e narrativa',
+   body:`Megacomplexo de luxo na região central de São Paulo, próximo à Avenida Paulista, erguido no terreno do antigo Hospital e Maternidade Matarazzo. Idealizado por Alexandre Allard (Groupe Allard, que adquiriu a área em 2008), o projeto restaura edifícios históricos tombados e os converte em usos de altíssimo padrão — hotel Rosewood, torre "Mata Atlântica" assinada por Jean Nouvel e interiores de Philippe Starck.`,
+   strategy:['Transformar patrimônio histórico em ativo de marca (retrofit + narrativa de passado, presente e futuro)','Assinatura de arquiteto e designer renomados como prova de autoridade','Ancorar valor na experiência e no conceito de "sense of place", não só no m²','Natureza como diferencial escasso no centro da cidade','Exclusividade e escassez (poucas unidades com serviço de hotel)'],
+   learn:['Diferenciação por significado e narrativa, não por atributo físico','Gatilhos de autoridade, escassez e prova social de elite','Job emocional/social: pertencer a um lugar único, status','Posicionamento de topo da pirâmide'],
+   sources:[{name:'Wikipédia — Cidade Matarazzo',url:'https://pt.wikipedia.org/wiki/Cidade_Matarazzo'},{name:'Terra — Allard/Gafisa',url:'https://www.terra.com.br/economia/gafisa-traz-criador-do-cidade-matarazzo-para-o-allard-oscar-freire-predio-de-r-800-milhoes,2ad7a9b32de9a97a34183b8b9a9f22c6aavvydqp.html'}]},
+  {title:'Cyrela — arquitetura de marcas',
+   sub:'Segmentação por renda com marcas especialistas',
+   body:`A Cyrela cobre a "pirâmide" de renda com marcas distintas: Cyrela (alto padrão/luxo), Living (médio) e Vivaz (econômico, em parceria com o Minha Casa Minha Vida, criada em 2018). Cada marca tem produto, linguagem e canal de venda próprios. A companhia abriu capital em 2005 no Novo Mercado da B3.`,
+   strategy:['Uma marca especialista por segmento, em vez de esticar uma marca única','Produto, comunicação e canal ajustados ao comportamento de cada público','Segmentação como mitigação de risco ao longo do ciclo econômico','Parcerias/JVs para entrar no econômico com eficiência'],
+   learn:['Segmentação e posicionamento: por que separar marcas em vez de diluir','O comportamento de compra muda por faixa (aspiração x acesso x investimento)','Consistência de identidade dentro de cada segmento'],
+   sources:[{name:'Forbes — estratégia Cyrela',url:'https://forbes.com.br/forbes-money/forbes-real-estate/2026/02/cyrela-imoveis-alto-padrao-estrategia-60-dias/'},{name:'InvestNews — marcas e segmentos',url:'https://investnews.com.br/colunistas/por-dentro-do-negocio/cyrela-o-que-monitorar-para-investir-no-setor-de-construcao-e-incorporacao/amp/'}]}
+];
+
+/* ============================ ESTADO ============================ */
+let DATABASE={classes:{'DEMO2025':{name:'Turma Demo 2025',teacher:'Coordenação',teams:{}}}};
+let currentUser=null,currentClass=null,currentTeamId=null,currentTeamName=null,currentPage=0,currentStep=0,gameData={},supa=null,currentClassPass=null,currentProfPass=null;
+
+/* ============================ PERSISTÊNCIA ============================ */
+function initSupabase(){if(CONFIG.useSupabase&&window.supabase&&CONFIG.supabaseUrl&&CONFIG.supabaseAnonKey){
+  try{supa=window.supabase.createClient(CONFIG.supabaseUrl,CONFIG.supabaseAnonKey);return true;}catch(e){console.warn(e);}}return false;}
+function teamKey(cc,id){return 'teamData_'+cc+'_'+id;}
+function loadTeamRecord(cc,id){try{const v=localStorage.getItem(teamKey(cc,id));return v?JSON.parse(v):null;}catch(e){return null;}}
+function saveTeamRecord(team){if(team&&currentClass)localStorage.setItem(teamKey(currentClass,team.id),JSON.stringify(team));}
+function getTeam(){if(!currentClass||!currentTeamId)return null;
+  const mem=DATABASE.classes[currentClass]&&DATABASE.classes[currentClass].teams&&DATABASE.classes[currentClass].teams[currentTeamId];
+  return mem||loadTeamRecord(currentClass,currentTeamId);}
+async function persistStudent(){
+  if(!currentUser||currentUser.type!=='student')return;
+  let team=getTeam();if(!team)return;
+  team.data=gameData;team.score=gameData.finalScore||team.score||0;team.completed=!!gameData.completed;team.currentStep=currentStep;team.lastActive=new Date().toISOString();
+  DATABASE.classes[currentClass]=DATABASE.classes[currentClass]||{name:'Turma '+currentClass,teams:{}};
+  DATABASE.classes[currentClass].teams=DATABASE.classes[currentClass].teams||{};
+  DATABASE.classes[currentClass].teams[currentTeamId]=team;
+  saveTeamRecord(team);
+  if(supa){try{await supa.rpc('salvar_equipe',{p_codigo:currentClass,p_senha_aluno:currentClassPass,p_equipe_id:currentTeamId,p_etapa:currentStep,p_completo:!!gameData.completed,p_score:team.score,p_dados:gameData});}catch(e){console.warn('salvar_equipe',e);}}
+}
+async function fetchClassStudents(cc){
+  if(supa){try{const {data,error}=await supa.rpc('listar_equipes_prof',{p_codigo:cc,p_senha_prof:currentProfPass});
+    if(error)throw error;const out={};(data||[]).forEach(r=>out[r.equipe_id]={name:r.equipe_nome,id:r.equipe_id,members:r.membros||[],currentStep:r.etapa||0,completed:!!r.completo,score:r.score||0,data:r.dados||{},lastActive:r.atualizado_em});return out;}catch(e){console.warn('listar_equipes_prof',e);return {};}}
+  const out={};const pref='teamData_'+cc+'_';
+  for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.indexOf(pref)===0){try{const t=JSON.parse(localStorage.getItem(k));if(t&&t.id)out[t.id]=t;}catch(e){}}}
+  const mem=(DATABASE.classes[cc]&&DATABASE.classes[cc].teams)||{};Object.keys(mem).forEach(id=>{out[id]=mem[id];});
+  return out;
+}
+
+/* ============================ INIT ============================ */
+document.addEventListener('DOMContentLoaded',()=>{
+  buildStepsUI();initSupabase();
+  const saved=localStorage.getItem('testeUser');
+  if(saved){currentUser=JSON.parse(saved);currentClass=currentUser.classCode;
+    if(currentUser.type==='student'){currentTeamId=currentUser.teamId;currentTeamName=currentUser.teamName;currentClassPass=currentUser.pass||null;
+      const t=loadTeamRecord(currentClass,currentTeamId);
+      if(t){DATABASE.classes[currentClass]=DATABASE.classes[currentClass]||{name:'Turma '+currentClass,teams:{}};DATABASE.classes[currentClass].teams=DATABASE.classes[currentClass].teams||{};DATABASE.classes[currentClass].teams[currentTeamId]=t;}
+      startGame();}
+    else{currentProfPass=currentUser.profPass||null;showDashboard();}}
+  setInterval(()=>{if(currentUser&&currentUser.type==='student')autoSave();},12000);
+});
+
+/* ============================ LOGIN ============================ */
+function switchTab(t){document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x.dataset.tab===t));
+  document.getElementById('studentForm').classList.toggle('active',t==='student');
+  document.getElementById('teacherForm').classList.toggle('active',t==='teacher');}
+function quickTeacherLogin(n,c){document.getElementById('teacherName').value=n;document.getElementById('teacherClassCode').value=c;const tp=document.getElementById('teacherPass');if(tp)tp.value='demo';loginTeacher();}
+function quickJoin(team,name,email){document.getElementById('classCode').value='DEMO2025';document.getElementById('teamName').value=team;
+  document.getElementById('memberName').value=name;document.getElementById('memberPhone').value='(61) 90000-0000';
+  document.getElementById('memberEmail').value=email;document.getElementById('consent').checked=true;const cp=document.getElementById('classPass');if(cp)cp.value='demo';loginStudent();}
+async function loginStudent(){
+  const V=id=>(document.getElementById(id).value||'').trim();
+  const cc=V('classCode').toUpperCase();const teamName=V('teamName');
+  const mName=V('memberName'),mPhone=V('memberPhone'),mEmail=V('memberEmail');
+  const pass=(document.getElementById('classPass')?V('classPass'):'');
+  const consent=document.getElementById('consent').checked;
+  if(!cc||!teamName)return alert('Preencha o código da turma e o nome da equipe.');
+  if(mName.length<2)return alert('Digite seu nome completo.');
+  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(mEmail))return alert('Digite um e-mail válido.');
+  if(!mPhone)return alert('Digite seu telefone.');
+  if(!consent)return alert('É necessário autorizar o uso dos dados (LGPD) para participar.');
+  if(supa&&!pass)return alert('Digite a senha da turma.');
+  const teamIdS=norm(teamName).replace(/\s+/g,'_');
+  const memberS={nome:mName,tel:mPhone,email:mEmail};
+  if(supa){
+    try{
+      const {data,error}=await supa.rpc('entrar_equipe',{p_codigo:cc,p_senha_aluno:pass,p_equipe_id:teamIdS,p_equipe_nome:teamName,p_membro:memberS});
+      if(error)throw error;
+      const row=Array.isArray(data)?data[0]:data;
+      currentClass=cc;currentTeamId=teamIdS;currentTeamName=(row&&row.equipe_nome)||teamName;currentClassPass=pass;
+      const team={id:teamIdS,name:currentTeamName,members:(row&&row.membros)||[memberS],data:(row&&row.dados)||{},completed:!!(row&&row.completo),score:(row&&row.score)||0,currentStep:(row&&row.etapa)||0,lastActive:(row&&row.atualizado_em)||new Date().toISOString()};
+      DATABASE.classes[cc]={name:'Turma '+cc,teams:{}};DATABASE.classes[cc].teams[teamIdS]=team;
+      currentUser={type:'student',name:mName,email:mEmail,teamId:teamIdS,teamName:currentTeamName,classCode:cc,pass:pass};
+      localStorage.setItem('testeUser',JSON.stringify(currentUser));
+      startGame();return;
+    }catch(e){const m=(e&&e.message)||String(e);return alert(/SENHA/i.test(m)?'Senha da turma inválida.':'Não foi possível entrar: '+m);}
+  }
+  if(!DATABASE.classes[cc])DATABASE.classes[cc]={name:'Turma '+cc,teacher:'Professor(a)',teams:{}};
+  DATABASE.classes[cc].teams=DATABASE.classes[cc].teams||{};
+  const teamId=norm(teamName).replace(/\s+/g,'_');
+  currentClass=cc;currentTeamId=teamId;
+  let team=DATABASE.classes[cc].teams[teamId]||loadTeamRecord(cc,teamId)||{id:teamId,name:teamName,members:[],data:{},completed:false,score:0,currentStep:0,lastActive:new Date().toISOString()};
+  team.members=team.members||[];
+  const ix=team.members.findIndex(m=>norm(m.email)===norm(mEmail));
+  const member={nome:mName,tel:mPhone,email:mEmail};
+  if(ix>=0)team.members[ix]=member;else team.members.push(member);
+  team.lastActive=new Date().toISOString();
+  DATABASE.classes[cc].teams[teamId]=team;
+  currentTeamName=team.name;
+  currentUser={type:'student',name:mName,email:mEmail,teamId,teamName:team.name,classCode:cc};
+  localStorage.setItem('testeUser',JSON.stringify(currentUser));
+  saveTeamRecord(team);startGame();
+}
+async function loginTeacher(){
+  const name=document.getElementById('teacherName').value.trim();
+  let cc=document.getElementById('teacherClassCode').value.trim().toUpperCase();
+  const pProf=(document.getElementById('teacherPass')?document.getElementById('teacherPass').value.trim():'');
+  const pAluno=(document.getElementById('teacherPassAluno')?document.getElementById('teacherPassAluno').value.trim():'');
+  if(!name)return alert('Digite seu nome.');
+  if(supa){
+    try{
+      if(!cc){
+        if(!pProf||!pAluno)return alert('Para criar a turma, defina a senha do professor e a senha dos alunos.');
+        cc='MBA'+Date.now().toString().slice(-4);
+        await supa.rpc('criar_turma',{p_codigo:cc,p_nome:'Turma '+cc,p_senha_aluno:pAluno,p_senha_prof:pProf});
+        alert('Turma criada!\nCódigo: '+cc+'\nSenha dos alunos: '+pAluno+'\n(Anote e compartilhe com a turma.)');
+      }else{
+        if(!pProf)return alert('Digite a senha do professor.');
+        try{await supa.rpc('entrar_professor',{p_codigo:cc,p_senha_prof:pProf});}
+        catch(err){const em=(err&&err.message)||'';
+          if(pAluno&&!/SENHA/i.test(em)){await supa.rpc('criar_turma',{p_codigo:cc,p_nome:'Turma '+cc,p_senha_aluno:pAluno,p_senha_prof:pProf});alert('Turma '+cc+' criada.');}
+          else throw err;}
+      }
+      currentProfPass=pProf;currentClass=cc;
+      currentUser={type:'teacher',name,classCode:cc,profPass:pProf};
+      localStorage.setItem('testeUser',JSON.stringify(currentUser));showDashboard();return;
+    }catch(e){const m=(e&&e.message)||String(e);
+      return alert(/SENHA/i.test(m)?'Senha do professor inválida.':(/EXISTE/i.test(m)?'Esse código já existe — informe a senha do professor para entrar.':'Erro: '+m));}
+  }
+  if(!cc){cc='MBA'+Date.now().toString().slice(-4);DATABASE.classes[cc]={name:'Turma '+cc,teacher:name,teams:{}};alert('Nova turma criada. Código: '+cc);}
+  else if(!DATABASE.classes[cc])DATABASE.classes[cc]={name:'Turma '+cc,teacher:name,teams:{}};
+  currentUser={type:'teacher',name,classCode:cc};currentClass=cc;
+  localStorage.setItem('testeUser',JSON.stringify(currentUser));showDashboard();
+}
+function logout(){
+  localStorage.removeItem('testeUser');closeDrawer();
+  currentUser=currentClass=currentTeamId=currentTeamName=currentClassPass=currentProfPass=null;currentPage=currentStep=0;gameData={};
+  if(showDashboard._t){clearInterval(showDashboard._t);showDashboard._t=null;}
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('topbar').classList.add('hidden');
+  document.getElementById('consultFab').classList.add('hidden');
+  document.getElementById('loginSection').classList.remove('hidden');
+  document.querySelectorAll('input,textarea,select').forEach(i=>{if(i.type==='range')i.value=50;else i.value='';});
+  syncUIFromData();
+}
+
+/* ============================ GAME ============================ */
+function startGame(){
+  document.getElementById('loginSection').classList.add('hidden');
+  document.getElementById('dashboard').classList.remove('active');
+  document.getElementById('topbar').classList.remove('hidden');
+  document.getElementById('consultFab').classList.remove('hidden');
+  document.getElementById('userDisplay').textContent=(currentTeamName||'—')+' · '+currentUser.name;
+  loadGameData();showPage(currentPage||0);
+}
+function showPage(n){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page'+(n+1)).classList.add('active');
+  currentPage=n;window.scrollTo({top:0,behavior:'smooth'});
+  if(currentUser&&currentUser.type==='student'){gameData.currentPage=n;persistStudent();}
+}
+function nextPage(){if(currentPage<4)showPage(currentPage+1);}
+function previousPage(){if(currentPage>0)showPage(currentPage-1);}
+function validateContext(){
+  const nome=document.getElementById('nomeProduto').value.trim();
+  const con=document.getElementById('conceito').value.trim();
+  if(!nome||!con)return alert('Preencha ao menos o nome do produto e o conceito central.');
+  if(looksInvalid(nome)||looksInvalid(con)){if(!confirm('O nome do produto ou o conceito parecem incompletos (ex.: "dd", "xxx"). Deseja continuar mesmo assim?'))return;}
+  collectFields();showPage(2);
+}
+
+/* ---- Render das etapas ---- */
+function buildStepsUI(){
+  const tabs=document.getElementById('stepsTabs'),host=document.getElementById('stepsHost');
+  tabs.innerHTML='';host.innerHTML='';
+  STEPS.forEach((s,i)=>{
+    const tab=document.createElement('button');
+    tab.className='step-tab '+s.color+(i===0?' active':'');
+    tab.innerHTML='<span class="l">'+s.letter+'</span><span class="n">'+s.name+'</span>';
+    tab.onclick=()=>goToStep(i);tabs.appendChild(tab);
+
+    const body=document.createElement('div');
+    body.className='step-body'+(i===0?' active':'');body.id='stepBody'+i;
+    const h=document.createElement('h3');h.textContent=s.title;body.appendChild(h);
+    const g=document.createElement('div');g.className='goal';g.textContent=s.goal;body.appendChild(g);
+    const fw=document.createElement('details');fw.className='framework';
+    fw.innerHTML='<summary>'+s.framework.label+'</summary><div class="fw-inner">'+s.framework.html+'</div>';
+    body.appendChild(fw);const note=document.createElement('div');note.className='banner';note.style.background='#eef2fb';note.style.borderColor='#cfe0f5';note.style.color='#264f78';note.innerHTML='<span>\ud83c\udfaf</span><div>Cada escolha vira uma <b>aposta fundamentada</b>: selecione e preencha <b>Evid\u00eancia</b> (dado do briefing/mercado), <b>Impacto</b> e <b>Confian\u00e7a</b>. Escolha sem evid\u00eancia n\u00e3o pontua.</div>';body.appendChild(note);const sq=document.createElement('div');sq.className='stepq';sq.id='sq_'+s.id;body.appendChild(sq);if(s.id==='testar'){const cb=document.createElement('div');cb.className='cohbox';cb.id='coh_testar';body.appendChild(cb);}
+    if(s.psycho){const holder=document.createElement('div');holder.innerHTML=psyRenderTool();body.appendChild(holder.firstElementChild);const ph=document.createElement('div');ph.innerHTML=personaCard();body.appendChild(ph.firstElementChild);}
+
+    s.questions.forEach(q=>{
+      const qd=document.createElement('div');qd.className='q';qd.id='q_'+q.id;
+      const head=document.createElement('div');head.className='qhead';
+      head.innerHTML='<label>'+q.label+(q.optional?'<span class="opt">(opcional)</span>':'')+'</label><div class="qright"><button type="button" class="qhelp" title="Como responder" onclick="showHelp(\''+q.id+'\')">?</button><span class="count" id="count_'+q.id+'"></span></div>';
+      qd.appendChild(head);
+      const hint=document.createElement('div');hint.className='hint';hint.textContent=q.hint||'';qd.appendChild(hint);
+      if(q.type==='chips'){
+        const chips=document.createElement('div');chips.className='chips';chips.id='chips_'+q.id;qd.appendChild(chips);const betsC=document.createElement('div');betsC.className='bets';betsC.id='bets_'+q.id;qd.appendChild(betsC);
+        const other=document.createElement('div');other.className='other-add';
+        other.innerHTML='<input id="other_'+q.id+'" placeholder="Outro (adicionar)..."><button type="button">+ Adicionar</button>';
+        other.querySelector('button').onclick=()=>addOther(q.id);
+        other.querySelector('input').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();addOther(q.id);}});
+        qd.appendChild(other);
+      }else if(q.type==='select'){
+        const sel=document.createElement('select');sel.className='q-select';sel.id=q.id;
+        sel.innerHTML='<option value="">Selecione...</option>'+q.options.map(o=>'<option>'+o+'</option>').join('');
+        sel.onchange=()=>{gameData[q.id]=sel.value;updateQCount(q);toggleFilled(q);persistStudent();afterFieldInput(q.id);};
+        qd.appendChild(sel);
+      }else{
+        const ta=document.createElement('textarea');ta.className='q-text';ta.id=q.id;
+        ta.oninput=()=>{gameData[q.id]=ta.value;updateQCount(q);toggleFilled(q);afterFieldInput(q.id);};ta.onblur=persistStudent;qd.appendChild(ta);
+      }
+      body.appendChild(qd);
+    });
+    const r=document.createElement('div');r.className='reason';
+    r.innerHTML='<label>Justificativa estratégica da etapa (opcional, mas conta pontos)</label><textarea id="'+s.id+'_reason" placeholder="Por que essas escolhas? Conecte com os dados de mercado e o comportamento do consumidor."></textarea>';
+    const rta=r.querySelector('textarea');rta.oninput=()=>{gameData[s.id+'_reason']=rta.value;};rta.onblur=persistStudent;
+    body.appendChild(r);host.appendChild(body);
+    s.questions.filter(q=>q.type==='chips').forEach(renderChips);
+  });
+}
+function renderChips(q){
+  const c=document.getElementById('chips_'+q.id);if(!c)return;
+  const sel=gameData[q.id]||[];const opts=[...q.options];sel.forEach(v=>{if(!opts.includes(v))opts.push(v);});
+  c.innerHTML='';
+  opts.forEach(opt=>{const b=document.createElement('button');b.type='button';
+    b.className='chip-opt'+(sel.includes(opt)?' sel':'');b.textContent=opt;b.onclick=()=>toggleChip(q.id,opt);c.appendChild(b);});
+  renderBets(q);updateQCount(q);toggleFilled(q);
+}
+function toggleChip(id,opt){let arr=gameData[id]||[];const on=arr.includes(opt);
+  arr=on?arr.filter(x=>x!==opt):[...arr,opt];gameData[id]=arr;
+  const meta=gameData[id+'_bets']=gameData[id+'_bets']||{};
+  if(on)delete meta[opt];else meta[opt]=meta[opt]||{ev:'',imp:3,conf:3};
+  renderChips(QMAP[id]);persistStudent();afterFieldInput(id);}
+function renderBets(q){
+  const host=document.getElementById('bets_'+q.id);if(!host)return;
+  const sel=gameData[q.id]||[];const meta=gameData[q.id+'_bets']=gameData[q.id+'_bets']||{};
+  Object.keys(meta).forEach(k=>{if(!sel.includes(k))delete meta[k];});
+  host.innerHTML='';if(!sel.length)return;
+  sel.forEach(lb=>{
+    const m=meta[lb]=meta[lb]||{ev:'',imp:3,conf:3};
+    const miss=!((m.ev||'').trim());
+    const card=document.createElement('div');card.className='bet'+(miss?' miss':'');
+    card.innerHTML='<div class="betlabel"><span>'+lb+'</span>'+(miss?'<span class="miss-tag">falta evid\u00eancia</span>':'')+'</div>';
+    const ta=document.createElement('textarea');ta.placeholder='Evid\u00eancia: em que dado do briefing/mercado voc\u00ea se baseia?';ta.value=m.ev||'';
+    const fb=document.createElement('div');fb.className='betfb';
+    const upfb=()=>{const f=evFeedback(m.ev);fb.className='betfb '+f.cls;fb.textContent=f.msg;};
+    ta.oninput=()=>{m.ev=ta.value;upfb();updateQCount(q);toggleFilled(q);afterFieldInput(q.id);};
+    ta.onblur=()=>{persistStudent();renderBets(q);};
+    card.appendChild(ta);card.appendChild(fb);upfb();
+    const scales=document.createElement('div');scales.className='scales';
+    [['imp','Impacto'],['conf','Confian\u00e7a']].forEach(([kind,lblTxt])=>{
+      const wrap=document.createElement('div');wrap.className='scale';
+      wrap.innerHTML='<label><span>'+lblTxt+'</span><span class="sv">'+(m[kind]||3)+'</span></label>';
+      const r=document.createElement('input');r.type='range';r.min=1;r.max=5;r.value=m[kind]||3;
+      r.oninput=()=>{m[kind]=+r.value;const sv=wrap.querySelector('.sv');if(sv)sv.textContent=r.value;};
+      r.onchange=()=>persistStudent();
+      wrap.appendChild(r);scales.appendChild(wrap);
+    });
+    card.appendChild(scales);host.appendChild(card);
+  });
+}
+function addOther(id){const inp=document.getElementById('other_'+id);const v=(inp.value||'').trim();if(!v)return;
+  let arr=gameData[id]||[];if(!arr.includes(v))arr.push(v);gameData[id]=arr;inp.value='';renderChips(QMAP[id]);persistStudent();}
+function updateQCount(q){const el=document.getElementById('count_'+q.id);if(!el)return;
+  if(q.type==='chips'){const sel=gameData[q.id]||[];const meta=gameData[q.id+'_bets']||{};
+    const ok=sel.filter(l=>evValid((meta[l]&&meta[l].ev)||'')).length;
+    el.textContent=sel.length?sel.length+' escolha(s) · '+ok+' c/ evidência':'';}
+  else if(q.type==='select'){el.textContent=gameData[q.id]?'✓':'';}
+  else{const l=(gameData[q.id]||'').trim().length;el.textContent=l?l+' car.':'';}}
+function toggleFilled(q){const qd=document.getElementById('q_'+q.id);if(!qd)return;let ok;
+  if(q.type==='chips'){const sel=gameData[q.id]||[];const meta=gameData[q.id+'_bets']||{};
+    ok=sel.length>0&&sel.every(l=>evValid((meta[l]&&meta[l].ev)||''));}
+  else if(q.type==='select')ok=!!gameData[q.id];else ok=((gameData[q.id]||'').trim().length>0);
+  qd.classList.toggle('filled',ok);}
+
+function goToStep(n){if(validateCurrentStep(true))showStep(n);}
+function nextStep(){if(validateCurrentStep()){if(currentStep<STEPS.length-1)showStep(currentStep+1);else finishGame();}}
+function previousStep(){if(currentStep>0)showStep(currentStep-1);}
+function showStep(n){
+  document.querySelectorAll('.step-tab').forEach((t,i)=>{t.classList.toggle('active',i===n);t.classList.toggle('done',i<n);});
+  document.querySelectorAll('.step-body').forEach((b,i)=>b.classList.toggle('active',i===n));
+  document.getElementById('progressFill').style.width=(((n+1)/STEPS.length)*100)+'%';
+  document.getElementById('prevStepBtn').disabled=n===0;
+  document.getElementById('nextStepBtn').textContent=n===STEPS.length-1?'Finalizar →':'Próxima →';
+  currentStep=n;collectFields();persistStudent();updateStepQuality(STEPS[n].id);if(STEPS[n].id==='testar')updateCoherence();window.scrollTo({top:0,behavior:'smooth'});
+}
+function validateCurrentStep(silent){
+  const s=STEPS[currentStep];
+  for(const q of s.questions){
+    if(q.optional)continue;
+    let ok,msg;const nome=q.label.replace(/^\d+\.\s*/,'');
+    if(q.type==='chips'){const sel=gameData[q.id]||[];const meta=gameData[q.id+'_bets']||{};
+      if(!sel.length){ok=false;msg='Selecione ao menos uma opção em "'+nome+'".';}
+      else if(!sel.every(l=>((meta[l]&&meta[l].ev)||'').trim())){ok=false;msg='Preencha a Evidência de cada escolha em "'+nome+'".';}
+      else ok=true;}
+    else if(q.type==='select'){ok=!!gameData[q.id];msg='Selecione "'+nome+'".';}
+    else{ok=((gameData[q.id]||'').trim().length>0);msg='Complete "'+nome+'".';}
+    if(!ok){if(!silent){alert(msg);const el=document.getElementById('q_'+q.id);if(el)el.scrollIntoView({behavior:'smooth',block:'center'});}return false;}
+  }
+  collectFields();return true;
+}
+
+/* ---- coleta / restauração ---- */
+function collectFields(){
+  document.querySelectorAll('#page2 input,#page2 textarea,#page2 select').forEach(el=>{if(el.id)gameData[el.id]=el.value;});
+  STEPS.forEach(s=>{s.questions.forEach(q=>{if(q.type==='select'||q.type==='text'){const el=document.getElementById(q.id);if(el)gameData[q.id]=el.value;}});
+    const r=document.getElementById(s.id+'_reason');if(r)gameData[s.id+'_reason']=r.value;});
+  onPsico();gameData.currentStep=currentStep;
+}
+function autoSave(){collectFields();persistStudent();}
+function loadGameData(){
+  const team=getTeam();gameData=(team&&team.data)?team.data:{};
+  syncUIFromData();
+  if(gameData.currentStep!==undefined){currentStep=gameData.currentStep;showStep(currentStep);}
+  if(gameData.currentPage!==undefined)currentPage=gameData.currentPage;
+}
+function syncUIFromData(){
+  Object.keys(gameData).forEach(k=>{const el=document.getElementById(k);
+    if(el&&!Array.isArray(gameData[k])&&typeof gameData[k]!=='object'&&'value'in el)el.value=gameData[k];});
+  if(gameData.psico)PSY_AXES.forEach(a=>{const el=document.getElementById('psico_'+a.id);if(el&&gameData.psico[a.id]!==undefined)el.value=gameData.psico[a.id];});
+  if(gameData.psicoGenerated){const o=document.getElementById('psicoOut');if(o)generatePsico(true);}
+  STEPS.forEach(s=>s.questions.forEach(q=>{if(q.type==='chips')renderChips(q);else{updateQCount(q);toggleFilled(q);}}));
+  STEPS.forEach(s=>updateStepQuality(s.id));updateCoherence();
+}
+
+/* ============================ RUBRICA (v4) ============================ */
+/* ================================================================
+   MOTOR v4 — Apostas fundamentadas + Rubrica de 4 eixos
+   Este arquivo isola a lógica pura para validação com node.
+   Depois é integrado ao index.html.
+   ================================================================ */
+
+/* Cada questão do tipo 'chips' agora guarda:
+   gameData[qid]            -> array de labels selecionados (agregação/proposta)
+   gameData[qid+'_bets']    -> { label: {ev:'', imp:1..5, conf:1..5} }
+*/
+
+const STEP_IDS = ['target','explorar','solucoes','testar','escala'];
+
+/* Lexicons para heurística transparente (não é "IA achando") */
+const LEX = {
+  grounded: /(\d|%|r\$|dado|pesquis|concorr|ticket|absor|\blead|nps|cap\s*rate|briefing|vso|vgv|roas|cpl|cac|amostra|taxa|média|media)/i,
+  gat: ['escass','prova social','ancorag','autoridad','reciprocid','coerenc','afinidad','aversao','aversão','storytelling','exclusiv','rentab','pertenc','comunidad'],
+  kpi: ['vso','conversao','conversão','cpl','cac','nps','ticket','roas','tempo','retorno'],
+  pub: ['investidor','morador','primeira moradia','familia','família','jovem','casal','aposentad','locacao','locação','renda','dink','ninho']
+};
+
+function norm(s){return (s||'').toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');}
+function hasAny(str, arr){const n=norm(str);return arr.some(k=>n.includes(norm(k)));}
+function looksInvalid(t){t=(t||'').trim();if(!t)return true;const s=t.replace(/\s/g,'');
+  if(t.length<3)return true;
+  if(/^(.)\1+$/i.test(s))return true;
+  if(!/[aeiou\u00e1\u00e9\u00ed\u00f3\u00fa\u00e2\u00ea\u00f4\u00e3\u00f5]/i.test(t))return true;
+  if(/^(x+|dd+|teste|asdf|qwer|abc+|123+)$/i.test(s))return true;
+  return false;}
+function evValid(ev){ev=(ev||'').trim();if(ev.length<12)return false;if(looksInvalid(ev))return false;
+  const w=ev.split(/\s+/).filter(x=>x.length>2);return w.length>=2;}
+
+/* ---- coleta de apostas ---- */
+function betsOf(gameData, qid){return gameData[qid+'_bets']||{};}
+function chipQuestions(STEPS){const out=[];STEPS.forEach(s=>s.questions.forEach(q=>{if(q.type==='chips')out.push({step:s.id,q});}));return out;}
+function allBets(gameData, STEPS){
+  const out=[];
+  chipQuestions(STEPS).forEach(({step,q})=>{
+    const sel=gameData[q.id]||[];const meta=betsOf(gameData,q.id);
+    sel.forEach(label=>{const m=meta[label]||{ev:'',imp:3,conf:3};
+      out.push({step,qid:q.id,label,ev:m.ev||'',imp:+m.imp||3,conf:+m.conf||3});});
+  });
+  return out;
+}
+
+/* ---- estatística ---- */
+function std(arr){if(arr.length<2)return 0;const m=arr.reduce((a,b)=>a+b,0)/arr.length;
+  return Math.sqrt(arr.reduce((a,b)=>a+(b-m)*(b-m),0)/arr.length);}
+function pct(n){return Math.max(0,Math.min(100,Math.round(n)));}
+
+/* ================= RUBRICA — 4 EIXOS ================= */
+/* Recebe a lista de apostas (de uma etapa ou geral) */
+function eixoCompletude(bets){
+  if(!bets.length)return 0;
+  const filled=bets.filter(b=>evValid(b.ev)).length;
+  return pct(filled/bets.length*100);
+}
+function eixoFundamentacao(bets){
+  if(!bets.length)return 0;
+  const grounded=bets.filter(b=>evValid(b.ev)&&LEX.grounded.test(b.ev)).length;
+  return pct(grounded/bets.length*100);
+}
+function eixoCalibracao(bets){
+  if(!bets.length)return 0;
+  // discriminação: variar impacto/confiança (não marcar tudo igual)
+  const discrim = bets.length<2 ? 60 :
+    pct(((std(bets.map(b=>b.imp))+std(bets.map(b=>b.conf)))/2)/1.2*100);
+  // alinhamento: alta confiança exige evidência fundamentada; alto impacto exige evidência
+  const ok=bets.filter(b=>{
+    const evOk=evValid(b.ev);const grounded=evOk&&LEX.grounded.test(b.ev);
+    const confOk=b.conf<4||grounded;const impOk=b.imp<4||evOk;
+    return confOk&&impOk;
+  }).length;
+  const alin=pct(ok/bets.length*100);
+  return pct(0.5*discrim+0.5*alin);
+}
+
+/* Coerência da cadeia TESTE (só faz sentido no geral) */
+function eixoCoerencia(gameData){
+  const checks=[];
+  const sel=id=>gameData[id]||[];
+  const psico=gameData.psicoProfile;
+  // 1) Gatilhos das Soluções conversam com o perfil psicográfico?
+  if(psico&&psico.gatilhos){
+    const psicoStr=psico.gatilhos.join(' ');
+    const solStr=sel('solucoes_q1').join(' ');
+    checks.push(hasAny(psicoStr,LEX.gat)&&hasAny(solStr,LEX.gat)&&
+      LEX.gat.some(g=>norm(psicoStr).includes(norm(g))&&norm(solStr).includes(norm(g)))?1:0);
+  }
+  // 2) Hipótese do Testar menciona público/gatilho definidos?
+  const hyp=[gameData.testar_hyp_if,gameData.testar_hyp_then,gameData.testar_hyp_why].join(' ');
+  if(hyp.trim()){
+    const pubChosen=sel('target_q1').join(' ');
+    const gatChosen=sel('solucoes_q1').join(' ');
+    checks.push((hasAny(hyp,LEX.pub)||hasAny(hyp,LEX.gat)||
+      LEX.gat.some(g=>norm(gatChosen).includes(norm(g))&&norm(hyp).includes(norm(g))))?1:0);
+  }
+  // 3) Indicadores do Target aparecem nas métricas do Testar / resultados das Soluções?
+  const kpiT=sel('target_q6').join(' ');
+  const kpiTest=[...sel('testar_q3'),...sel('solucoes_q4')].join(' ');
+  if(kpiT.trim()&&kpiTest.trim()){
+    checks.push(LEX.kpi.some(k=>norm(kpiT).includes(k)&&norm(kpiTest).includes(k))?1:0.4);
+  }
+  // 4) Barreira (Target/Explorar) endereçada por Solução ou Hipótese?
+  const barr=[...sel('target_q5'),...sel('explorar_q1')].join(' ');
+  const solAll=[...sel('solucoes_q1'),...sel('solucoes_q2'),...sel('solucoes_q3')].join(' ')+' '+hyp;
+  if(barr.trim()&&solAll.trim()){
+    // se citam financiamento/crédito e a solução fala de condição/garantia, etc. (heurística leve)
+    const barrTokens=['financ','credito','crédito','preco','preço','confian','entrega','urgenc','concorr'];
+    const hit=barrTokens.some(t=>norm(barr).includes(t)&&norm(solAll).includes(t));
+    checks.push(hit?1:0.4);
+  }
+  if(!checks.length)return 0;
+  return pct(checks.reduce((a,b)=>a+b,0)/checks.length*100);
+}
+
+/* ---- score por etapa (para barras) ---- */
+function scoreStep(gameData, STEPS, stepId){
+  const bets=allBets(gameData,STEPS).filter(b=>b.step===stepId);
+  const comp=eixoCompletude(bets),fund=eixoFundamentacao(bets),cal=eixoCalibracao(bets);
+  // etapas de texto puro (testar hipótese) entram por completude textual
+  const step=STEPS.find(s=>s.id===stepId);
+  const textQs=step.questions.filter(q=>q.type==='text'&&!q.optional);
+  let textScore=null;
+  if(textQs.length){
+    const filled=textQs.filter(q=>(gameData[q.id]||'').trim()!=='').length;
+    textScore=pct(filled/textQs.length*100);
+  }
+  const parts=[comp*0.4+fund*0.4+cal*0.2];
+  if(textScore!==null)parts.push(textScore);
+  const score=pct(parts.reduce((a,b)=>a+b,0)/parts.length);
+  return {score,comp,fund,cal,nbets:bets.length};
+}
+
+/* ---- índice geral por eixo ---- */
+function scoreOverall(gameData, STEPS){
+  const bets=allBets(gameData,STEPS);
+  const comp=eixoCompletude(bets);
+  const fund=eixoFundamentacao(bets);
+  const cal=eixoCalibracao(bets);
+  const coer=eixoCoerencia(gameData);
+  const indice=pct(0.30*comp+0.30*fund+0.20*cal+0.20*coer);
+  return {indice,eixos:{completude:comp,fundamentacao:fund,calibracao:cal,coerencia:coer},nbets:bets.length};
+}
+
+/* ---- coerência: elos fracos (para o painel) ---- */
+function coerenciaElos(gameData){
+  const sel=id=>gameData[id]||[];const elos=[];
+  const psico=gameData.psicoProfile;
+  const solGat=sel('solucoes_q1').join(' ');
+  if(psico&&psico.gatilhos&&!(LEX.gat.some(g=>norm(psico.gatilhos.join(' ')).includes(norm(g))&&norm(solGat).includes(norm(g)))))
+    elos.push('Os gatilhos das Soluções não refletem o perfil psicográfico gerado.');
+  const hyp=[gameData.testar_hyp_if,gameData.testar_hyp_then,gameData.testar_hyp_why].join(' ');
+  if(hyp.trim()&&!(hasAny(hyp,LEX.pub)||hasAny(hyp,LEX.gat)))
+    elos.push('A hipótese do Testar não menciona o público nem os gatilhos escolhidos.');
+  const kpiT=sel('target_q6').join(' '),kpiTest=[...sel('testar_q3'),...sel('solucoes_q4')].join(' ');
+  if(kpiT.trim()&&kpiTest.trim()&&!LEX.kpi.some(k=>norm(kpiT).includes(k)&&norm(kpiTest).includes(k)))
+    elos.push('Os indicadores do Target não aparecem nas métricas do Testar.');
+  return elos;
+}
+
+/* ================= AGREGAÇÃO DA TURMA ================= */
+/* Divergências: para cada questão de chips, o quanto a turma se divide */
+function divergencias(students, STEPS){
+  const out=[];
+  chipQuestions(STEPS).forEach(({q})=>{
+    const counts={};let total=0;
+    students.forEach(s=>{const arr=(s.data&&s.data[q.id])||[];arr.forEach(v=>{counts[v]=(counts[v]||0)+1;total++;});});
+    const vals=Object.values(counts);if(vals.length<2||total<2)return;
+    // entropia normalizada -> divergência
+    const p=vals.map(v=>v/total);
+    const H=-p.reduce((a,x)=>a+x*Math.log2(x),0);
+    const Hmax=Math.log2(vals.length);
+    const div=Hmax?H/Hmax:0;
+    out.push({qid:q.id,label:(q.label||q.id).replace(/^\d+\.\s*/,''),div:Math.round(div*100),
+      top:Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,3)});
+  });
+  return out.sort((a,b)=>b.div-a.div).slice(0,6);
+}
+
+/* Fundamentação média por etapa (turma) */
+function fundamentacaoPorEtapa(students, STEPS){
+  return STEP_IDS.map(sid=>{
+    let g=0,n=0;
+    students.forEach(s=>{const bets=allBets(s.data||{},STEPS).filter(b=>b.step===sid);
+      bets.forEach(b=>{n++;if(LEX.grounded.test(b.ev))g++;});});
+    return {step:sid,fund:n?pct(g/n*100):0,n};
+  });
+}
+function computeOverall(){return scoreOverall(gameData,STEPS).indice;}
+
+
+/* ============================ FINALIZAR ============================ */
+function finishGame(){
+  collectFields();if(gameData.psicoGenerated)generatePsico(true);
+  const _o=scoreOverall(gameData,STEPS);gameData.finalScore=_o.indice;gameData.eixos=_o.eixos;gameData.completed=true;gameData.completedAt=new Date().toISOString();
+  const t=getTeam();if(t){t.completed=true;t.score=gameData.finalScore;t.currentStep=STEPS.length-1;t.data=gameData;saveTeamRecord(t);}
+  persistStudent();renderDiagnosis();showPage(4);
+}
+function join(id){const v=gameData[id];return Array.isArray(v)?v.join(', '):(v||'');}
+function buildProposalHTML(){
+  const g=gameData;const tags=arr=>{const a=Array.isArray(arr)?arr:(arr?[arr]:[]);
+    return a.length?'<div class="ptags">'+a.map(x=>'<span class="ptag">'+x+'</span>').join('')+'</div>':'<span class="none">—</span>';};
+  const row=(t,v)=>'<div class="pblock"><b>'+t+'</b> '+v+'</div>';
+  const nome=g.nomeProduto||'(produto sem nome)';const praca=g.praca?' · '+g.praca:'';
+  const hip=(g.testar_hyp_if||g.testar_hyp_then||g.testar_hyp_why)?
+    ('SE '+(g.testar_hyp_if||'…')+' ENTÃO '+(g.testar_hyp_then||'…')+' PORQUE '+(g.testar_hyp_why||'…')):'';
+  return '<h3>Proposta preliminar — '+nome+praca+'</h3>'+
+    '<p class="psub">Síntese automática cruzando as suas escolhas nas 5 etapas. Use como rascunho da proposta e refine.</p>'+
+    (g.psicoProfile?row('Perfil psicográfico:','<b>'+g.psicoProfile.title+'</b>'):'')+
+    ((g.persona_idade||g.persona_ocupacao||g.persona_estilo||g.persona_valores||g.persona_canais)?
+      row('Persona:',[g.persona_idade&&('Idade '+g.persona_idade),g.target_q3&&('Renda '+g.target_q3),g.persona_ocupacao,g.persona_estilo,g.persona_valores,g.persona_canais].filter(Boolean).join(' · ')):'')+
+    row('Público-alvo:',tags(g.target_q1))+
+    row('Momento de vida / renda:',tags([...(g.target_q2||[]),...(g.target_q3?[g.target_q3]:[])]))+
+    row('Job resolvido:',tags(g.target_q4))+
+    row('Barreiras a superar:',tags([...(g.target_q5||[]),...(g.explorar_q1||[])]))+
+    row('Ambiente de impacto:',tags(g.explorar_q4))+
+    row('Estratégia — gatilhos:',tags(g.solucoes_q1))+
+    row('Diferenciação:',tags(g.solucoes_q2))+
+    row('Ativos de experiência:',tags(g.solucoes_q3))+
+    (hip?row('Hipótese de teste:',hip):'')+
+    row('Validação:',tags([...(g.testar_q1||[]),...(g.testar_lab||[]),...(g.testar_q2?[g.testar_q2]:[])]))+
+    row('Escala e sustentação:',tags([...(g.escala_q1||[]),...(g.escala_q2||[])]))+
+    (g.escala_q4?row('Próximos passos:',g.escala_q4):'');
+}
+function esc(t){return (t||'').toString().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function trunc(t,n){t=(t||'').toString();return t.length>n?t.slice(0,n-1)+'\u2026':t;}
+function heatColor(v){const hue=Math.round(1.2*v);return 'hsl('+hue+',62%,'+(v<50?46:42)+'%)';}
+function matrixSVG(bets,showNums){
+  const w=460,h=300,pad=40;const iw=w-2*pad,ih=h-2*pad;
+  const xf=c=>pad+((c-1)/4)*iw,yf=i=>h-pad-((i-1)/4)*ih;
+  let s='<svg viewBox="0 0 '+w+' '+h+'" style="width:100%;max-width:480px;height:auto">';
+  s+='<rect x="'+pad+'" y="'+pad+'" width="'+iw+'" height="'+ih+'" fill="#fafbfc" stroke="#e5e9ef"/>';
+  s+='<line x1="'+xf(3)+'" y1="'+pad+'" x2="'+xf(3)+'" y2="'+(h-pad)+'" stroke="#dfe5ec" stroke-dasharray="4"/>';
+  s+='<line x1="'+pad+'" y1="'+yf(3)+'" x2="'+(w-pad)+'" y2="'+yf(3)+'" stroke="#dfe5ec" stroke-dasharray="4"/>';
+  [[xf(4.2),yf(4.7),'Certeiras'],[xf(1.5),yf(4.7),'Arriscadas (validar!)'],[xf(4.2),yf(1.4),'Baixo impacto'],[xf(1.5),yf(1.4),'Ruído']].forEach(a=>{
+    s+='<text x="'+a[0]+'" y="'+a[1]+'" font-size="10" fill="#9aa4b0" text-anchor="middle">'+a[2]+'</text>';});
+  s+='<text x="'+(w/2)+'" y="'+(h-8)+'" font-size="11" fill="#5b6572" text-anchor="middle">Confiança →</text>';
+  s+='<text x="14" y="'+(h/2)+'" font-size="11" fill="#5b6572" text-anchor="middle" transform="rotate(-90 14 '+(h/2)+')">Impacto →</text>';
+  const seen={};
+  bets.forEach((b,i)=>{const k=b.imp+'_'+b.conf;const idx=seen[k]=(seen[k]===undefined?0:seen[k]+1);
+    const ring=Math.floor(idx/6),pos=idx%6,ang=pos*Math.PI/3,rad=idx===0?0:(11+ring*11);
+    const cx=xf(b.conf)+rad*Math.cos(ang),cy=yf(b.imp)+rad*Math.sin(ang);
+    const grounded=evValid(b.ev)&&LEX.grounded.test(b.ev);
+    s+='<circle cx="'+cx+'" cy="'+cy+'" r="'+(showNums?9:6)+'" fill="'+(grounded?'#1A6B3C':'#c9a227')+'" fill-opacity="0.85" stroke="#fff"/>';
+    if(showNums)s+='<text x="'+cx+'" y="'+(cy+3)+'" font-size="9.5" font-weight="700" fill="#fff" text-anchor="middle">'+(i+1)+'</text>';});
+  s+='</svg>';return s;
+}
+function matrixLegend(bets){
+  if(!bets.length)return '';
+  return '<ol class="mxleg">'+bets.map((b,i)=>{const g=evValid(b.ev)&&LEX.grounded.test(b.ev);
+    return '<li><span class="mxn '+(g?'g':'a')+'">'+(i+1)+'</span>'+esc(b.label)+' <span style="color:#9aa4b0">(I'+b.imp+'/C'+b.conf+')</span></li>';}).join('')+'</ol>';
+}
+function radarSVG(e){
+  const cx=180,cy=140,R=100;
+  const A=[['Completude',e.completude,-90],['Fundamentação',e.fundamentacao,0],['Calibração',e.calibracao,90],['Coerência',e.coerencia,180]];
+  const pt=(v,ang)=>{const r=R*(Math.max(0,v)/100),a=ang*Math.PI/180;return [cx+r*Math.cos(a),cy+r*Math.sin(a)];};
+  let s='<svg viewBox="0 0 360 300" style="width:100%;max-width:340px;height:auto">';
+  [25,50,75,100].forEach(g=>{const pts=A.map(ax=>{const a=ax[2]*Math.PI/180;return (cx+R*(g/100)*Math.cos(a))+','+(cy+R*(g/100)*Math.sin(a));}).join(' ');
+    s+='<polygon points="'+pts+'" fill="none" stroke="#e9edf2"/>';});
+  A.forEach(ax=>{const a=ax[2]*Math.PI/180;s+='<line x1="'+cx+'" y1="'+cy+'" x2="'+(cx+R*Math.cos(a))+'" y2="'+(cy+R*Math.sin(a))+'" stroke="#e9edf2"/>';});
+  const poly=A.map(ax=>{const p=pt(ax[1],ax[2]);return p[0]+','+p[1];}).join(' ');
+  s+='<polygon points="'+poly+'" fill="rgba(26,107,60,0.22)" stroke="#1A6B3C" stroke-width="2"/>';
+  A.forEach(ax=>{const p=pt(ax[1],ax[2]);s+='<circle cx="'+p[0]+'" cy="'+p[1]+'" r="3.5" fill="#1A6B3C"/>';});
+  A.forEach(ax=>{const a=ax[2]*Math.PI/180,lx=cx+(R+20)*Math.cos(a),ly=cy+(R+20)*Math.sin(a);
+    const anc=Math.abs(Math.cos(a))<0.3?'middle':(Math.cos(a)>0?'start':'end');
+    s+='<text x="'+lx+'" y="'+(ly+2)+'" font-size="10" fill="#5b6572" text-anchor="'+anc+'">'+ax[0]+'</text>';
+    s+='<text x="'+lx+'" y="'+(ly+14)+'" font-size="10" font-weight="700" fill="#1A6B3C" text-anchor="'+anc+'">'+ax[1]+'</text>';});
+  s+='</svg>';return s;
+}
+function chainMapSVG(g){
+  const elos=coerenciaElos(g);
+  const l1bad=elos.some(e=>norm(e).includes('perfil'));
+  const l2bad=elos.some(e=>norm(e).includes('hipotese'));
+  const pub=trunc((g.target_q1||[]).join(', ')||'—',20);
+  const sol=trunc((g.solucoes_q1||[]).join(', ')||'—',20);
+  const tes=trunc(g.testar_hyp_if?('SE '+g.testar_hyp_if):'—',20);
+  const box=(x,title,txt,filled)=>'<rect x="'+x+'" y="40" width="120" height="58" rx="10" fill="'+(filled?'#f2f8fd':'#f7f7f7')+'" stroke="'+(filled?'#2E75B6':'#cfd8e3')+'"/>'+
+    '<text x="'+(x+60)+'" y="33" font-size="11" font-weight="800" fill="#1A6B3C" text-anchor="middle">'+title+'</text>'+
+    '<text x="'+(x+60)+'" y="73" font-size="9" fill="#3a4552" text-anchor="middle">'+esc(txt)+'</text>';
+  const arrow=(x1,x2,state)=>{const c=state==='bad'?'#c0392b':(state==='ok'?'#1A6B3C':'#c7cfd9'),my=69,lbl=state==='bad'?'quebra':(state==='ok'?'coerente':'');
+    return '<line x1="'+x1+'" y1="'+my+'" x2="'+(x2-8)+'" y2="'+my+'" stroke="'+c+'" stroke-width="2"/>'+
+      '<polygon points="'+(x2-8)+','+(my-5)+' '+x2+','+my+' '+(x2-8)+','+(my+5)+'" fill="'+c+'"/>'+
+      '<text x="'+((x1+x2)/2)+'" y="'+(my-9)+'" font-size="8.5" fill="'+c+'" text-anchor="middle" font-weight="700">'+lbl+'</text>';};
+  const hasPub=(g.target_q1||[]).length>0,hasSol=(g.solucoes_q1||[]).length>0,hasTes=!!(g.testar_hyp_if);
+  let s='<svg viewBox="0 0 460 120" style="width:100%;max-width:480px;height:auto">';
+  s+=box(20,'Público',pub,hasPub);
+  s+=box(170,'Solução',sol,hasSol);
+  s+=box(320,'Teste',tes,hasTes);
+  s+=arrow(140,170,(!hasPub||!hasSol)?'na':(l1bad?'bad':'ok'));
+  s+=arrow(290,320,(!hasSol||!hasTes)?'na':(l2bad?'bad':'ok'));
+  s+='</svg>';return s;
+}
+function heatmapSVG(students){
+  const teams=students.filter(s=>s.data);
+  if(!teams.length)return '<p class="asub">Sem equipes com dados.</p>';
+  const rowH=26,left=120,top=24,colW=60,w=left+colW*STEPS.length+10,h=top+rowH*teams.length+8;
+  let s='<svg viewBox="0 0 '+w+' '+h+'" style="width:'+w+'px;max-width:100%;height:auto">';
+  STEPS.forEach((st,c)=>{s+='<text x="'+(left+colW*c+(colW-4)/2)+'" y="'+(top-8)+'" font-size="11" fill="#5b6572" text-anchor="middle" font-weight="800">'+st.letter+'</text>';});
+  teams.forEach((tm,r)=>{const y=top+rowH*r;
+    s+='<text x="0" y="'+(y+rowH/2+3)+'" font-size="10" fill="#3a4552">'+esc(trunc(tm.name,16))+'</text>';
+    STEPS.forEach((st,c)=>{const v=scoreStep(tm.data,STEPS,st.id).score,x=left+colW*c;
+      s+='<rect x="'+x+'" y="'+y+'" width="'+(colW-4)+'" height="'+(rowH-4)+'" rx="4" fill="'+heatColor(v)+'"/>';
+      s+='<text x="'+(x+(colW-4)/2)+'" y="'+(y+rowH/2+3)+'" font-size="9.5" fill="#fff" text-anchor="middle" font-weight="700">'+v+'</text>';});});
+  s+='</svg>';return s;
+}
+function rankingSVG(students){
+  const teams=students.filter(s=>s.data).map(s=>({name:s.name,o:scoreOverall(s.data,STEPS)})).sort((a,b)=>b.o.indice-a.o.indice);
+  if(!teams.length)return '<p class="asub">Sem equipes com dados.</p>';
+  const left=120,barMax=250,rowH=30,top=6,w=left+barMax+50,h=top+rowH*teams.length+6;
+  const cols={completude:'#1A6B3C',fundamentacao:'#2E75B6',calibracao:'#8e44ad',coerencia:'#d35400'};
+  let s='<svg viewBox="0 0 '+w+' '+h+'" style="width:'+w+'px;max-width:100%;height:auto">';
+  teams.forEach((t,r)=>{const y=top+rowH*r;let x=left;
+    s+='<text x="0" y="'+(y+rowH/2+3)+'" font-size="10" fill="#3a4552">'+esc(trunc(t.name,16))+'</text>';
+    [['completude',t.o.eixos.completude*0.3],['fundamentacao',t.o.eixos.fundamentacao*0.3],['calibracao',t.o.eixos.calibracao*0.2],['coerencia',t.o.eixos.coerencia*0.2]].forEach(sg=>{
+      const ww=barMax*(sg[1]/100);s+='<rect x="'+x+'" y="'+(y+6)+'" width="'+ww+'" height="'+(rowH-14)+'" fill="'+cols[sg[0]]+'"/>';x+=ww;});
+    s+='<text x="'+(x+6)+'" y="'+(y+rowH/2+3)+'" font-size="11" font-weight="800" fill="#1f2733">'+t.o.indice+'</text>';});
+  s+='</svg>';return s;
+}
+function rankingLegend(){return '<div class="rk-legend"><span><i style="background:#1A6B3C"></i>Completude</span><span><i style="background:#2E75B6"></i>Fundamentação</span><span><i style="background:#8e44ad"></i>Calibração</span><span><i style="background:#d35400"></i>Coerência</span></div>';}
+function renderDiagnosis(){
+  const o=scoreOverall(gameData,STEPS);gameData.finalScore=o.indice;gameData.eixos=o.eixos;
+  document.getElementById('overallScore').textContent=o.indice;
+  document.getElementById('scoreTier').textContent=o.indice>=75?'Estratégia robusta':o.indice>=50?'Boa base — refinar':'Precisa aprofundar';
+  document.getElementById('proposalBox').innerHTML=buildProposalHTML();
+  const eixDefs=[['completude','Completude','As escolhas têm evidência preenchida?'],['fundamentacao','Fundamentação','A evidência cita dados do briefing/mercado?'],['calibracao','Calibração','Impacto e confiança bem calibrados (sem "tudo 5")?'],['coerencia','Coerência da cadeia','Público → solução → teste conversam entre si?']];
+  const pisoG=CONFIG.pisoGeral||60;const aprov=o.indice>=pisoG;
+  let html='<div class="verdict '+(aprov?'ok':'bad')+'">'+(aprov?('\u2713 Aprovado pela rubrica \u2014 '+o.indice+' \u2265 piso '+pisoG):('\u25b2 Abaixo do piso \u2014 '+o.indice+' < '+pisoG+' \u00b7 reveja antes de finalizar'))+'</div>';
+  html+='<h3 style="color:var(--brand);margin-bottom:10px">\u00cdndice por eixo da rubrica</h3><div class="eixos">';
+  eixDefs.forEach(d=>{const v=o.eixos[d[0]];html+='<div class="eixo"><div class="en"><span>'+d[1]+'</span><span>'+v+'/100</span></div><div class="etrack"><div class="efill" style="width:'+v+'%"></div></div><div class="ed">'+d[2]+'</div></div>';});
+  html+='</div>';
+  html+='<div class="chartgrid"><div class="chartwrap"><h4>Radar de qualidade</h4><div class="cdesc">Seu perfil nos 4 eixos da rubrica.</div><div style="text-align:center">'+radarSVG(o.eixos)+'</div></div>'+
+    '<div class="chartwrap"><h4>Cadeia TESTE</h4><div class="cdesc">Público → Solução → Teste. Verde = coerente; vermelho = elo quebrado.</div>'+chainMapSVG(gameData)+'</div></div>';
+  const bets=allBets(gameData,STEPS);
+  html+='<div class="matrixwrap"><h4>Matriz Impacto × Confiança</h4><div class="mnote">Cada ponto é uma aposta (numerada). Verde = fundamentada em dado; âmbar = sem dado citado.</div><div class="svgscroll">'+matrixSVG(bets,true)+'</div><div class="mlegend"><span><span class="dotg"></span>Com dado</span><span><span class="dotr"></span>Sem dado</span></div>'+matrixLegend(bets)+'</div>';
+  const elos=coerenciaElos(gameData);
+  if(elos.length)html+='<div class="elos"><h4>Elos fracos da cadeia TESTE</h4><ul>'+elos.map(e=>'<li>'+e+'</li>').join('')+'</ul></div>';
+  html+='<h3 style="color:var(--brand);margin:6px 0 10px">Desempenho por etapa</h3>';
+  const pisoE=CONFIG.pisoEtapa||60;
+  STEPS.forEach(step=>{const r=scoreStep(gameData,STEPS,step.id);const okS=r.score>=pisoE;
+    html+='<div class="eval"><h4>'+step.letter+' — '+step.name+'<span class="steptag '+(okS?'ok':'bad')+'">'+(okS?'aprovada':'reveja')+'</span></h4><div class="bar"><div class="track"><div class="fill" style="width:'+r.score+'%"></div></div><div class="sc">'+r.score+'/100</div></div><p><span class="chip-view">completude '+r.comp+'</span> <span class="chip-view">fundamentação '+r.fund+'</span> <span class="chip-view">calibração '+r.cal+'</span></p></div>';});
+  if(supa&&CONFIG.supabaseUrl)html+='<div style="text-align:center;margin-top:6px"><button class="ai-btn" onclick="analyzeMyTeam()">\ud83e\udd16 Analisar minha proposta com IA</button></div>';
+  document.getElementById('evaluationSections').innerHTML=html;
+}
+function restartGame(){
+  if(!confirm('Recomeçar? As respostas atuais serão apagadas.'))return;
+  gameData={};currentStep=0;currentPage=0;
+  const _t=getTeam();if(_t){_t.data={};saveTeamRecord(_t);}
+  document.querySelectorAll('#page2 input,#page2 textarea,#page2 select').forEach(el=>el.value='');
+  PSY_AXES.forEach(a=>{const el=document.getElementById('psico_'+a.id);if(el)el.value=50;});
+  const o=document.getElementById('psicoOut');if(o)o.innerHTML='';
+  syncUIFromData();showStep(0);showPage(0);
+}
+
+/* ============================ HELP POPUP ============================ */
+function showHelp(qid){const q=QMAP[qid];if(!q)return;
+  const guide={chips:'Selecione as opções que se aplicam. Para CADA escolha, preencha a Evidência (em que dado do briefing/mercado você se baseia), o Impacto (1–5, o quanto pesa na decisão) e a Confiança (1–5, o quão seguro você está). Escolha sem evidência não pontua.',
+    select:'Escolha a opção que melhor representa o cenário do seu produto.',
+    text:'Escreva de forma objetiva e conecte com dados do briefing/mercado.'}[q.type]||'';
+  document.getElementById('helpTitle').textContent=q.label.replace(/^\d+\.\s*/,'');
+  document.getElementById('helpBody').innerHTML=(q.hint?'<p><b>Dica:</b> '+q.hint+'</p>':'')+'<p>'+guide+'</p>';
+  document.getElementById('helpModal').classList.add('open');
+}
+function closeHelp(){document.getElementById('helpModal').classList.remove('open');}
+function stepOf(qid){const s=STEPS.find(st=>st.questions.some(q=>q.id===qid));return s?s.id:null;}
+function evFeedback(ev){ev=(ev||'').trim();
+  if(!ev)return {cls:'muted',msg:'Preencha a evid\u00eancia com um dado do briefing.'};
+  if(!evValid(ev))return {cls:'bad',msg:'\u26a0 Evid\u00eancia muito curta ou inv\u00e1lida \u2014 descreva o dado (evite "xxx", "dd").'};
+  if(!LEX.grounded.test(ev))return {cls:'warn',msg:'\u25b2 Cite um dado do briefing (n\u00famero, %, R$, ticket, absor\u00e7\u00e3o, CPL...).'};
+  return {cls:'ok',msg:'\u2713 Evid\u00eancia fundamentada em dado.'};}
+function updateStepQuality(sid){const el=document.getElementById('sq_'+sid);if(!el)return;
+  const r=scoreStep(gameData,STEPS,sid);
+  const bets=allBets(gameData,STEPS).filter(b=>b.step===sid);
+  const invalid=bets.filter(b=>b.ev.trim()&&!evValid(b.ev)).length;
+  const semDado=bets.filter(b=>evValid(b.ev)&&!LEX.grounded.test(b.ev)).length;
+  const allMax=bets.length>=2&&bets.every(b=>b.imp===5&&b.conf===5);
+  const issues=[];
+  if(invalid)issues.push(invalid+' evid\u00eancia(s) inv\u00e1lida(s)');
+  if(semDado)issues.push(semDado+' sem dado citado');
+  if(allMax)issues.push('impacto/confian\u00e7a tudo no 5 \u2014 calibre');
+  const piso=CONFIG.pisoEtapa||60;const ok=r.score>=piso&&!issues.length;
+  el.className='stepq '+(ok?'ok':(r.score<piso?'bad':'warn'));
+  el.innerHTML=ok?('\u2713 Etapa consistente ('+r.score+'/100)'):('\u25b2 Reveja esta etapa ('+r.score+'/100)'+(issues.length?': '+issues.join(' \u00b7 '):''));
+}
+function updateCoherence(){const el=document.getElementById('coh_testar');if(!el)return;
+  const pub=(gameData.target_q1||[]),gat=(gameData.solucoes_q1||[]);
+  const hyp=[gameData.testar_hyp_if,gameData.testar_hyp_then,gameData.testar_hyp_why].join(' ');
+  let h='<b>Puxando da sua estrat\u00e9gia:</b> p\u00fablico ['+(pub.join(', ')||'\u2014')+'] \u00b7 gatilhos ['+(gat.join(', ')||'\u2014')+']. ';
+  if(hyp.trim()){const okPub=hasAny(hyp,LEX.pub)||pub.some(p=>norm(hyp).includes(norm(p.split(' ')[0])));
+    const okGat=hasAny(hyp,LEX.gat)||gat.some(g=>norm(hyp).includes(norm(g.split(' ')[0])));
+    h+=(okPub||okGat)?'<span class="ok">\u2713 a hip\u00f3tese conversa com a estrat\u00e9gia.</span>':'<span class="bad">\u26a0 sua hip\u00f3tese n\u00e3o cita o p\u00fablico nem os gatilhos escolhidos.</span>';}
+  else h+='<span class="muted">Escreva a hip\u00f3tese conectando com esses elementos.</span>';
+  el.innerHTML=h;}
+function afterFieldInput(qid){const sid=stepOf(qid);if(sid){updateStepQuality(sid);if(sid==='testar')updateCoherence();}}
+/* ============================ DRAWER (Insights/Cases) ============================ */
+function openDrawer(tab){document.getElementById('overlay').classList.add('open');document.getElementById('drawer').classList.add('open');switchDrawerTab(tab||'instr');}
+function closeDrawer(){document.getElementById('overlay').classList.remove('open');document.getElementById('drawer').classList.remove('open');}
+function switchDrawerTab(tab){
+  document.querySelectorAll('.dtab').forEach(b=>b.classList.toggle('active',b.dataset.dt===tab));
+  const body=document.getElementById('drawerBody');
+  if(tab==='instr'){body.innerHTML=INSTRUCOES_HTML;}
+  else if(tab==='brief'){body.innerHTML='<div class="brief"><div class="bnote">Cen\u00e1rios de oficina \u2014 <b>dados ilustrativos</b> para a din\u00e2mica; n\u00e3o representam levantamento de mercado real. Use os n\u00fameros como base das suas evid\u00eancias.</div>'+BRIEFINGS.map(b=>'<div class="bcard"><h4>'+b.nome+'</h4><div class="bsub">'+b.sub+'</div><ul>'+b.dados.map(d=>'<li>'+d+'</li>').join('')+'</ul></div>').join('')+'</div>';}
+  else if(tab==='insights'){
+    body.innerHTML=INSIGHTS.map(i=>'<div class="ins"><span class="itag">'+i.tag+'</span><h4>'+i.title+'</h4><div class="ibody">'+i.body+'</div></div>').join('');
+  }else{
+    body.innerHTML='<div class="case-note">Material para discussão em aula. Confirme dados atualizados antes de citar em avaliações.</div>'+
+      CASES.map(c=>'<div class="casecard"><h4>'+c.title+'</h4><div class="csub">'+c.sub+'</div>'+
+        '<div class="cbody">'+c.body+'</div>'+
+        '<div class="clabel">O que fizeram</div><ul>'+c.strategy.map(x=>'<li>'+x+'</li>').join('')+'</ul>'+
+        '<div class="clabel">Conexão com o curso</div><ul>'+c.learn.map(x=>'<li>'+x+'</li>').join('')+'</ul>'+
+        '<div class="csrc">Fontes: '+c.sources.map(s=>'<a href="'+s.url+'" target="_blank" rel="noopener">'+s.name+'</a>').join(' · ')+'</div></div>').join('');
+  }
+}
+
+/* ============================ DASHBOARD ============================ */
+function aiKeyGet(){return localStorage.getItem('anthropicKey')||'';}
+function aiModelGet(){return localStorage.getItem('anthropicModel')||CONFIG.aiModelDefault;}
+function refreshAIStatus(){const el=document.getElementById('aiStatus');if(!el)return;const k=aiKeyGet();
+  const mi=document.getElementById('aiModel');if(mi&&!mi.value)mi.value=aiModelGet();
+  el.innerHTML=k?('<span style="color:#1c6b41">\u2713 Chave configurada ('+k.slice(0,10)+'\u2026) \u00b7 modelo '+aiModelGet()+'</span>'):'<span style="color:#8a5a00">Nenhuma chave \u2014 an\u00e1lise por IA indispon\u00edvel.</span>';}
+function saveAIKey(){const k=(document.getElementById('aiKey').value||'').trim();const m=(document.getElementById('aiModel').value||'').trim();
+  if(k)localStorage.setItem('anthropicKey',k);if(m)localStorage.setItem('anthropicModel',m);
+  document.getElementById('aiKey').value='';refreshAIStatus();alert('Configura\u00e7\u00e3o salva neste navegador. Lembre de remover a chave ap\u00f3s a aula.');}
+function removeAIKey(){localStorage.removeItem('anthropicKey');refreshAIStatus();alert('Chave removida deste navegador.');}
+function proposalText(d){const j=id=>Array.isArray(d[id])?d[id].join(', '):(d[id]||'\u2014');
+  const persona=[d.persona_idade&&('Idade: '+d.persona_idade),d.target_q3&&('Renda: '+d.target_q3),d.persona_ocupacao&&('Ocupa\u00e7\u00e3o: '+d.persona_ocupacao),d.persona_estilo&&('Estilo: '+d.persona_estilo),d.persona_valores&&('Valores: '+d.persona_valores),d.persona_canais&&('Canais: '+d.persona_canais)].filter(Boolean).join('; ');
+  const hip=d.testar_hyp_if?('SE '+d.testar_hyp_if+' ENT\u00c3O '+(d.testar_hyp_then||'\u2026')+' PORQUE '+(d.testar_hyp_why||'\u2026')):'\u2014';
+  return 'Produto: '+(d.nomeProduto||'\u2014')+' ('+(d.praca||'\u2014')+')\n'+
+    'Conceito: '+(d.conceito||'\u2014')+'\n'+
+    'Perfil psicogr\u00e1fico: '+((d.psicoProfile&&d.psicoProfile.title)||'\u2014')+'\n'+
+    'Persona: '+(persona||'\u2014')+'\n'+
+    'P\u00fablico-alvo: '+j('target_q1')+'\n'+'Job: '+j('target_q4')+'\n'+
+    'Barreiras: '+[j('target_q5'),j('explorar_q1')].filter(x=>x&&x!=='\u2014').join(', ')+'\n'+
+    'Gatilhos: '+j('solucoes_q1')+'\n'+'Diferencia\u00e7\u00e3o: '+j('solucoes_q2')+'\n'+
+    'Hip\u00f3tese: '+hip+'\n'+
+    'Valida\u00e7\u00e3o: '+[j('testar_q1'),j('testar_lab')].filter(x=>x&&x!=='\u2014').join(', ')+'\n'+
+    'Escala: '+[j('escala_q1'),j('escala_q2')].filter(x=>x&&x!=='\u2014').join(', ');}
+function buildAIPrompt(team){const d=team.data||{};const o=scoreOverall(d,STEPS);
+  return 'Voc\u00ea \u00e9 avaliador(a) de um MBA de intelig\u00eancia de mercado e comportamento do consumidor no setor imobili\u00e1rio. Avalie a proposta da equipe "'+team.name+'", constru\u00edda pela metodologia TESTE (Target, Explorar, Solu\u00e7\u00f5es, Testar, Escalar).\n\nEntregue em portugu\u00eas, objetivo:\n1) Parecer (pontos fortes e fracos, 3-5 linhas);\n2) Duas recomenda\u00e7\u00f5es pr\u00e1ticas;\n3) Uma linha final: "\u00cdNDICE DE SUCESSO: NN/100 \u2014 justificativa".\nSeja rigoroso e aponte incoer\u00eancias entre p\u00fablico, solu\u00e7\u00e3o e teste.\n\nPROPOSTA:\n'+proposalText(d)+'\n\nRefer\u00eancia da rubrica autom\u00e1tica: \u00edndice '+o.indice+', completude '+o.eixos.completude+', fundamenta\u00e7\u00e3o '+o.eixos.fundamentacao+', calibra\u00e7\u00e3o '+o.eixos.calibracao+', coer\u00eancia '+o.eixos.coerencia+'.';}
+function openAIModal(title,inner){document.getElementById('aiTitle').textContent='An\u00e1lise IA \u2014 '+title;document.getElementById('aiBody').innerHTML=inner;document.getElementById('aiModal').classList.add('open');}
+function closeAI(){document.getElementById('aiModal').classList.remove('open');}
+function rubricaResumo(d){const o=scoreOverall(d,STEPS);return 'índice '+o.indice+', completude '+o.eixos.completude+', fundamentação '+o.eixos.fundamentacao+', calibração '+o.eixos.calibracao+', coerência '+o.eixos.coerencia;}
+async function analyzeMyTeam(){
+  if(!supa||!CONFIG.supabaseUrl){alert('Análise por IA disponível apenas com o Supabase configurado.');return;}
+  openAIModal(currentTeamName||'Sua equipe','<p>Analisando com IA… pode levar alguns segundos.</p>');
+  try{
+    const url=CONFIG.supabaseUrl.replace(/\/$/,'')+'/functions/v1/analyze';
+    const resp=await fetch(url,{method:'POST',headers:{'content-type':'application/json','Authorization':'Bearer '+CONFIG.supabaseAnonKey},
+      body:JSON.stringify({codigo:currentClass,senha:currentClassPass,equipe_nome:currentTeamName,proposta:proposalText(gameData),rubrica:rubricaResumo(gameData)})});
+    const data=await resp.json().catch(()=>({error:'resposta inválida'}));
+    if(!resp.ok||data.error)throw new Error(data.error||('HTTP '+resp.status));
+    openAIModal(currentTeamName,(data.indice?'<div class="aiindex">Índice de sucesso (IA): <b>'+data.indice+'/100</b></div>':'')+'<pre class="aitext">'+esc(data.texto||'(sem resposta)')+'</pre><p class="aidisc">Parecer de IA — opinião do modelo, separada do índice da rubrica automática.</p>');
+  }catch(e){openAIModal(currentTeamName,'<p style="color:#b02a2a"><b>Não foi possível concluir a análise.</b></p><p class="aidisc">'+esc((e&&e.message)||String(e))+'</p><p class="aidisc">Verifique se a Edge Function <code>analyze</code> foi publicada e se as senhas estão corretas.</p>');}
+}
+async function analyzeTeam(teamId){
+  const key=aiKeyGet();if(!key){alert('Configure a chave da Anthropic no painel (\ud83e\udd16 An\u00e1lise por IA).');return;}
+  const teams=await fetchClassStudents(currentClass);const team=teams[teamId];if(!team){alert('Equipe n\u00e3o encontrada.');return;}
+  openAIModal(team.name,'<p>Analisando com IA\u2026 pode levar alguns segundos.</p>');
+  try{
+    const resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',
+      headers:{'content-type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:aiModelGet(),max_tokens:900,messages:[{role:'user',content:buildAIPrompt(team)}]})});
+    if(!resp.ok){const t=await resp.text();throw new Error('HTTP '+resp.status+' \u2014 '+t.slice(0,300));}
+    const data=await resp.json();
+    const txt=(data.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('\n')||'(sem resposta)';
+    const m=txt.match(/\u00cdNDICE DE SUCESSO:\s*(\d{1,3})/i);const idx=m?m[1]:null;
+    openAIModal(team.name,(idx?'<div class="aiindex">\u00cdndice de sucesso (IA): <b>'+idx+'/100</b></div>':'')+'<pre class="aitext">'+esc(txt)+'</pre><p class="aidisc">Parecer gerado por IA \u2014 opini\u00e3o do modelo, separada do \u00edndice da rubrica autom\u00e1tica.</p>');
+  }catch(e){
+    openAIModal(team.name,'<p style="color:#b02a2a"><b>N\u00e3o foi poss\u00edvel concluir a an\u00e1lise.</b></p><p class="aidisc">'+esc(e.message||String(e))+'</p><p class="aidisc">Se aparecer <b>CORS</b> ou <b>Failed to fetch</b>, o navegador bloqueou a chamada direta \u00e0 Anthropic. Nesse caso a an\u00e1lise precisa passar por uma fun\u00e7\u00e3o no Supabase (pr\u00f3ximo passo).</p>');
+  }
+}
+async function showDashboard(){
+  document.getElementById('loginSection').classList.add('hidden');
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('dashboard').classList.add('active');
+  document.getElementById('topbar').classList.remove('hidden');
+  document.getElementById('consultFab').classList.remove('hidden');
+  document.getElementById('userDisplay').textContent=currentUser.name+' · '+currentUser.classCode;
+  document.getElementById('dashboardClass').textContent=currentUser.classCode;
+  document.getElementById('dashBanner').innerHTML=supa?'':
+    '<div class="banner"><span>⚠️</span><div><strong>Modo local ativo.</strong> Sem backend, o dashboard mostra apenas alunos deste navegador. Para ver a turma inteira em tempo real, ative o Supabase em <code>CONFIG.useSupabase</code>.</div></div>';
+  refreshAIStatus();await updateDashboard();
+  if(showDashboard._t)clearInterval(showDashboard._t);
+  showDashboard._t=setInterval(()=>{if(!document.getElementById('dashboard').classList.contains('active')){clearInterval(showDashboard._t);showDashboard._t=null;return;}updateDashboard();},4000);
+}
+function aggregate(students,qid){const m={};students.forEach(s=>{const a=(s.data&&s.data[qid])||[];if(Array.isArray(a))a.forEach(v=>m[v]=(m[v]||0)+1);});
+  return Object.entries(m).sort((a,b)=>b[1]-a[1]).slice(0,5);}
+function aggCol(title,rows){if(!rows.length)return '<div class="agg-col"><h4>'+title+'</h4><div class="agg-row"><span class="aname" style="color:#9aa4b0">Sem dados ainda</span></div></div>';
+  const max=rows[0][1];return '<div class="agg-col"><h4>'+title+'</h4>'+rows.map(([n,c])=>'<div class="agg-row"><span class="aname">'+n+'</span><span class="atrack"><span class="afill" style="width:'+(c/max*100)+'%"></span></span><span class="acount">'+c+'</span></div>').join('')+'</div>';}
+function avgEixos(students){const acc={completude:0,fundamentacao:0,calibracao:0,coerencia:0};let n=0;
+  students.forEach(s=>{if(s.data){const o=scoreOverall(s.data,STEPS);Object.keys(acc).forEach(k=>acc[k]+=o.eixos[k]);n++;}});
+  if(n)Object.keys(acc).forEach(k=>acc[k]=Math.round(acc[k]/n));return acc;}
+function buildTurmaVisions(students){
+  if(!students.length)return '<h3>Super dashboard da turma</h3><p class="asub">Sem dados ainda.</p>';
+  let allB=[];students.forEach(s=>{if(s.data)allB=allB.concat(allBets(s.data,STEPS));});
+  const eix=avgEixos(students),fund=fundamentacaoPorEtapa(students,STEPS),div=divergencias(students,STEPS);
+  const withData=students.filter(s=>s.data);
+  const coerAvg=withData.length?Math.round(withData.reduce((a,s)=>a+scoreOverall(s.data,STEPS).eixos.coerencia,0)/withData.length):0;
+  let h='<h3>Super dashboard da turma</h3><p class="asub">Rubrica agregada — para conduzir a discussão em aula.</p>';
+  h+='<div class="dvz"><h4>Índice por eixo (média da turma)</h4><div class="eixos">';
+  [['completude','Completude'],['fundamentacao','Fundamentação'],['calibracao','Calibração'],['coerencia','Coerência']].forEach(e=>{
+    h+='<div class="eixo"><div class="en"><span>'+e[1]+'</span><span>'+eix[e[0]]+'/100</span></div><div class="etrack"><div class="efill" style="width:'+eix[e[0]]+'%"></div></div></div>';});
+  h+='</div></div>';
+  h+='<div class="dvz"><h4>Ranking das equipes</h4><div class="dsub">Barra = índice; segmentos = contribuição de cada eixo.</div><div class="svgscroll">'+rankingSVG(students)+'</div>'+rankingLegend()+'</div>';
+  h+='<div class="dvz"><h4>Heatmap turma × etapa</h4><div class="dsub">Verde = forte, vermelho = fraco. Onde intervir.</div><div class="svgscroll">'+heatmapSVG(students)+'</div></div>';
+  h+='<div class="dvz"><h4>Matriz Impacto × Confiança (todas as apostas)</h4><div class="dsub">Verde = fundamentada; âmbar = sem dado. n='+allB.length+' apostas.</div><div style="text-align:center">'+matrixSVG(allB)+'</div></div>';
+  h+='<div class="dvz"><h4>Mapa de fundamentação (dado vs achismo)</h4><div class="dsub">% das apostas com evidência baseada em dado, por etapa.</div>';
+  fund.forEach(f=>{const st=STEPS.find(s=>s.id===f.step);h+='<div class="agg-row"><span class="aname">'+(st?st.name:f.step)+'</span><span class="atrack"><span class="afill" style="width:'+f.fund+'%"></span></span><span class="acount">'+f.fund+'%</span></div>';});
+  h+='</div>';
+  h+='<div class="dvz"><h4>Coerência média da cadeia TESTE</h4><div class="bar"><div class="track"><div class="fill" style="width:'+coerAvg+'%"></div></div><div class="sc">'+coerAvg+'/100</div></div></div>';
+  h+='<div class="dvz"><h4>Divergências da turma</h4><div class="dsub">Onde as escolhas mais se dividem — bons pontos de debate.</div>';
+  if(!div.length)h+='<p class="asub">Precisa de mais alunos/equipes para calcular.</p>';
+  div.forEach(d=>{h+='<div class="divrow"><div class="dq">'+d.label+' <span class="chip-view">'+d.div+'% divisão</span></div><div class="dbar" style="width:'+Math.max(6,d.div)+'%"></div><div class="asub" style="margin-top:4px">'+d.top.map(t=>t[0]+' ('+t[1]+')').join(' · ')+'</div></div>';});
+  h+='</div>';return h;
+}
+async function updateDashboard(){
+  const students=Object.values(await fetchClassStudents(currentClass));
+  document.getElementById('totalStudents').textContent=students.length;
+  const now=Date.now();
+  document.getElementById('activeStudents').textContent=students.filter(s=>now-new Date(s.lastActive).getTime()<300000).length;
+  document.getElementById('completedStudents').textContent=students.filter(s=>s.completed).length;
+  document.getElementById('averageScore').textContent=students.length?Math.round(students.reduce((a,s)=>a+(s.score||0),0)/students.length):0;
+  document.getElementById('aggPanel').innerHTML=buildTurmaVisions(students);
+  const grid=document.getElementById('studentsGrid');grid.innerHTML='';
+  if(!students.length){grid.innerHTML='<div class="empty">Nenhuma equipe registrada ainda nesta turma.</div>';return;}
+  students.sort((a,b)=>(b.score||0)-(a.score||0)).forEach(s=>{
+    const online=now-new Date(s.lastActive).getTime()<300000;
+    const dots=STEPS.map((st,i)=>'<div class="dot '+(i<s.currentStep?'done':i===s.currentStep?'cur':'')+'">'+st.letter+'</div>').join('');
+    const o=s.data?scoreOverall(s.data,STEPS):{indice:0,eixos:{completude:0,fundamentacao:0,calibracao:0,coerencia:0}};
+    const bets=s.data?allBets(s.data,STEPS):[];const semEv=bets.filter(b=>!(b.ev||'').trim()).length;
+    const invalid=bets.filter(b=>(b.ev||'').trim()&&!evValid(b.ev)).length;
+    const abaixo=(s.data&&s.completed)&&o.indice<(CONFIG.pisoGeral||60);
+    const flags=[];if(invalid)flags.push('<span class="tflag bad">'+invalid+' evid. inv\u00e1lida(s)</span>');if(abaixo)flags.push('<span class="tflag bad">abaixo do piso</span>');if(semEv)flags.push('<span class="tflag warn">'+semEv+' sem evid.</span>');
+    const eixMini=[['Compl.',o.eixos.completude],['Fund.',o.eixos.fundamentacao],['Calib.',o.eixos.calibracao],['Coer.',o.eixos.coerencia]].map(e=>'<span class="chip-view">'+e[0]+' '+e[1]+'</span>').join(' ');
+    const nMem=(s.members&&s.members.length)||0;
+    const card=document.createElement('div');card.className='scard';card.onclick=()=>showStudentDetails(s);
+    card.innerHTML='<div class="sn">'+s.name+' <span class="chip-view">'+nMem+' membro(s)</span></div>'+
+      '<div class="dots">'+dots+'</div>'+
+      '<div class="stt">'+(online?'🟢 Online':'⚪ Offline')+' · Etapa '+Math.min(s.currentStep+1,5)+'/5 · Índice '+o.indice+'/100'+
+      (semEv?' · <b style="color:var(--warn)">'+semEv+' aposta(s) sem evidência</b>':(s.completed?' · ✅ Finalizado':''))+'</div>'+
+      '<div class="teixos">'+eixMini+'</div>'+
+      (flags.length?'<div class="tflags">'+flags.join('')+'</div>':'')+
+      '<div class="tmembers">'+(s.members||[]).map(m=>m.nome).join(', ')+'</div>'+      (s.data?'<button class="ai-btn" onclick="event.stopPropagation();analyzeTeam(\''+s.id+'\')">\ud83e\udd16 Analisar com IA</button>':'');
+    grid.appendChild(card);});
+}
+function showStudentDetails(s){const d=s.data||{};const o=scoreOverall(d,STEPS);
+  const mem=(s.members||[]).map(m=>'• '+m.nome+' · '+(m.tel||'')+' · '+(m.email||'')).join('\n')||'—';
+  const bets=allBets(d,STEPS);const semEv=bets.filter(b=>!(b.ev||'').trim()).length;
+  alert('EQUIPE: '+s.name+'\n\nMembros:\n'+mem+'\n\nÍndice: '+o.indice+'/100\nCompletude '+o.eixos.completude+' · Fundamentação '+o.eixos.fundamentacao+' · Calibração '+o.eixos.calibracao+' · Coerência '+o.eixos.coerencia+'\nApostas sem evidência: '+semEv+'\nProduto: '+(d.nomeProduto||'—')+'\nPerfil: '+((d.psicoProfile&&d.psicoProfile.title)||'—'));}
+async function exportClassData(){
+  const students=Object.values(await fetchClassStudents(currentClass));
+  let csv='Equipe;Membros;Emails;Telefones;Etapa;Status;Indice;Completude;Fundamentacao;Calibracao;Coerencia;ApostasSemEvidencia;Produto;Praca;Atualizado\n';
+  students.forEach(s=>{const d=s.data||{};const o=scoreOverall(d,STEPS);const c=v=>(Array.isArray(v)?v.join(' | '):(v||'')).toString().replace(/;/g,',');
+    const nomes=(s.members||[]).map(m=>m.nome).join(' | ');const emails=(s.members||[]).map(m=>m.email).join(' | ');const tels=(s.members||[]).map(m=>m.tel).join(' | ');
+    const semEv=allBets(d,STEPS).filter(b=>!(b.ev||'').trim()).length;
+    csv+=[c(s.name),c(nomes),c(emails),c(tels),Math.min(s.currentStep+1,5)+'/5',s.completed?'Finalizado':'Andamento',o.indice,o.eixos.completude,o.eixos.fundamentacao,o.eixos.calibracao,o.eixos.coerencia,semEv,c(d.nomeProduto),c(d.praca),new Date(s.lastActive).toLocaleString('pt-BR')].join(';')+'\n';});
+  const blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='turma_'+currentClass+'_equipes.csv';a.click();URL.revokeObjectURL(a.href);
+}
+
+/* ============================ PDF ============================ */
+function exportToPDF(){
+  try{
+    if(!window.jspdf){alert('Biblioteca PDF não carregada. Recarregue a página.');return;}
+    collectFields();
+    const {jsPDF}=window.jspdf;const doc=new jsPDF();
+    const W=doc.internal.pageSize.getWidth(),H=doc.internal.pageSize.getHeight(),M=18,LH=6.2;let y=M;const brand=[26,107,60];
+    const page=(sp=18)=>{if(y+sp>H-M){doc.addPage();y=M;}};
+    const T=(txt,size=11,bold=false,color=[31,39,51])=>{doc.setFontSize(size);doc.setFont(undefined,bold?'bold':'normal');doc.setTextColor(...color);
+      const lines=doc.splitTextToSize(String(txt),W-2*M);page(lines.length*LH+4);doc.text(lines,M,y);y+=lines.length*LH+3;};
+    doc.setFillColor(...brand);doc.rect(0,0,W,26,'F');doc.setTextColor(255,255,255);doc.setFontSize(16);doc.setFont(undefined,'bold');
+    doc.text('Metodologia TESTE · Relatório',M,16);y=34;
+    T('Aluno(a): '+(currentUser.name||'—'),11);
+    T('Turma: '+(currentUser.classCode||'—')+'   ·   Data: '+new Date().toLocaleDateString('pt-BR'),11);y+=2;
+    T('CONTEXTO DO PROJETO',13,true,brand);
+    T('Produto: '+(gameData.nomeProduto||'—'),11,true);T(gameData.conceito||'—',10);
+    [['Tipo',gameData.tipoProduto],['Torres/Unidades',gameData.totalUnidades],['Metragem',gameData.metragem&&gameData.metragem+' m²'],
+     ['Praça',gameData.praca],['Estágio',gameData.estagio],['Ticket médio',gameData.ticket&&'R$ '+gameData.ticket],
+     ['VGV alvo',gameData.vgv&&'R$ '+gameData.vgv],['Meta VSO',gameData.vso],['Concorrentes',gameData.concorrentes],
+     ['Lazer',gameData.areaLazer],['Serviços',gameData.servicosFacilidades]].forEach(([k,v])=>{if(v)T(k+': '+v,10);});
+    if(gameData.psicoProfile){y+=2;T('PERFIL PSICOGRÁFICO',12,true,brand);
+      T(gameData.psicoProfile.title,11,true);T(gameData.psicoProfile.descricao,10);
+      T('Gatilhos: '+gameData.psicoProfile.gatilhos.join(', '),9.5);
+      T('Canais: '+gameData.psicoProfile.canais.join(', '),9.5);}
+    y+=3;
+    if(gameData.completed){page(24);T('PROPOSTA PRELIMINAR (síntese das escolhas)',13,true,brand);
+      const g=gameData;const jn=id=>join(id)||'—';
+      [['Público-alvo',jn('target_q1')],['Momento de vida',jn('target_q2')],['Renda',g.target_q3||'—'],['Job resolvido',jn('target_q4')],
+       ['Barreiras',[join('target_q5'),join('explorar_q1')].filter(Boolean).join(', ')||'—'],['Ambiente de impacto',jn('explorar_q4')],
+       ['Gatilhos',jn('solucoes_q1')],['Diferenciação',jn('solucoes_q2')],['Ativos de experiência',jn('solucoes_q3')],
+       ['Hipótese','SE '+(g.testar_hyp_if||'…')+' ENTÃO '+(g.testar_hyp_then||'…')+' PORQUE '+(g.testar_hyp_why||'…')],
+       ['Validação',[join('testar_q1'),join('testar_lab'),g.testar_q2||''].filter(Boolean).join(', ')||'—'],
+       ['Escala/sustentação',[join('escala_q1'),join('escala_q2')].filter(Boolean).join(', ')||'—']].forEach(([k,v])=>{T(k+': '+v,10);});
+      y+=3;}
+    STEPS.forEach(step=>{T(step.title,12,true,brand);
+      step.questions.forEach(q=>{
+        if(q.type==='chips'){const sel=gameData[q.id]||[];if(sel.length){T(q.label,10,true);
+          const meta=gameData[q.id+'_bets']||{};
+          sel.forEach(lb=>{const m=meta[lb]||{};T('• '+lb+'  (Impacto '+(m.imp||'-')+' / Confiança '+(m.conf||'-')+')',9.5,true);if(m.ev&&m.ev.trim())T('   Evidência: '+m.ev,9);});}}
+        else{const v=gameData[q.id];const val=Array.isArray(v)?v.join(', '):(v||'');if(val&&val.toString().trim()){T(q.label,10,true);T(val,9.5);}}
+      });
+      const rz=gameData[step.id+'_reason'];if(rz&&rz.trim()){T('Justificativa:',10,true);T(rz,9.5);}y+=3;});
+    {page(28);const _o=scoreOverall(gameData,STEPS);T('DIAGNÓSTICO POR RUBRICA',13,true,brand);T('Índice de robustez: '+_o.indice+'/100',11,true);
+      T('Completude '+_o.eixos.completude+' · Fundamentação '+_o.eixos.fundamentacao+' · Calibração '+_o.eixos.calibracao+' · Coerência '+_o.eixos.coerencia,9.5);
+      STEPS.forEach(step=>{const r=scoreStep(gameData,STEPS,step.id);T(step.letter+' — '+step.name+': '+r.score+'/100  (comp '+r.comp+' · fund '+r.fund+' · cal '+r.cal+')',9.5,true);});
+      const elos=coerenciaElos(gameData);if(elos.length){T('Elos fracos:',10,true,[138,90,0]);elos.forEach(e=>T('• '+e,9,false,[138,90,0]));}
+      y+=2;T('Diagnóstico gerado por rubrica automática transparente (apoio de revisão).',8,false,[120,120,120]);}
+    const n=doc.internal.getNumberOfPages();
+    for(let i=1;i<=n;i++){doc.setPage(i);doc.setFontSize(8);doc.setTextColor(140,140,140);
+      doc.text('ENEDES · Metodologia TESTE',M,H-8);doc.text('Página '+i+' de '+n,W-M,H-8,{align:'right'});}
+    doc.save('TESTE_'+(currentUser.name||'aluno').replace(/\s+/g,'_')+'_'+new Date().toISOString().slice(0,10)+'.pdf');
+  }catch(e){console.error(e);alert('Erro ao gerar PDF. Tente novamente.');}
+}
+</script>
+<div class="helpmodal" id="helpModal">
+  <div class="helpbox">
+    <div class="helphead"><h3 id="helpTitle"></h3><button onclick="closeHelp()">✕</button></div>
+    <div id="helpBody" class="helpbody"></div>
+    <button class="primary-btn" style="margin-top:16px" onclick="closeHelp()">Entendi</button>
+  </div>
+</div>
+<div class="aimodal" id="aiModal">
+  <div class="aibox">
+    <div class="aihead"><h3 id="aiTitle">Análise IA</h3><button onclick="closeAI()">✕</button></div>
+    <div id="aiBody"></div>
+    <button class="nav-btn" style="margin-top:16px" onclick="closeAI()">Fechar</button>
+  </div>
+</div>
+</body>
+</html>
