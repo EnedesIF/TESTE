@@ -386,6 +386,17 @@ button,textarea,input,select{font-family:inherit}
 .aitext{white-space:pre-wrap;font-family:inherit;font-size:13.5px;color:#2c3742;line-height:1.5;background:#fafbfc;border:1px solid var(--line);border-radius:10px;padding:14px;margin:0}
 .aidisc{font-size:11.5px;color:var(--muted);margin-top:10px}
 
+
+/* ===== cadastro de múltiplos membros ===== */
+.mrow{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:8px;margin-bottom:8px;align-items:center}
+.mrow input{padding:9px 10px;border:1px solid var(--line);border-radius:8px;font-size:13px}
+.mrow input:focus{outline:none;border-color:var(--brand-2);box-shadow:0 0 0 3px rgba(46,117,182,.1)}
+.mrow .mrem{background:#fdecec;border:none;color:#b02a2a;width:32px;height:32px;border-radius:8px;cursor:pointer;font-weight:700}
+.mrow .mrem:hover{background:#f8d7d7}
+.addmember{background:#eef7f1;border:1px dashed #1A6B3C;color:#1A6B3C;border-radius:8px;padding:9px 12px;font-weight:700;font-size:12.5px;cursor:pointer;width:100%;margin-top:2px}
+.addmember:hover{background:#e2f0e8}
+@media(max-width:640px){.mrow{grid-template-columns:1fr 1fr}.mrow .memail{grid-column:1/-1}.mrow .mrem{grid-column:1/-1;width:100%}}
+
 </style>
 </head>
 <body>
@@ -409,12 +420,11 @@ button,textarea,input,select{font-family:inherit}
       <div class="form active" id="studentForm">
         <div class="fg"><label>Código da turma</label><input id="classCode" placeholder="Ex: MBA2025A" style="text-transform:uppercase"></div>
         <div class="fg"><label>Nome da equipe</label><input id="teamName" placeholder="Ex: Equipe Alfa"></div><div class="fg"><label>Senha da turma</label><input id="classPass" type="password" placeholder="Senha informada pelo(a) professor(a)"></div>
-        <div class="memblock"><div class="mtitle">Seus dados (membro da equipe)</div>
-          <div class="fg"><label>Nome completo</label><input id="memberName" placeholder="Seu nome"></div>
-          <div class="fg"><label>Telefone</label><input id="memberPhone" placeholder="(61) 90000-0000"></div>
-          <div class="fg"><label>E-mail</label><input id="memberEmail" type="email" placeholder="voce@email.com"></div>
+        <div class="memblock"><div class="mtitle">Membros do grupo (cadastre todos)</div>
+          <div id="membersList"></div>
+          <button type="button" class="addmember" onclick="addMemberRow()">+ adicionar membro</button>
         </div>
-        <label class="consent-row"><input type="checkbox" id="consent"><span>Autorizo o uso dos meus dados (nome, telefone e e-mail) para a realização desta dinâmica da disciplina, conforme a LGPD. Os dados ficam acessíveis ao(à) professor(a) da turma.</span></label>
+        <label class="consent-row"><input type="checkbox" id="consent"><span>Autorizo o uso dos dados dos membros do grupo (nome, telefone e e-mail) para a realização desta dinâmica da disciplina, conforme a LGPD. Os dados ficam acessíveis ao(à) professor(a) da turma.</span></label>
         <button class="primary-btn" onclick="loginStudent()">Entrar na equipe</button>
         <div class="demo">
           <h4>Acesso rápido para teste</h4>
@@ -933,7 +943,7 @@ async function fetchClassStudents(cc){
 
 /* ============================ INIT ============================ */
 document.addEventListener('DOMContentLoaded',()=>{
-  buildStepsUI();initSupabase();
+  buildStepsUI();initSupabase();ensureMembers();
   const saved=localStorage.getItem('testeUser');
   if(saved){currentUser=JSON.parse(saved);currentClass=currentUser.classCode;
     if(currentUser.type==='student'){currentTeamId=currentUser.teamId;currentTeamName=currentUser.teamName;currentClassPass=currentUser.pass||null;
@@ -945,34 +955,45 @@ document.addEventListener('DOMContentLoaded',()=>{
 });
 
 /* ============================ LOGIN ============================ */
-function switchTab(t){document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x.dataset.tab===t));
+function switchTab(t){document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x.dataset.tab===t));if(t==='student')ensureMembers();
   document.getElementById('studentForm').classList.toggle('active',t==='student');
   document.getElementById('teacherForm').classList.toggle('active',t==='teacher');}
 function quickTeacherLogin(n,c){document.getElementById('teacherName').value=n;document.getElementById('teacherClassCode').value=c;const tp=document.getElementById('teacherPass');if(tp)tp.value='demo';loginTeacher();}
 function quickJoin(team,name,email){document.getElementById('classCode').value='DEMO2025';document.getElementById('teamName').value=team;
-  document.getElementById('memberName').value=name;document.getElementById('memberPhone').value='(61) 90000-0000';
-  document.getElementById('memberEmail').value=email;document.getElementById('consent').checked=true;const cp=document.getElementById('classPass');if(cp)cp.value='demo';loginStudent();}
+  ensureMembers();const r=document.querySelector('#membersList .mrow');if(r){r.querySelector('.mnome').value=name;r.querySelector('.mtel').value='(61) 90000-0000';r.querySelector('.memail').value=email;}
+  document.getElementById('consent').checked=true;const cp=document.getElementById('classPass');if(cp)cp.value='demo';loginStudent();}
+function memberRowHTML(){return '<div class="mrow"><input class="mnome" placeholder="Nome completo"><input class="mtel" placeholder="Telefone"><input class="memail" type="email" placeholder="E-mail"><button type="button" class="mrem" title="remover" onclick="removeMemberRow(this)">\u2715</button></div>';}
+function addMemberRow(){const l=document.getElementById('membersList');if(l)l.insertAdjacentHTML('beforeend',memberRowHTML());}
+function removeMemberRow(btn){const l=document.getElementById('membersList');const rows=l?l.querySelectorAll('.mrow'):[];if(rows.length<=1){const r=btn.closest('.mrow');r.querySelector('.mnome').value='';r.querySelector('.mtel').value='';r.querySelector('.memail').value='';return;}btn.closest('.mrow').remove();}
+function ensureMembers(){const l=document.getElementById('membersList');if(l&&!l.querySelector('.mrow'))l.insertAdjacentHTML('beforeend',memberRowHTML());}
+function collectMembers(){const out=[];document.querySelectorAll('#membersList .mrow').forEach(r=>{const nome=r.querySelector('.mnome').value.trim(),tel=r.querySelector('.mtel').value.trim(),email=r.querySelector('.memail').value.trim();if(nome||tel||email)out.push({nome,tel,email});});return out;}
 async function loginStudent(){
   const V=id=>(document.getElementById(id).value||'').trim();
   const cc=V('classCode').toUpperCase();const teamName=V('teamName');
-  const mName=V('memberName'),mPhone=V('memberPhone'),mEmail=V('memberEmail');
   const pass=(document.getElementById('classPass')?V('classPass'):'');
   const consent=document.getElementById('consent').checked;
+  const members=collectMembers();
+  const reMail=/^[^@\s]+@[^@\s]+\.[^@\s]+$/;
   if(!cc||!teamName)return alert('Preencha o código da turma e o nome da equipe.');
-  if(mName.length<2)return alert('Digite seu nome completo.');
-  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(mEmail))return alert('Digite um e-mail válido.');
-  if(!mPhone)return alert('Digite seu telefone.');
+  if(!members.length)return alert('Cadastre ao menos um membro do grupo.');
+  for(const m of members){
+    if((m.nome||'').length<2)return alert('Cada membro precisa do nome completo.');
+    if(!reMail.test(m.email||''))return alert('E-mail inválido para "'+(m.nome||'membro')+'".');
+    if(!m.tel)return alert('Telefone faltando para "'+(m.nome||'membro')+'".');
+  }
   if(!consent)return alert('É necessário autorizar o uso dos dados (LGPD) para participar.');
   if(supa&&!pass)return alert('Digite a senha da turma.');
   const teamIdS=norm(teamName).replace(/\s+/g,'_');
-  const memberS={nome:mName,tel:mPhone,email:mEmail};
+  const mName=members[0].nome,mEmail=members[0].email;
   if(supa){
     try{
-      const {data,error}=await supa.rpc('entrar_equipe',{p_codigo:cc,p_senha_aluno:pass,p_equipe_id:teamIdS,p_equipe_nome:teamName,p_membro:memberS});
-      if(error)throw error;
-      const row=Array.isArray(data)?data[0]:data;
+      let row=null;
+      for(const mem of members){
+        const {data,error}=await supa.rpc('entrar_equipe',{p_codigo:cc,p_senha_aluno:pass,p_equipe_id:teamIdS,p_equipe_nome:teamName,p_membro:mem});
+        if(error)throw error;row=Array.isArray(data)?data[0]:data;
+      }
       currentClass=cc;currentTeamId=teamIdS;currentTeamName=(row&&row.equipe_nome)||teamName;currentClassPass=pass;
-      const team={id:teamIdS,name:currentTeamName,members:(row&&row.membros)||[memberS],data:(row&&row.dados)||{},completed:!!(row&&row.completo),score:(row&&row.score)||0,currentStep:(row&&row.etapa)||0,lastActive:(row&&row.atualizado_em)||new Date().toISOString()};
+      const team={id:teamIdS,name:currentTeamName,members:(row&&row.membros)||members,data:(row&&row.dados)||{},completed:!!(row&&row.completo),score:(row&&row.score)||0,currentStep:(row&&row.etapa)||0,lastActive:(row&&row.atualizado_em)||new Date().toISOString()};
       DATABASE.classes[cc]={name:'Turma '+cc,teams:{}};DATABASE.classes[cc].teams[teamIdS]=team;
       currentUser={type:'student',name:mName,email:mEmail,teamId:teamIdS,teamName:currentTeamName,classCode:cc,pass:pass};
       localStorage.setItem('testeUser',JSON.stringify(currentUser));
@@ -985,9 +1006,7 @@ async function loginStudent(){
   currentClass=cc;currentTeamId=teamId;
   let team=DATABASE.classes[cc].teams[teamId]||loadTeamRecord(cc,teamId)||{id:teamId,name:teamName,members:[],data:{},completed:false,score:0,currentStep:0,lastActive:new Date().toISOString()};
   team.members=team.members||[];
-  const ix=team.members.findIndex(m=>norm(m.email)===norm(mEmail));
-  const member={nome:mName,tel:mPhone,email:mEmail};
-  if(ix>=0)team.members[ix]=member;else team.members.push(member);
+  members.forEach(member=>{const ix=team.members.findIndex(m=>norm(m.email)===norm(member.email));if(ix>=0)team.members[ix]=member;else team.members.push(member);});
   team.lastActive=new Date().toISOString();
   DATABASE.classes[cc].teams[teamId]=team;
   currentTeamName=team.name;
