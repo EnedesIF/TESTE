@@ -7,6 +7,7 @@ const script = html.match(/<script>\s*\/\* ============================ CONFIG[\
 
 assert.ok(script, 'O script principal da aplicação deve estar presente.');
 new Function(script);
+assert.match(html, /const cards=STEPS\.map/, 'O radar do aluno deve construir seus cartões de etapa antes de renderizá-los.');
 assert.match(html, /Prioridades de intervenção docente/, 'O painel deve indicar equipes que pedem intervenção.');
 assert.match(html, /function toggleTeamLock/, 'O professor deve poder encerrar ou reabrir dossiês.');
 assert.match(html, /function openTeamPresentation/, 'O professor deve abrir a apresentação de uma equipe.');
