@@ -168,6 +168,22 @@ begin
   return v_row;
 end $$;
 
+-- Aluno lista somente os nomes das equipes da própria turma. Esta função
+-- serve para alertar sobre duplicidade no cadastro e não expõe contatos,
+-- notas nem respostas das demais equipes.
+create or replace function public.listar_equipes_aluno(
+  p_codigo text, p_senha_aluno text
+) returns table(equipe_id text, equipe_nome text)
+language plpgsql security definer set search_path = public as $$
+begin
+  if not exists (select 1 from turmas
+      where codigo = upper(p_codigo) and senha_aluno = crypt(p_senha_aluno, senha_aluno)) then
+    raise exception 'SENHA_INVALIDA';
+  end if;
+  return query select e.equipe_id, e.equipe_nome
+    from equipes e where e.turma = upper(p_codigo) order by e.equipe_nome;
+end $$;
+
 -- Professor lista TODAS as equipes (com contatos) — exige senha_prof.
 create or replace function public.listar_equipes_prof(
   p_codigo text, p_senha_prof text
@@ -199,6 +215,7 @@ grant execute on function
   public.entrar_equipe(text,text,text,text,jsonb),
   public.salvar_equipe(text,text,text,int,boolean,int,jsonb),
   public.carregar_equipe(text,text,text),
+  public.listar_equipes_aluno(text,text),
   public.listar_equipes_prof(text,text),
   public.verificar_senha_aluno(text,text)
 to anon, authenticated;

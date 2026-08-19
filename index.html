@@ -97,8 +97,14 @@ button,textarea,input,select{font-family:inherit}
 .method .exp p{font-size:13.5px;color:var(--muted)}
 .method .core{grid-column:1/-1;background:linear-gradient(135deg,var(--brand),var(--brand-2));color:#fff;border-radius:12px;padding:22px;text-align:center;font-weight:700;font-size:1.15em}
 
-.progress{background:#eceff3;height:8px;border-radius:5px;overflow:hidden;margin-bottom:22px}
-.progress > i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--brand),var(--brand-2));transition:width .4s}
+	.progress{background:#eceff3;height:8px;border-radius:5px;overflow:hidden;margin-bottom:22px}
+	.progress > i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--brand),var(--brand-2));transition:width .4s}
+	.live-dash{background:linear-gradient(135deg,#f8fbfa,#f4f8fd);border:1px solid #dce7e5;border-radius:16px;padding:18px;margin:0 0 22px}
+	.live-dash-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:14px}.live-dash-head h3{font-size:1em;color:var(--brand)}.live-dash-head p{font-size:12px;color:var(--muted);margin-top:3px}
+	.save-pill{display:inline-flex;align-items:center;gap:6px;background:#fff;border:1px solid #dce7e5;color:var(--muted);border-radius:99px;padding:6px 10px;font-size:11px;font-weight:700;white-space:nowrap}.save-pill.sync{color:var(--brand);border-color:#bfe0cd;background:#f4fcf7}.save-pill.wait{color:#8a5a00;border-color:#f2c98a;background:#fff9ed}.save-pill.fail{color:var(--bad);border-color:#f0c8c5;background:#fff7f7}
+	.live-metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.live-metric{border-radius:12px;padding:13px;color:#fff;min-height:84px}.live-metric .lm-label{font-size:10px;letter-spacing:.06em;text-transform:uppercase;font-weight:800;opacity:.82}.live-metric .lm-value{font-size:1.7em;font-weight:900;line-height:1.1;margin-top:6px}.live-metric .lm-sub{font-size:11px;opacity:.85;margin-top:3px}.lm-score{background:linear-gradient(135deg,#166534,#22a06b)}.lm-evidence{background:linear-gradient(135deg,#1d4ed8,#38bdf8)}.lm-coherence{background:linear-gradient(135deg,#7e22ce,#c084fc)}.lm-progress{background:linear-gradient(135deg,#c2410c,#f59e0b)}
+	.stage-health{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:14px}.stage-health-card{background:#fff;border:1px solid var(--line);border-radius:10px;padding:9px 8px}.stage-health-card .sh-top{display:flex;justify-content:space-between;align-items:center;font-size:11px;font-weight:800;color:var(--ink)}.stage-health-card .sh-track{height:6px;background:#edf1f5;border-radius:6px;overflow:hidden;margin-top:7px}.stage-health-card .sh-fill{height:100%;border-radius:6px}.stage-health-card .sh-score{font-size:10px;color:var(--muted);margin-top:5px}
+	.save-now{background:#fff;color:var(--brand);border:1px solid #bfe0cd;padding:12px 18px;border-radius:26px;font-size:14px;font-weight:800;cursor:pointer;transition:.2s}.save-now:hover{background:#f2faf5;transform:translateY(-1px)}
 .steps{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:28px}
 .step-tab{position:relative;text-align:center;padding:16px 6px;border-radius:12px;color:#fff;cursor:pointer;opacity:.55;transition:.2s;border:none}
 .step-tab .l{font-size:1.9em;font-weight:900;display:block}
@@ -256,6 +262,9 @@ button,textarea,input,select{font-family:inherit}
   .steps,.method .letter-row{grid-template-columns:repeat(3,1fr)}
   .hero h1{font-size:2em}
   .axis{grid-template-columns:90px 1fr 90px}
+  .live-metrics{grid-template-columns:repeat(2,1fr)}
+  .stage-health{grid-template-columns:repeat(2,1fr)}
+  .live-dash-head{flex-direction:column}
 }
 /* ===== v4: apostas, rubrica, matriz, super dashboard ===== */
 .bets{margin-top:12px;display:flex;flex-direction:column;gap:10px}
@@ -568,17 +577,18 @@ button,textarea,input,select{font-family:inherit}
   </div>
 
   <!-- PÁGINA 4 · ETAPAS -->
-  <div class="page" id="page4">
-    <div class="card">
-      <div class="progress"><i id="progressFill"></i></div>
-      <div class="steps" id="stepsTabs"></div>
-      <div id="stepsHost"></div>
-      <div class="nav">
-        <button class="nav-btn ghost" id="prevStepBtn" onclick="previousStep()" disabled>← Anterior</button>
-        <button class="nav-btn" id="nextStepBtn" onclick="nextStep()">Próxima →</button>
-      </div>
-    </div>
-  </div>
+	<div class="page" id="page4">
+	  <div class="card">
+	    <div class="progress"><i id="progressFill"></i></div>
+	    <section class="live-dash" id="studentLiveDash" aria-live="polite"></section>
+	    <div class="steps" id="stepsTabs"></div>
+	    <div id="stepsHost"></div>
+	    <div class="nav">
+	      <button class="nav-btn ghost" id="prevStepBtn" onclick="previousStep()" disabled>← Anterior</button>
+	      <div style="display:flex;gap:10px;align-items:center"><button class="save-now" type="button" onclick="saveNow()">💾 Salvar agora</button><button class="nav-btn" id="nextStepBtn" onclick="nextStep()">Próxima →</button></div>
+	    </div>
+	  </div>
+	</div>
 
   <!-- PÁGINA 5 · DIAGNÓSTICO + PROPOSTA -->
   <div class="page" id="page5">
@@ -743,7 +753,7 @@ const PSY_AXES=[
 function psyRenderTool(){
   const rows=PSY_AXES.map(a=>`<div><div class="axis-name">${a.name}</div>
     <div class="axis"><span class="ax-l">${a.l}</span>
-    <input type="range" min="0" max="100" value="50" id="psico_${a.id}" oninput="onPsico()">
+    <input type="range" min="0" max="100" value="50" id="psico_${a.id}" oninput="onPsicoInput()">
     <span class="ax-r">${a.r}</span></div></div>`).join('');
   return `<div class="psycho">
     <h4>🧠 Gerador de perfil psicográfico</h4>
@@ -770,6 +780,7 @@ function personaCard(){
 }
 function setPersona(id){const el=document.getElementById(id);if(el){gameData[id]=el.value;persistStudent();}}
 function onPsico(){gameData.psico=gameData.psico||{};PSY_AXES.forEach(a=>{const el=document.getElementById('psico_'+a.id);if(el)gameData.psico[a.id]=+el.value;});}
+function onPsicoInput(){onPsico();queuePersistStudent();}
 function buildPsicoProfile(v){
   const hi=x=>x>=60,lo=x=>x<=40;
   const persona=v.motivacao>=55?'Investidor(a)':v.motivacao<=45?'Morador(a)':'Perfil híbrido (uso + investimento)';
@@ -911,7 +922,7 @@ const CASES=[
 
 /* ============================ ESTADO ============================ */
 let DATABASE={classes:{'DEMO2025':{name:'Turma Demo 2025',teacher:'Coordenação',teams:{}}}};
-let currentUser=null,currentClass=null,currentTeamId=null,currentTeamName=null,currentPage=0,currentStep=0,gameData={},supa=null,currentClassPass=null,currentProfPass=null;
+let currentUser=null,currentClass=null,currentTeamId=null,currentTeamName=null,currentPage=0,currentStep=0,gameData={},supa=null,currentClassPass=null,currentProfPass=null,persistTimer=null,saveState={status:'sync',at:null};
 
 /* ============================ PERSISTÊNCIA ============================ */
 function initSupabase(){if(CONFIG.useSupabase&&window.supabase&&CONFIG.supabaseUrl&&CONFIG.supabaseAnonKey){
@@ -925,13 +936,34 @@ function getTeam(){if(!currentClass||!currentTeamId)return null;
 async function persistStudent(){
   if(!currentUser||currentUser.type!=='student')return;
   if(!gameData||Object.keys(gameData).length===0)return; // nunca grava vazio por cima
+  setSaveState('wait');
   let team=getTeam();if(!team)return;
   team.data=gameData;team.score=gameData.finalScore||team.score||0;team.completed=!!gameData.completed;team.currentStep=currentStep;team.lastActive=new Date().toISOString();
   DATABASE.classes[currentClass]=DATABASE.classes[currentClass]||{name:'Turma '+currentClass,teams:{}};
   DATABASE.classes[currentClass].teams=DATABASE.classes[currentClass].teams||{};
   DATABASE.classes[currentClass].teams[currentTeamId]=team;
   saveTeamRecord(team);
-  if(supa){try{await supa.rpc('salvar_equipe',{p_codigo:currentClass,p_senha_aluno:currentClassPass,p_equipe_id:currentTeamId,p_etapa:currentStep,p_completo:!!gameData.completed,p_score:team.score,p_dados:gameData});}catch(e){console.warn('salvar_equipe',e);}}
+  if(supa){try{const {error}=await supa.rpc('salvar_equipe',{p_codigo:currentClass,p_senha_aluno:currentClassPass,p_equipe_id:currentTeamId,p_etapa:currentStep,p_completo:!!gameData.completed,p_score:team.score,p_dados:gameData});if(error)throw error;setSaveState('sync',team.lastActive);}catch(e){console.warn('salvar_equipe',e);setSaveState('fail');}}
+  else setSaveState('sync',team.lastActive);
+}
+function queuePersistStudent(){
+  if(!currentUser||currentUser.type!=='student')return;
+  setSaveState('wait');
+  if(persistTimer)clearTimeout(persistTimer);
+  persistTimer=setTimeout(()=>{collectFields();persistStudent();},650);
+}
+function setSaveState(status,at){saveState={status,at:at||saveState.at};renderStudentDashboard();}
+function saveNow(){collectFields();persistStudent();}
+function renderStudentDashboard(){
+  const host=document.getElementById('studentLiveDash');if(!host||!gameData)return;
+  const overall=scoreOverall(gameData,STEPS),bets=allBets(gameData,STEPS);
+  const grounded=bets.filter(b=>evValid(b.ev)&&LEX.grounded.test(b.ev)).length;
+  const activeStages=STEPS.filter(s=>scoreStep(gameData,STEPS,s.id).score>0).length;
+  const statusMap={sync:{cls:'sync',icon:'✓',text:saveState.at?'Salvo às '+new Date(saveState.at).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}):'Tudo salvo'},wait:{cls:'wait',icon:'◌',text:'Salvando alterações…'},fail:{cls:'fail',icon:'!',text:'Verifique a conexão'}};
+  const sv=statusMap[saveState.status]||statusMap.sync;
+  const colors=['#8e44ad','#2E75B6','#e84393','#d35400','#1A6B3C'];
+  const cards=STEPS.map((s,i)=>{const r=scoreStep(gameData,STEPS,s.id);return '<div class="stage-health-card"><div class="sh-top"><span>'+s.letter+' · '+s.name+'</span><span>'+r.score+'</span></div><div class="sh-track"><div class="sh-fill" style="width:'+r.score+'%;background:'+colors[i]+'"></div></div><div class="sh-score">'+(r.score>=70?'Bem sustentada':r.score>=35?'Em construção':'Comece aqui')+'</div></div>';}).join('');
+  host.innerHTML='<div class="live-dash-head"><div><h3>Radar da proposta</h3><p>Leitura em tempo real da robustez, das evidências e da coerência do seu plano.</p></div><span class="save-pill '+sv.cls+'">'+sv.icon+' '+sv.text+'</span></div><div class="live-metrics"><div class="live-metric lm-score"><div class="lm-label">Robustez</div><div class="lm-value">'+overall.indice+'</div><div class="lm-sub">de 100 pontos</div></div><div class="live-metric lm-evidence"><div class="lm-label">Evidências</div><div class="lm-value">'+grounded+'/'+bets.length+'</div><div class="lm-sub">com dado citado</div></div><div class="live-metric lm-coherence"><div class="lm-label">Coerência</div><div class="lm-value">'+overall.eixos.coerencia+'</div><div class="lm-sub">estratégia ↔ teste</div></div><div class="live-metric lm-progress"><div class="lm-label">Etapas</div><div class="lm-value">'+activeStages+'/5</div><div class="lm-sub">com proposta iniciada</div></div></div><div class="stage-health">'+cards+'</div>';
 }
 async function fetchClassStudents(cc){
   if(supa){try{const {data,error}=await supa.rpc('listar_equipes_prof',{p_codigo:cc,p_senha_prof:currentProfPass});
@@ -945,6 +977,10 @@ async function fetchClassStudents(cc){
 /* ============================ INIT ============================ */
 document.addEventListener('DOMContentLoaded',()=>{
   buildStepsUI();initSupabase();ensureMembers();
+  document.querySelectorAll('#page2 input,#page2 textarea,#page2 select').forEach(el=>{
+    el.addEventListener('input',queuePersistStudent);
+    el.addEventListener('change',queuePersistStudent);
+  });
   const saved=localStorage.getItem('testeUser');
   if(saved){currentUser=JSON.parse(saved);currentClass=currentUser.classCode;
     if(currentUser.type==='student'){currentTeamId=currentUser.teamId;currentTeamName=currentUser.teamName;currentClassPass=currentUser.pass||null;
@@ -1145,13 +1181,13 @@ function buildStepsUI(){
         qd.appendChild(sel);
       }else{
         const ta=document.createElement('textarea');ta.className='q-text';ta.id=q.id;
-        ta.oninput=()=>{gameData[q.id]=ta.value;updateQCount(q);toggleFilled(q);afterFieldInput(q.id);};ta.onblur=persistStudent;qd.appendChild(ta);
+        ta.oninput=()=>{gameData[q.id]=ta.value;updateQCount(q);toggleFilled(q);afterFieldInput(q.id);queuePersistStudent();};ta.onblur=persistStudent;qd.appendChild(ta);
       }
       body.appendChild(qd);
     });
     const r=document.createElement('div');r.className='reason';
     r.innerHTML='<label>Justificativa estratégica da etapa (opcional, mas conta pontos)</label><textarea id="'+s.id+'_reason" placeholder="Por que essas escolhas? Conecte com os dados de mercado e o comportamento do consumidor."></textarea>';
-    const rta=r.querySelector('textarea');rta.oninput=()=>{gameData[s.id+'_reason']=rta.value;};rta.onblur=persistStudent;
+    const rta=r.querySelector('textarea');rta.oninput=()=>{gameData[s.id+'_reason']=rta.value;queuePersistStudent();};rta.onblur=persistStudent;
     body.appendChild(r);host.appendChild(body);
     s.questions.filter(q=>q.type==='chips').forEach(renderChips);
   });
@@ -1182,7 +1218,7 @@ function renderBets(q){
     const ta=document.createElement('textarea');ta.placeholder='Evid\u00eancia: em que dado do briefing/mercado voc\u00ea se baseia?';ta.value=m.ev||'';
     const fb=document.createElement('div');fb.className='betfb';
     const upfb=()=>{const f=evFeedback(m.ev);fb.className='betfb '+f.cls;fb.textContent=f.msg;};
-    ta.oninput=()=>{m.ev=ta.value;upfb();updateQCount(q);toggleFilled(q);afterFieldInput(q.id);};
+    ta.oninput=()=>{m.ev=ta.value;upfb();updateQCount(q);toggleFilled(q);afterFieldInput(q.id);queuePersistStudent();};
     ta.onblur=()=>{persistStudent();renderBets(q);};
     card.appendChild(ta);card.appendChild(fb);upfb();
     const scales=document.createElement('div');scales.className='scales';
@@ -1220,7 +1256,7 @@ function showStep(n){
   document.getElementById('progressFill').style.width=(((n+1)/STEPS.length)*100)+'%';
   document.getElementById('prevStepBtn').disabled=n===0;
   document.getElementById('nextStepBtn').textContent=n===STEPS.length-1?'Finalizar →':'Próxima →';
-  currentStep=n;collectFields();persistStudent();updateStepQuality(STEPS[n].id);if(STEPS[n].id==='testar')updateCoherence();window.scrollTo({top:0,behavior:'smooth'});
+  currentStep=n;collectFields();persistStudent();updateStepQuality(STEPS[n].id);if(STEPS[n].id==='testar')updateCoherence();renderStudentDashboard();window.scrollTo({top:0,behavior:'smooth'});
 }
 function validateCurrentStep(silent){
   const s=STEPS[currentStep];
@@ -1258,7 +1294,7 @@ function syncUIFromData(){
   if(gameData.psico)PSY_AXES.forEach(a=>{const el=document.getElementById('psico_'+a.id);if(el&&gameData.psico[a.id]!==undefined)el.value=gameData.psico[a.id];});
   if(gameData.psicoGenerated){const o=document.getElementById('psicoOut');if(o)generatePsico(true);}
   STEPS.forEach(s=>s.questions.forEach(q=>{if(q.type==='chips')renderChips(q);else{updateQCount(q);toggleFilled(q);}}));
-  STEPS.forEach(s=>updateStepQuality(s.id));updateCoherence();
+  STEPS.forEach(s=>updateStepQuality(s.id));updateCoherence();renderStudentDashboard();
 }
 
 /* ============================ RUBRICA (v4) ============================ */
@@ -1655,7 +1691,7 @@ function updateCoherence(){const el=document.getElementById('coh_testar');if(!el
     h+=(okPub||okGat)?'<span class="ok">\u2713 a hip\u00f3tese conversa com a estrat\u00e9gia.</span>':'<span class="bad">\u26a0 sua hip\u00f3tese n\u00e3o cita o p\u00fablico nem os gatilhos escolhidos.</span>';}
   else h+='<span class="muted">Escreva a hip\u00f3tese conectando com esses elementos.</span>';
   el.innerHTML=h;}
-function afterFieldInput(qid){const sid=stepOf(qid);if(sid){updateStepQuality(sid);if(sid==='testar')updateCoherence();}}
+function afterFieldInput(qid){collectFields();const sid=stepOf(qid);if(sid){updateStepQuality(sid);if(sid==='testar')updateCoherence();}renderStudentDashboard();}
 /* ============================ DRAWER (Insights/Cases) ============================ */
 function openDrawer(tab){document.getElementById('overlay').classList.add('open');document.getElementById('drawer').classList.add('open');switchDrawerTab(tab||'instr');}
 function closeDrawer(){document.getElementById('overlay').classList.remove('open');document.getElementById('drawer').classList.remove('open');}
@@ -1836,6 +1872,10 @@ function exportToPDF(){
     doc.text('Metodologia TESTE · Relatório',M,16);y=34;
     T('Aluno(a): '+(currentUser.name||'—'),11);
     T('Turma: '+(currentUser.classCode||'—')+'   ·   Data: '+new Date().toLocaleDateString('pt-BR'),11);y+=2;
+    const pdfScore=scoreOverall(gameData,STEPS),pdfBets=allBets(gameData,STEPS),pdfGrounded=pdfBets.filter(b=>evValid(b.ev)&&LEX.grounded.test(b.ev)).length;
+    const pdfMetrics=[['Robustez',pdfScore.indice,'#166534'],['Evidências',pdfGrounded+'/'+pdfBets.length,'#1d4ed8'],['Coerência',pdfScore.eixos.coerencia,'#7e22ce'],['Etapas',STEPS.filter(s=>scoreStep(gameData,STEPS,s.id).score>0).length+'/5','#c2410c']];
+    const metricW=(W-2*M-9)/4;pdfMetrics.forEach((m,i)=>{const x=M+i*(metricW+3),hex=m[2].slice(1);doc.setFillColor(parseInt(hex.slice(0,2),16),parseInt(hex.slice(2,4),16),parseInt(hex.slice(4,6),16));doc.roundedRect(x,y,metricW,19,3,3,'F');doc.setTextColor(255,255,255);doc.setFontSize(7);doc.setFont(undefined,'bold');doc.text(m[0].toUpperCase(),x+4,y+6);doc.setFontSize(13);doc.text(String(m[1]),x+4,y+15);});
+    y+=25;
     T('CONTEXTO DO PROJETO',13,true,brand);
     T('Produto: '+(gameData.nomeProduto||'—'),11,true);T(gameData.conceito||'—',10);
     [['Tipo',gameData.tipoProduto],['Torres/Unidades',gameData.totalUnidades],['Metragem',gameData.metragem&&gameData.metragem+' m²'],
