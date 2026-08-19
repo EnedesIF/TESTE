@@ -383,6 +383,8 @@ button,textarea,input,select{font-family:inherit}
 .airow{display:flex;gap:8px;flex-wrap:wrap}
 .airow input{flex:1;min-width:160px;padding:10px;border:1px solid var(--line);border-radius:9px;font-size:13px}
 .aistatus{margin-top:10px;font-size:12.5px;font-weight:600}
+.completion-strip{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}.completion-chip{flex:1;min-width:150px;border:1px solid #dfe6ed;background:#fff;border-radius:10px;padding:9px 10px;font-size:11px;color:var(--muted)}.completion-chip strong{display:block;color:var(--ink);font-size:12px;margin-bottom:3px}.completion-chip.ok{border-color:#bfe0cd;background:#f4fcf7}.completion-chip.warn{border-color:#f2c98a;background:#fff9ed}.lock-notice{margin:0 0 14px;padding:12px 14px;border:1px solid #bfe0cd;border-radius:10px;background:#f4fcf7;color:#1a623b;font-size:13px;font-weight:700}.lock-notice.hidden{display:none}.submission-status{margin:16px 0;padding:14px;border-radius:12px;background:#f8fafc;border:1px solid #dfe6ed;font-size:13px;color:var(--muted)}.submission-status strong{color:var(--brand)}.committee-btn{background:#7e22ce;color:#fff;border:none;padding:13px 22px;border-radius:24px;font-size:14px;font-weight:800;cursor:pointer;margin:6px}.committee-btn:hover{background:#6b21a8}.submit-btn{background:#fff;color:#1a623b;border:1px solid #bfe0cd;padding:12px 20px;border-radius:24px;font-weight:800;cursor:pointer;margin:6px}.submit-btn[disabled],.committee-btn[disabled]{opacity:.55;cursor:not-allowed}
+.presentation-modal{position:fixed;inset:0;z-index:70;background:rgba(16,24,40,.82);display:none;align-items:center;justify-content:center;padding:20px}.presentation-modal.open{display:flex}.presentation-shell{width:min(1080px,100%);max-height:94vh;overflow:auto;background:#fff;border-radius:20px;box-shadow:0 22px 60px rgba(0,0,0,.3);padding:30px;position:relative}.presentation-close{position:absolute;right:18px;top:16px;border:none;background:#f1f5f9;color:#334155;border-radius:50%;width:34px;height:34px;font-size:18px;cursor:pointer}.presentation-head{padding:8px 46px 22px 0;border-bottom:3px solid var(--brand)}.presentation-head .eyebrow{font-size:11px;font-weight:900;letter-spacing:.12em;color:var(--brand-2);text-transform:uppercase}.presentation-head h2{font-size:clamp(1.55rem,4vw,2.35rem);color:#163329;margin:7px 0}.presentation-head p{color:var(--muted)}.presentation-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:18px;margin-top:22px}.presentation-card{border:1px solid #dfe6ed;border-radius:14px;padding:18px;background:#fff}.presentation-card h3{font-size:13px;color:var(--brand);text-transform:uppercase;letter-spacing:.06em;margin-bottom:9px}.presentation-card p{font-size:14px;line-height:1.55;color:#344054}.presentation-score{border-radius:14px;padding:20px;background:linear-gradient(135deg,#166534,#22a06b);color:#fff}.presentation-score .n{font-size:3.6rem;font-weight:900;line-height:1}.presentation-score small{display:block;margin-top:5px;opacity:.9}.presentation-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:20px}@media(max-width:700px){.presentation-grid{grid-template-columns:1fr}.presentation-shell{padding:22px}.completion-chip{min-width:calc(50% - 8px)}}
 .ai-btn{background:#7a3fa0;color:#fff;border:none;border-radius:16px;padding:6px 12px;font-weight:700;font-size:12px;cursor:pointer;margin-top:8px}
 .ai-btn:hover{background:#653488}
 .aimodal{position:fixed;inset:0;background:rgba(15,25,40,.5);z-index:990;display:none;align-items:center;justify-content:center;padding:20px}
@@ -466,15 +468,9 @@ button,textarea,input,select{font-family:inherit}
         </div>
       </div>
       <div id="dashBanner"></div>
-      <details class="aipanel"><summary>🤖 Análise por IA (opcional) — configurar chave</summary>
+      <details class="aipanel"><summary>🤖 Análise por IA — protegida no servidor</summary>
         <div class="aibody">
-          <p>A chave fica <b>somente neste navegador</b> (o seu). Cada análise consome tokens (tem custo) e precisa de internet. <b>Remova a chave após a aula.</b></p>
-          <div class="airow">
-            <input type="password" id="aiKey" placeholder="Chave da Anthropic (sk-ant-...)">
-            <input type="text" id="aiModel" placeholder="modelo">
-            <button class="nav-btn" onclick="saveAIKey()">Salvar</button>
-            <button class="nav-btn ghost" onclick="removeAIKey()">Remover</button>
-          </div>
+          <p>A análise usa uma <b>Edge Function</b>: a chave OpenAI fica guardada como segredo no Supabase e nunca é enviada ao navegador de alunos ou professor(a).</p>
           <div id="aiStatus" class="aistatus"></div>
         </div>
       </details>
@@ -577,10 +573,11 @@ button,textarea,input,select{font-family:inherit}
   </div>
 
   <!-- PÁGINA 4 · ETAPAS -->
-	<div class="page" id="page4">
-	  <div class="card">
-	    <div class="progress"><i id="progressFill"></i></div>
-	    <section class="live-dash" id="studentLiveDash" aria-live="polite"></section>
+		<div class="page" id="page4">
+		  <div class="card">
+		    <div class="progress"><i id="progressFill"></i></div>
+		    <div class="lock-notice hidden" id="lockNotice" role="status"></div>
+		    <section class="live-dash" id="studentLiveDash" aria-live="polite"></section>
 	    <div class="steps" id="stepsTabs"></div>
 	    <div id="stepsHost"></div>
 	    <div class="nav">
@@ -600,15 +597,26 @@ button,textarea,input,select{font-family:inherit}
       <p class="diag-note">Índice gerado por <strong>rubrica automática</strong> (amplitude das escolhas, uso de dados e profundidade das justificativas). Apoio de revisão — não substitui a avaliação do(a) professor(a).</p>
       <div class="proposal" id="proposalBox"></div>
       <div id="evaluationSections"></div>
+	      <div class="submission-status" id="submissionStatus"></div>
       <div class="export">
         <h3 style="margin-bottom:6px">Exportar relatório</h3>
         <p class="section-sub" style="margin-bottom:14px">Projeto completo com perfil, escolhas, proposta e diagnóstico.</p>
         <button class="export-btn" onclick="exportToPDF()">Baixar PDF</button>
+	        <button class="committee-btn" id="committeeBtn" onclick="openCommitteePresentation()">Apresentar ao comitê</button>
+	        <button class="submit-btn" id="lockRequestBtn" onclick="requestLock()">Solicitar encerramento ao professor</button>
         <button class="restart" onclick="restartGame()">Recomeçar</button>
       </div>
     </div>
   </div>
 
+</div>
+
+<!-- APRESENTAÇÃO EXECUTIVA -->
+<div class="presentation-modal" id="presentationModal" role="dialog" aria-modal="true" aria-label="Apresentação ao comitê">
+  <div class="presentation-shell">
+    <button class="presentation-close" onclick="closeCommitteePresentation()" aria-label="Fechar apresentação">×</button>
+    <div id="presentationBody"></div>
+  </div>
 </div>
 
 <!-- CENTRAL DE CONSULTA -->
@@ -625,7 +633,7 @@ button,textarea,input,select{font-family:inherit}
 
 <script>
 /* ============================ CONFIG ============================ */
-const CONFIG={useSupabase:true,supabaseUrl:'https://vhpqncvvzwoowhbmlkrm.supabase.co',supabaseAnonKey:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZocHFuY3Z2endvb3doYm1sa3JtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODcwNTY3NTIsImV4cCI6MjEwMjYzMjc1Mn0.Sv8yTQHgZsCV2m2qKmkSsMZnwQH561hQ6kCwDWPxuWg',aiEvalEndpoint:'',pisoEtapa:60,pisoGeral:60,aiModelDefault:'claude-3-5-sonnet-latest'};
+const CONFIG={useSupabase:true,supabaseUrl:'https://vhpqncvvzwoowhbmlkrm.supabase.co',supabaseAnonKey:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZocHFuY3Z2endvb3doYm1sa3JtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODcwNTY3NTIsImV4cCI6MjEwMjYzMjc1Mn0.Sv8yTQHgZsCV2m2qKmkSsMZnwQH561hQ6kCwDWPxuWg',aiEvalEndpoint:'',pisoEtapa:60,pisoGeral:60};
 /* SQL: create table respostas_teste(id uuid primary key default gen_random_uuid(),
    turma text, aluno_id text, aluno_nome text, etapa int default 0, completo boolean default false,
    score int default 0, dados jsonb default '{}', atualizado_em timestamptz default now(),
@@ -936,6 +944,7 @@ function getTeam(){if(!currentClass||!currentTeamId)return null;
 async function persistStudent(){
   if(!currentUser||currentUser.type!=='student')return;
   if(!studentDataHydrated)return; // nunca permite que cache local antigo sobrescreva o dossiê remoto
+  if(isTeamLocked())return;
   if(!gameData||Object.keys(gameData).length===0)return; // nunca grava vazio por cima
   setSaveState('wait');
   let team=getTeam();if(!team)return;
@@ -955,6 +964,23 @@ function queuePersistStudent(){
 }
 function setSaveState(status,at){saveState={status,at:at||saveState.at};renderStudentDashboard();}
 function saveNow(){collectFields();persistStudent();}
+function isTeamLocked(){const t=getTeam();return !!(t&&(t.lockedAt||t.bloqueado_em));}
+function stepCompletion(step){
+  const required=step.questions.filter(q=>!q.optional);let done=0;const pending=[];
+  required.forEach(q=>{let ok=false;
+    if(q.type==='chips'){const choices=gameData[q.id]||[];const bets=gameData[q.id+'_bets']||{};ok=choices.length>0&&choices.every(v=>evValid((bets[v]&&bets[v].ev)||''));}
+    else ok=!!String(gameData[q.id]||'').trim();
+    if(ok)done++;else pending.push(q.label.replace(/^\d+\.\s*/,''));
+  });
+  return {done,total:required.length,pending};
+}
+function applyLockedState(){
+  const locked=isTeamLocked();const notice=document.getElementById('lockNotice');
+  if(notice){notice.classList.toggle('hidden',!locked);notice.textContent=locked?'Dossiê encerrado pelo(a) professor(a). As respostas estão preservadas para consulta e apresentação.':'';}
+  document.querySelectorAll('#page2 input,#page2 textarea,#page2 select,#page4 input,#page4 textarea,#page4 select,#stepsHost button,#prevStepBtn,#nextStepBtn,.save-now').forEach(el=>{if('disabled' in el)el.disabled=locked;});
+  const restart=document.querySelector('.restart');if(restart)restart.disabled=locked;
+  const req=document.getElementById('lockRequestBtn');if(req)req.disabled=locked;
+}
 function renderStudentDashboard(){
   const host=document.getElementById('studentLiveDash');if(!host||!gameData)return;
   const overall=scoreOverall(gameData,STEPS),bets=allBets(gameData,STEPS);
@@ -963,12 +989,12 @@ function renderStudentDashboard(){
   const statusMap={sync:{cls:'sync',icon:'✓',text:saveState.at?'Salvo às '+new Date(saveState.at).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}):'Tudo salvo'},wait:{cls:'wait',icon:'◌',text:'Salvando alterações…'},fail:{cls:'fail',icon:'!',text:'Verifique a conexão'}};
   const sv=statusMap[saveState.status]||statusMap.sync;
   const colors=['#8e44ad','#2E75B6','#e84393','#d35400','#1A6B3C'];
-  const cards=STEPS.map((s,i)=>{const r=scoreStep(gameData,STEPS,s.id);return '<div class="stage-health-card"><div class="sh-top"><span>'+s.letter+' · '+s.name+'</span><span>'+r.score+'</span></div><div class="sh-track"><div class="sh-fill" style="width:'+r.score+'%;background:'+colors[i]+'"></div></div><div class="sh-score">'+(r.score>=70?'Bem sustentada':r.score>=35?'Em construção':'Comece aqui')+'</div></div>';}).join('');
-  host.innerHTML='<div class="live-dash-head"><div><h3>Radar da proposta</h3><p>Leitura em tempo real da robustez, das evidências e da coerência do seu plano.</p></div><span class="save-pill '+sv.cls+'">'+sv.icon+' '+sv.text+'</span></div><div class="live-metrics"><div class="live-metric lm-score"><div class="lm-label">Robustez</div><div class="lm-value">'+overall.indice+'</div><div class="lm-sub">de 100 pontos</div></div><div class="live-metric lm-evidence"><div class="lm-label">Evidências</div><div class="lm-value">'+grounded+'/'+bets.length+'</div><div class="lm-sub">com dado citado</div></div><div class="live-metric lm-coherence"><div class="lm-label">Coerência</div><div class="lm-value">'+overall.eixos.coerencia+'</div><div class="lm-sub">estratégia ↔ teste</div></div><div class="live-metric lm-progress"><div class="lm-label">Etapas</div><div class="lm-value">'+activeStages+'/5</div><div class="lm-sub">com proposta iniciada</div></div></div><div class="stage-health">'+cards+'</div>';
+  const completions=STEPS.map(s=>{const c=stepCompletion(s),ok=c.done===c.total;return '<div class="completion-chip '+(ok?'ok':'warn')+'"><strong>'+s.letter+' · '+s.name+' · '+c.done+'/'+c.total+'</strong>'+(ok?'Pronta para a banca.':'Falta: '+(c.pending.slice(0,2).join(' · ')||'refinar evidências')+(c.pending.length>2?'…':''))+'</div>';}).join('');
+  host.innerHTML='<div class="live-dash-head"><div><h3>Radar da proposta</h3><p>Leitura em tempo real da robustez, das evidências e da coerência do seu plano.</p></div><span class="save-pill '+(isTeamLocked()?'sync':sv.cls)+'">'+(isTeamLocked()?'▣ Dossiê encerrado':sv.icon+' '+sv.text)+'</span></div><div class="live-metrics"><div class="live-metric lm-score"><div class="lm-label">Robustez</div><div class="lm-value">'+overall.indice+'</div><div class="lm-sub">de 100 pontos</div></div><div class="live-metric lm-evidence"><div class="lm-label">Evidências</div><div class="lm-value">'+grounded+'/'+bets.length+'</div><div class="lm-sub">com dado citado</div></div><div class="live-metric lm-coherence"><div class="lm-label">Coerência</div><div class="lm-value">'+overall.eixos.coerencia+'</div><div class="lm-sub">estratégia ↔ teste</div></div><div class="live-metric lm-progress"><div class="lm-label">Etapas</div><div class="lm-value">'+activeStages+'/5</div><div class="lm-sub">com proposta iniciada</div></div></div><div class="stage-health">'+cards+'</div><div class="completion-strip">'+completions+'</div>';
 }
 async function fetchClassStudents(cc){
   if(supa){try{const {data,error}=await supa.rpc('listar_equipes_prof',{p_codigo:cc,p_senha_prof:currentProfPass});
-    if(error)throw error;const out={};(data||[]).forEach(r=>out[r.equipe_id]={name:r.equipe_nome,id:r.equipe_id,members:r.membros||[],currentStep:r.etapa||0,completed:!!r.completo,score:r.score||0,data:r.dados||{},lastActive:r.atualizado_em});return out;}catch(e){console.warn('listar_equipes_prof',e);return {};}}
+    if(error)throw error;const out={};(data||[]).forEach(r=>out[r.equipe_id]={name:r.equipe_nome,id:r.equipe_id,members:r.membros||[],currentStep:r.etapa||0,completed:!!r.completo,score:r.score||0,data:r.dados||{},lockedAt:r.bloqueado_em||null,lastActive:r.atualizado_em});return out;}catch(e){console.warn('listar_equipes_prof',e);return {};}}
   const out={};const pref='teamData_'+cc+'_';
   for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.indexOf(pref)===0){try{const t=JSON.parse(localStorage.getItem(k));if(t&&t.id)out[t.id]=t;}catch(e){}}}
   const mem=(DATABASE.classes[cc]&&DATABASE.classes[cc].teams)||{};Object.keys(mem).forEach(id=>{out[id]=mem[id];});
@@ -1001,7 +1027,7 @@ async function resumeStudentFromServer(){
     const {data,error}=await supa.rpc('carregar_equipe',{p_codigo:currentClass,p_senha_aluno:currentClassPass,p_equipe_id:currentTeamId});
     if(error)throw error;
     const row=Array.isArray(data)?data[0]:data;
-    const team={id:currentTeamId,name:(row&&row.equipe_nome)||currentTeamName,members:(row&&row.membros)||[],data:(row&&row.dados)||{},completed:!!(row&&row.completo),score:(row&&row.score)||0,currentStep:(row&&row.etapa)||0,lastActive:(row&&row.atualizado_em)||new Date().toISOString()};
+    const team={id:currentTeamId,name:(row&&row.equipe_nome)||currentTeamName,members:(row&&row.membros)||[],data:(row&&row.dados)||{},completed:!!(row&&row.completo),score:(row&&row.score)||0,currentStep:(row&&row.etapa)||0,lockedAt:(row&&row.bloqueado_em)||null,lastActive:(row&&row.atualizado_em)||new Date().toISOString()};
     DATABASE.classes[currentClass]={name:'Turma '+currentClass,teams:{}};DATABASE.classes[currentClass].teams[currentTeamId]=team;
     currentTeamName=team.name;
     studentDataHydrated=true;
@@ -1130,7 +1156,7 @@ function startGame(){
   document.getElementById('topbar').classList.remove('hidden');
   document.getElementById('consultFab').classList.remove('hidden');
   document.getElementById('userDisplay').textContent=(currentTeamName||'—')+' · '+currentUser.name;
-  loadGameData();showPage(currentPage||0);
+  loadGameData();applyLockedState();showPage(currentPage||0);
 }
 function showPage(n){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
@@ -1498,10 +1524,27 @@ function computeOverall(){return scoreOverall(gameData,STEPS).indice;}
 
 /* ============================ FINALIZAR ============================ */
 function finishGame(){
+  if(isTeamLocked())return;
   collectFields();if(gameData.psicoGenerated)generatePsico(true);
-  const _o=scoreOverall(gameData,STEPS);gameData.finalScore=_o.indice;gameData.eixos=_o.eixos;gameData.completed=true;gameData.completedAt=new Date().toISOString();
+  const _o=scoreOverall(gameData,STEPS);gameData.finalScore=_o.indice;gameData.eixos=_o.eixos;gameData.completed=true;gameData.completedAt=gameData.completedAt||new Date().toISOString();gameData.submittedAt=gameData.submittedAt||new Date().toISOString();
   const t=getTeam();if(t){t.completed=true;t.score=gameData.finalScore;t.currentStep=STEPS.length-1;t.data=gameData;saveTeamRecord(t);}
   persistStudent();renderDiagnosis();showPage(4);
+}
+function requestLock(){
+  if(isTeamLocked())return;
+  if(!gameData.completed){alert('Finalize as cinco etapas antes de solicitar o encerramento.');return;}
+  gameData.lockRequestedAt=gameData.lockRequestedAt||new Date().toISOString();persistStudent();renderDiagnosis();alert('Solicitação registrada. O(a) professor(a) pode encerrar o dossiê no painel da turma.');
+}
+function openCommitteePresentation(){
+  const o=scoreOverall(gameData,STEPS),g=gameData;const title=esc(g.nomeProduto||'Proposta imobiliária');
+  const hypothesis=g.testar_hyp_if?('SE '+esc(g.testar_hyp_if)+' ENTÃO '+esc(g.testar_hyp_then||'—')+' PORQUE '+esc(g.testar_hyp_why||'—')):'Hipótese de teste ainda não preenchida.';
+  document.getElementById('presentationBody').innerHTML='<div class="presentation-head"><div class="eyebrow">Comitê de decisão · Metodologia TESTE</div><h2>'+title+'</h2><p>'+esc(g.praca||'Praça não informada')+' · '+esc(g.tipoProduto||'Produto não informado')+'</p></div><div class="presentation-grid"><div class="presentation-card"><h3>Decisão estratégica</h3><p>'+esc(g.conceito||'Conceito ainda não informado.')+'</p></div><div class="presentation-score"><div class="n">'+o.indice+'</div><small>Índice de robustez automática · '+(o.indice>=75?'Estratégia robusta':o.indice>=50?'Boa base para refinamento':'Risco elevado — aprofundar')+'</small></div><div class="presentation-card"><h3>Público e oportunidade</h3><p><b>Público:</b> '+esc(join('target_q1')||'—')+'<br><b>Job:</b> '+esc(join('target_q4')||'—')+'<br><b>Barreiras:</b> '+esc([join('target_q5'),join('explorar_q1')].filter(Boolean).join(' · ')||'—')+'</p></div><div class="presentation-card"><h3>Solução proposta</h3><p><b>Gatilhos:</b> '+esc(join('solucoes_q1')||'—')+'<br><b>Diferenciação:</b> '+esc(join('solucoes_q2')||'—')+'<br><b>Escala:</b> '+esc([join('escala_q1'),join('escala_q2')].filter(Boolean).join(' · ')||'—')+'</p></div><div class="presentation-card" style="grid-column:1/-1"><h3>Hipótese, validação e decisão</h3><p>'+hypothesis+'<br><br><b>Validação:</b> '+esc([join('testar_q1'),join('testar_lab'),g.testar_q2].filter(Boolean).join(' · ')||'—')+'<br><b>Critério:</b> '+esc(g.testar_q4||'—')+'</p></div></div><div class="presentation-actions"><button class="nav-btn ghost" onclick="window.print()">Imprimir</button><button class="nav-btn" onclick="closeCommitteePresentation()">Voltar ao dossiê</button></div>';
+  document.getElementById('presentationModal').classList.add('open');
+}
+function closeCommitteePresentation(){document.getElementById('presentationModal').classList.remove('open');}
+async function openTeamPresentation(teamId){
+  const teams=await fetchClassStudents(currentClass),team=teams[teamId];if(!team){alert('Equipe não encontrada.');return;}
+  const original=gameData;gameData=team.data||{};openCommitteePresentation();gameData=original;
 }
 function join(id){const v=gameData[id];return Array.isArray(v)?v.join(', '):(v||'');}
 function buildProposalHTML(){
@@ -1647,6 +1690,8 @@ function renderDiagnosis(){
     html+='<div class="eval"><h4>'+step.letter+' — '+step.name+'<span class="steptag '+(okS?'ok':'bad')+'">'+(okS?'aprovada':'reveja')+'</span></h4><div class="bar"><div class="track"><div class="fill" style="width:'+r.score+'%"></div></div><div class="sc">'+r.score+'/100</div></div><p><span class="chip-view">completude '+r.comp+'</span> <span class="chip-view">fundamentação '+r.fund+'</span> <span class="chip-view">calibração '+r.cal+'</span></p></div>';});
   if(supa&&CONFIG.supabaseUrl)html+='<div style="text-align:center;margin-top:6px"><button class="ai-btn" onclick="analyzeMyTeam()">\ud83e\udd16 Analisar minha proposta com IA</button></div>';
   document.getElementById('evaluationSections').innerHTML=html;
+  const st=document.getElementById('submissionStatus');if(st)st.innerHTML=isTeamLocked()?'<strong>Dossiê encerrado pelo(a) professor(a).</strong> A versão atual fica preservada para apresentação e PDF.':(gameData.lockRequestedAt?'<strong>Encerramento solicitado em '+new Date(gameData.lockRequestedAt).toLocaleString('pt-BR')+'.</strong> O(a) professor(a) poderá bloquear novas alterações no painel.':(gameData.submittedAt?'<strong>Proposta entregue em '+new Date(gameData.submittedAt).toLocaleString('pt-BR')+'.</strong> Você ainda pode solicitar o encerramento definitivo.':'Conclua as cinco etapas para gerar a entrega executiva.'));
+  applyLockedState();
 }
 function restartGame(){
   if(!confirm('Recomeçar? As respostas atuais serão apagadas.'))return;
@@ -1719,15 +1764,8 @@ function switchDrawerTab(tab){
 }
 
 /* ============================ DASHBOARD ============================ */
-function aiKeyGet(){return localStorage.getItem('anthropicKey')||'';}
-function aiModelGet(){return localStorage.getItem('anthropicModel')||CONFIG.aiModelDefault;}
-function refreshAIStatus(){const el=document.getElementById('aiStatus');if(!el)return;const k=aiKeyGet();
-  const mi=document.getElementById('aiModel');if(mi&&!mi.value)mi.value=aiModelGet();
-  el.innerHTML=k?('<span style="color:#1c6b41">\u2713 Chave configurada ('+k.slice(0,10)+'\u2026) \u00b7 modelo '+aiModelGet()+'</span>'):'<span style="color:#8a5a00">Nenhuma chave \u2014 an\u00e1lise por IA indispon\u00edvel.</span>';}
-function saveAIKey(){const k=(document.getElementById('aiKey').value||'').trim();const m=(document.getElementById('aiModel').value||'').trim();
-  if(k)localStorage.setItem('anthropicKey',k);if(m)localStorage.setItem('anthropicModel',m);
-  document.getElementById('aiKey').value='';refreshAIStatus();alert('Configura\u00e7\u00e3o salva neste navegador. Lembre de remover a chave ap\u00f3s a aula.');}
-function removeAIKey(){localStorage.removeItem('anthropicKey');refreshAIStatus();alert('Chave removida deste navegador.');}
+function refreshAIStatus(){const el=document.getElementById('aiStatus');if(!el)return;
+  el.innerHTML=supa?'<span style="color:#1c6b41">✓ Pronto para a Edge Function segura. Se a análise falhar, confirme os segredos e a publicação da função no Supabase.</span>':'<span style="color:#8a5a00">Configure o Supabase para ativar a análise segura.</span>';}
 function proposalText(d){const j=id=>Array.isArray(d[id])?d[id].join(', '):(d[id]||'\u2014');
   const persona=[d.persona_idade&&('Idade: '+d.persona_idade),d.target_q3&&('Renda: '+d.target_q3),d.persona_ocupacao&&('Ocupa\u00e7\u00e3o: '+d.persona_ocupacao),d.persona_estilo&&('Estilo: '+d.persona_estilo),d.persona_valores&&('Valores: '+d.persona_valores),d.persona_canais&&('Canais: '+d.persona_canais)].filter(Boolean).join('; ');
   const hip=d.testar_hyp_if?('SE '+d.testar_hyp_if+' ENT\u00c3O '+(d.testar_hyp_then||'\u2026')+' PORQUE '+(d.testar_hyp_why||'\u2026')):'\u2014';
@@ -1746,34 +1784,25 @@ function buildAIPrompt(team){const d=team.data||{};const o=scoreOverall(d,STEPS)
 function openAIModal(title,inner){document.getElementById('aiTitle').textContent='An\u00e1lise IA \u2014 '+title;document.getElementById('aiBody').innerHTML=inner;document.getElementById('aiModal').classList.add('open');}
 function closeAI(){document.getElementById('aiModal').classList.remove('open');}
 function rubricaResumo(d){const o=scoreOverall(d,STEPS);return 'índice '+o.indice+', completude '+o.eixos.completude+', fundamentação '+o.eixos.fundamentacao+', calibração '+o.eixos.calibracao+', coerência '+o.eixos.coerencia;}
+async function secureAIAnalysis(team,role,password){
+  if(!supa||!CONFIG.supabaseUrl)throw new Error('Análise por IA disponível apenas com o Supabase configurado.');
+  const url=CONFIG.supabaseUrl.replace(/\/$/,'')+'/functions/v1/analyze';
+  const resp=await fetch(url,{method:'POST',headers:{'content-type':'application/json','Authorization':'Bearer '+CONFIG.supabaseAnonKey},
+    body:JSON.stringify({codigo:currentClass,senha:password,papel:role,equipe_nome:team.name,proposta:proposalText(team.data),rubrica:rubricaResumo(team.data)})});
+  const data=await resp.json().catch(()=>({error:'resposta inválida'}));
+  if(!resp.ok||data.error)throw new Error(data.error||('HTTP '+resp.status));return data;
+}
+function displayAIResult(label,data){openAIModal(label,(data.indice?'<div class="aiindex">Índice de sucesso (IA): <b>'+data.indice+'/100</b></div>':'')+'<pre class="aitext">'+esc(data.texto||'(sem resposta)')+'</pre><p class="aidisc">Parecer gerado por IA — opinião do modelo, separada do índice da rubrica automática.</p>');}
 async function analyzeMyTeam(){
-  if(!supa||!CONFIG.supabaseUrl){alert('Análise por IA disponível apenas com o Supabase configurado.');return;}
-  openAIModal(currentTeamName||'Sua equipe','<p>Analisando com IA… pode levar alguns segundos.</p>');
-  try{
-    const url=CONFIG.supabaseUrl.replace(/\/$/,'')+'/functions/v1/analyze';
-    const resp=await fetch(url,{method:'POST',headers:{'content-type':'application/json','Authorization':'Bearer '+CONFIG.supabaseAnonKey},
-      body:JSON.stringify({codigo:currentClass,senha:currentClassPass,equipe_nome:currentTeamName,proposta:proposalText(gameData),rubrica:rubricaResumo(gameData)})});
-    const data=await resp.json().catch(()=>({error:'resposta inválida'}));
-    if(!resp.ok||data.error)throw new Error(data.error||('HTTP '+resp.status));
-    openAIModal(currentTeamName,(data.indice?'<div class="aiindex">Índice de sucesso (IA): <b>'+data.indice+'/100</b></div>':'')+'<pre class="aitext">'+esc(data.texto||'(sem resposta)')+'</pre><p class="aidisc">Parecer de IA — opinião do modelo, separada do índice da rubrica automática.</p>');
-  }catch(e){openAIModal(currentTeamName,'<p style="color:#b02a2a"><b>Não foi possível concluir a análise.</b></p><p class="aidisc">'+esc((e&&e.message)||String(e))+'</p><p class="aidisc">Verifique se a Edge Function <code>analyze</code> foi publicada e se as senhas estão corretas.</p>');}
+  const team={name:currentTeamName||'Sua equipe',data:gameData};openAIModal(team.name,'<p>Analisando com IA… pode levar alguns segundos.</p>');
+  try{displayAIResult(team.name,await secureAIAnalysis(team,'aluno',currentClassPass));}
+  catch(e){openAIModal(team.name,'<p style="color:#b02a2a"><b>Não foi possível concluir a análise.</b></p><p class="aidisc">'+esc((e&&e.message)||String(e))+'</p><p class="aidisc">Confirme a Edge Function <code>analyze</code> e o segredo <code>OPENAI_API_KEY</code> no Supabase.</p>');}
 }
 async function analyzeTeam(teamId){
-  const key=aiKeyGet();if(!key){alert('Configure a chave da Anthropic no painel (\ud83e\udd16 An\u00e1lise por IA).');return;}
-  const teams=await fetchClassStudents(currentClass);const team=teams[teamId];if(!team){alert('Equipe n\u00e3o encontrada.');return;}
-  openAIModal(team.name,'<p>Analisando com IA\u2026 pode levar alguns segundos.</p>');
-  try{
-    const resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',
-      headers:{'content-type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-      body:JSON.stringify({model:aiModelGet(),max_tokens:900,messages:[{role:'user',content:buildAIPrompt(team)}]})});
-    if(!resp.ok){const t=await resp.text();throw new Error('HTTP '+resp.status+' \u2014 '+t.slice(0,300));}
-    const data=await resp.json();
-    const txt=(data.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('\n')||'(sem resposta)';
-    const m=txt.match(/\u00cdNDICE DE SUCESSO:\s*(\d{1,3})/i);const idx=m?m[1]:null;
-    openAIModal(team.name,(idx?'<div class="aiindex">\u00cdndice de sucesso (IA): <b>'+idx+'/100</b></div>':'')+'<pre class="aitext">'+esc(txt)+'</pre><p class="aidisc">Parecer gerado por IA \u2014 opini\u00e3o do modelo, separada do \u00edndice da rubrica autom\u00e1tica.</p>');
-  }catch(e){
-    openAIModal(team.name,'<p style="color:#b02a2a"><b>N\u00e3o foi poss\u00edvel concluir a an\u00e1lise.</b></p><p class="aidisc">'+esc(e.message||String(e))+'</p><p class="aidisc">Se aparecer <b>CORS</b> ou <b>Failed to fetch</b>, o navegador bloqueou a chamada direta \u00e0 Anthropic. Nesse caso a an\u00e1lise precisa passar por uma fun\u00e7\u00e3o no Supabase (pr\u00f3ximo passo).</p>');
-  }
+  const teams=await fetchClassStudents(currentClass);const team=teams[teamId];if(!team){alert('Equipe não encontrada.');return;}
+  openAIModal(team.name,'<p>Analisando com IA… pode levar alguns segundos.</p>');
+  try{displayAIResult(team.name,await secureAIAnalysis(team,'professor',currentProfPass));}
+  catch(e){openAIModal(team.name,'<p style="color:#b02a2a"><b>Não foi possível concluir a análise.</b></p><p class="aidisc">'+esc((e&&e.message)||String(e))+'</p><p class="aidisc">Confirme a Edge Function <code>analyze</code> e o segredo <code>OPENAI_API_KEY</code> no Supabase.</p>');}
 }
 async function showDashboard(){
   document.getElementById('loginSection').classList.add('hidden');
@@ -1803,6 +1832,8 @@ function buildTurmaVisions(students){
   const withData=students.filter(s=>s.data);
   const coerAvg=withData.length?Math.round(withData.reduce((a,s)=>a+scoreOverall(s.data,STEPS).eixos.coerencia,0)/withData.length):0;
   let h='<h3>Super dashboard da turma</h3><p class="asub">Rubrica agregada — para conduzir a discussão em aula.</p>';
+  const interventions=withData.map(s=>{const o=scoreOverall(s.data,STEPS),bets=allBets(s.data,STEPS),semEv=bets.filter(b=>!evValid(b.ev)||!LEX.grounded.test(b.ev)).length;return {name:s.name,score:o.indice,semEv,locked:!!s.lockedAt,requested:!!s.data.lockRequestedAt};}).sort((a,b)=>(b.semEv-a.semEv)||(a.score-b.score)).slice(0,4);
+  h+='<div class="dvz"><h4>Prioridades de intervenção docente</h4><div class="dsub">Equipes com maior necessidade de orientação antes da banca.</div>'+interventions.map(x=>'<div class="agg-row"><span class="aname"><b>'+esc(x.name)+'</b>'+((x.requested&&!x.locked)?' · pediu encerramento':'')+(x.locked?' · encerrada':'')+'</span><span class="atrack"><span class="afill" style="width:'+Math.max(8,100-x.score)+'%"></span></span><span class="acount">Índice '+x.score+' · '+x.semEv+' pend.</span></div>').join('')+'</div>';
   h+='<div class="dvz"><h4>Índice por eixo (média da turma)</h4><div class="eixos">';
   [['completude','Completude'],['fundamentacao','Fundamentação'],['calibracao','Calibração'],['coerencia','Coerência']].forEach(e=>{
     h+='<div class="eixo"><div class="en"><span>'+e[1]+'</span><span>'+eix[e[0]]+'/100</span></div><div class="etrack"><div class="efill" style="width:'+eix[e[0]]+'%"></div></div></div>';});
@@ -1836,7 +1867,7 @@ async function updateDashboard(){
     const bets=s.data?allBets(s.data,STEPS):[];const semEv=bets.filter(b=>!(b.ev||'').trim()).length;
     const invalid=bets.filter(b=>(b.ev||'').trim()&&!evValid(b.ev)).length;
     const abaixo=(s.data&&s.completed)&&o.indice<(CONFIG.pisoGeral||60);
-    const flags=[];if(invalid)flags.push('<span class="tflag bad">'+invalid+' evid. inv\u00e1lida(s)</span>');if(abaixo)flags.push('<span class="tflag bad">abaixo do piso</span>');if(semEv)flags.push('<span class="tflag warn">'+semEv+' sem evid.</span>');
+    const flags=[];if(invalid)flags.push('<span class="tflag bad">'+invalid+' evid. inv\u00e1lida(s)</span>');if(abaixo)flags.push('<span class="tflag bad">abaixo do piso</span>');if(semEv)flags.push('<span class="tflag warn">'+semEv+' sem evid.</span>');if(s.lockedAt)flags.push('<span class="tflag">dossiê encerrado</span>');else if(s.data&&s.data.lockRequestedAt)flags.push('<span class="tflag warn">solicitou encerramento</span>');
     const eixMini=[['Compl.',o.eixos.completude],['Fund.',o.eixos.fundamentacao],['Calib.',o.eixos.calibracao],['Coer.',o.eixos.coerencia]].map(e=>'<span class="chip-view">'+e[0]+' '+e[1]+'</span>').join(' ');
     const nMem=(s.members&&s.members.length)||0;
     const card=document.createElement('div');card.className='scard';card.onclick=()=>showStudentDetails(s);
@@ -1846,8 +1877,15 @@ async function updateDashboard(){
       (semEv?' · <b style="color:var(--warn)">'+semEv+' aposta(s) sem evidência</b>':(s.completed?' · ✅ Finalizado':''))+'</div>'+
       '<div class="teixos">'+eixMini+'</div>'+
       (flags.length?'<div class="tflags">'+flags.join('')+'</div>':'')+
-      '<div class="tmembers">'+(s.members||[]).map(m=>m.nome).join(', ')+'</div>'+      (s.data?'<button class="ai-btn" onclick="event.stopPropagation();analyzeTeam(\''+s.id+'\')">\ud83e\udd16 Analisar com IA</button>':'');
+      '<div class="tmembers">'+(s.members||[]).map(m=>m.nome).join(', ')+'</div>'+      (s.data?'<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"><button class="ai-btn" onclick="event.stopPropagation();analyzeTeam(\''+s.id+'\')">🤖 Analisar com IA</button><button class="nav-btn ghost" onclick="event.stopPropagation();openTeamPresentation(\''+s.id+'\')">Comitê</button><button class="nav-btn '+(s.lockedAt?'ghost':'')+'" onclick="event.stopPropagation();toggleTeamLock(\''+s.id+'\','+(s.lockedAt?'false':'true')+')">'+(s.lockedAt?'Reabrir':'Encerrar')+'</button></div>':'');
     grid.appendChild(card);});
+}
+async function toggleTeamLock(teamId,shouldLock){
+  if(!supa){alert('O encerramento controlado exige o Supabase configurado.');return;}
+  const action=shouldLock?'encerrar':'reabrir';
+  if(!confirm('Deseja '+action+' este dossiê? '+(shouldLock?'A equipe não poderá editar enquanto estiver encerrada.':'A equipe voltará a poder editar.')))return;
+  try{const {error}=await supa.rpc('definir_bloqueio_equipe',{p_codigo:currentClass,p_senha_prof:currentProfPass,p_equipe_id:teamId,p_bloquear:shouldLock});if(error)throw error;await updateDashboard();}
+  catch(e){alert('Não foi possível '+action+' o dossiê. Confirme se o SQL atualizado foi aplicado no Supabase.\n\n'+((e&&e.message)||String(e)));}
 }
 function showStudentDetails(s){const d=s.data||{};const o=scoreOverall(d,STEPS);
   const mem=(s.members||[]).map(m=>'• '+m.nome+' · '+(m.tel||'')+' · '+(m.email||'')).join('\n')||'—';

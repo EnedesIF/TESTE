@@ -34,6 +34,7 @@ create table if not exists public.equipes (
   completo      boolean not null default false,
   score         int  not null default 0,
   dados         jsonb not null default '{}'::jsonb,    -- gameData completo
+  bloqueado_em  timestamptz,                            -- somente o(a) professor(a) encerra a edição
   atualizado_em timestamptz not null default now(),
   primary key (turma, equipe_id)
 );
@@ -147,8 +148,28 @@ begin
       where codigo = upper(p_codigo) and senha_aluno = crypt(p_senha_aluno, senha_aluno)) then
     raise exception 'SENHA_INVALIDA';
   end if;
+  if exists (select 1 from equipes where turma=upper(p_codigo) and equipe_id=p_equipe_id and bloqueado_em is not null) then
+    raise exception 'DOSSIER_ENCERRADO';
+  end if;
   update equipes set etapa=p_etapa, completo=p_completo, score=p_score,
                      dados=coalesce(p_dados,'{}'::jsonb), atualizado_em=now()
+    where turma=upper(p_codigo) and equipe_id=p_equipe_id;
+  if not found then raise exception 'EQUIPE_NAO_ENCONTRADA'; end if;
+end $$;
+
+-- Professor encerra ou reabre uma equipe. O bloqueio é imposto no servidor,
+-- não apenas pela interface do aluno.
+create or replace function public.definir_bloqueio_equipe(
+  p_codigo text, p_senha_prof text, p_equipe_id text, p_bloquear boolean
+) returns void
+language plpgsql security definer set search_path = public as $$
+begin
+  if not exists (select 1 from turmas
+      where codigo = upper(p_codigo) and senha_prof = crypt(p_senha_prof, senha_prof)) then
+    raise exception 'SENHA_INVALIDA';
+  end if;
+  update equipes set bloqueado_em = case when p_bloquear then now() else null end,
+                     atualizado_em = now()
     where turma=upper(p_codigo) and equipe_id=p_equipe_id;
   if not found then raise exception 'EQUIPE_NAO_ENCONTRADA'; end if;
 end $$;
@@ -214,6 +235,7 @@ grant execute on function
   public.trocar_senhas(text,text,text,text),
   public.entrar_equipe(text,text,text,text,jsonb),
   public.salvar_equipe(text,text,text,int,boolean,int,jsonb),
+  public.definir_bloqueio_equipe(text,text,text,boolean),
   public.carregar_equipe(text,text,text),
   public.listar_equipes_aluno(text,text),
   public.listar_equipes_prof(text,text),

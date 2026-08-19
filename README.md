@@ -8,7 +8,7 @@ protegidos** (LGPD). Siga na ordem.
 > - **Vercel** hospeda o `index.html` (site estático).
 > - **Supabase** guarda turmas, equipes e respostas, e protege os contatos.
 > - A **senha da turma** controla quem entra (RLS no servidor).
-> - A **Edge Function** roda a análise de IA sem expor a chave da Anthropic.
+> - A **Edge Function** roda a análise OpenAI sem expor a chave no navegador.
 
 ---
 
@@ -47,7 +47,7 @@ Troque para:
 const CONFIG={useSupabase:true,
   supabaseUrl:'https://SEU-PROJETO.supabase.co',
   supabaseAnonKey:'SUA_ANON_KEY',
-  aiEvalEndpoint:'',pisoEtapa:60,pisoGeral:60,aiModelDefault:'claude-3-5-sonnet-latest'};
+  aiEvalEndpoint:'',pisoEtapa:60,pisoGeral:60};
 ```
 
 E confirme que a linha do SDK do Supabase está **descomentada** no `<head>`:
@@ -77,10 +77,10 @@ E confirme que a linha do SDK do Supabase está **descomentada** no `<head>`:
 
 ---
 
-## Passo 4 — (Opcional) IA para o aluno via Edge Function
-Sem este passo, a análise por IA continua funcionando **no seu painel de
-professor** (você cola a chave lá). Este passo libera a IA **para o aluno**
-sem expor a chave.
+## Passo 4 — IA segura via Edge Function
+Este passo ativa a análise por IA para **alunos e professor(a)** sem expor
+nenhuma chave no navegador. A interface chama apenas a função segura no
+Supabase, que valida a senha da turma antes de consultar a OpenAI.
 
 **4.1 Instalar a CLI do Supabase** (uma vez):
 - **Mac:** `brew install supabase/tap/supabase`
@@ -94,9 +94,11 @@ supabase link --project-ref SEU_REF
 ```
 > O `SEU_REF` é o trecho da URL do projeto (ex.: em `https://abcd1234.supabase.co`, o ref é `abcd1234`).
 
-**4.3 Guardar a chave da Anthropic como secret** (nunca no código):
+**4.3 Guardar a chave OpenAI como secret** (nunca no código):
 ```bash
-supabase secrets set ANTHROPIC_API_KEY=sk-ant-xxxxx
+supabase secrets set OPENAI_API_KEY=sua_chave_openai
+# opcional: modelo econômico e adequado para pareceres curtos
+supabase secrets set OPENAI_MODEL=gpt-4o-mini
 ```
 > `SUPABASE_URL` e `SUPABASE_SERVICE_ROLE_KEY` normalmente já ficam disponíveis
 > para a função; se necessário, defina-os também com `supabase secrets set`.
@@ -106,8 +108,8 @@ supabase secrets set ANTHROPIC_API_KEY=sk-ant-xxxxx
 supabase functions deploy analyze
 ```
 
-Pronto. No diagnóstico do aluno aparece o botão **"Analisar minha proposta com
-IA"**, que chama essa função. A chave da Anthropic **nunca** vai para o navegador.
+Pronto. No diagnóstico do aluno e no painel docente aparece o botão **"Analisar
+com IA"**, que chama essa função. A chave OpenAI **nunca** vai para o navegador.
 
 ---
 
@@ -118,7 +120,11 @@ IA"**, que chama essa função. A chave da Anthropic **nunca** vai para o navega
 2. **Alunos:** abrem o mesmo site, aba **Aluno(a)**, e entram com **código +
    senha da turma + nome da equipe + seus dados**. Qualquer membro entra com o
    mesmo código/senha e todos compartilham o trabalho.
-3. **Painel ao vivo:** o dashboard do professor atualiza sozinho (a cada ~4s).
+3. **Painel ao vivo:** o dashboard do professor atualiza sozinho (a cada ~4s),
+   prioriza as equipes que precisam de intervenção e permite encerrar/reabrir
+   um dossiê individualmente.
+4. **Banca simulada:** a equipe pode abrir **Apresentar ao comitê** no diagnóstico;
+   o professor também acessa a mesma visão pelo botão **Comitê** do cartão da equipe.
 
 ---
 
@@ -132,8 +138,8 @@ IA"**, que chama essa função. A chave da Anthropic **nunca** vai para o navega
 - **Finalidade dos dados:** use apenas para a dinâmica da disciplina. Ao final,
   se não precisar mais dos contatos, apague os dados da turma no Supabase
   (tabela `equipes`), cumprindo a minimização da LGPD.
-- **Chave de IA:** no painel do professor, a chave fica só no seu navegador —
-  **remova após a aula**. Na Edge Function, a chave fica como secret no servidor.
+- **Chave de IA:** mantenha a chave OpenAI exclusivamente como segredo da Edge
+  Function. Nunca cole uma chave em `index.html`, GitHub ou no painel visível.
 
 ---
 
@@ -141,7 +147,7 @@ IA"**, que chama essa função. A chave da Anthropic **nunca** vai para o navega
 - **"Senha da turma inválida"** no login do aluno → confira a senha com o professor.
 - **Dashboard vazio** → verifique se `CONFIG.useSupabase` está `true`, se a URL
   e a `anon key` estão corretas e se o `schema.sql` foi executado.
-- **IA do aluno falha** → confirme `supabase functions deploy analyze` e o secret
-  `ANTHROPIC_API_KEY`. Erros de "model not found" → ajuste `ANTHROPIC_MODEL`.
-- **IA do professor falha com CORS** → é esperado em alguns navegadores; use a
-  Edge Function (passo 4), que não tem esse problema.
+- **IA falha** → confirme `supabase functions deploy analyze` e o secret
+  `OPENAI_API_KEY`. Erros de modelo podem ser resolvidos ajustando `OPENAI_MODEL`.
+- **Encerramento não funciona** → execute novamente o `schema.sql` atualizado;
+  ele cria a função segura `definir_bloqueio_equipe` e impede edições após o bloqueio.
