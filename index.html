@@ -399,14 +399,15 @@ button,textarea,input,select{font-family:inherit}
 
 
 /* ===== cadastro de múltiplos membros ===== */
-.mrow{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:8px;margin-bottom:8px;align-items:center}
-.mrow input{padding:9px 10px;border:1px solid var(--line);border-radius:8px;font-size:13px}
+.mrow{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.95fr) minmax(0,1.15fr) 34px;gap:8px;margin-bottom:8px;align-items:center;width:100%}
+.mrow>*{min-width:0}.mrow input{width:100%;min-width:0;padding:9px 10px;border:1px solid var(--line);border-radius:8px;font-size:13px}
 .mrow input:focus{outline:none;border-color:var(--brand-2);box-shadow:0 0 0 3px rgba(46,117,182,.1)}
-.mrow .mrem{background:#fdecec;border:none;color:#b02a2a;width:32px;height:32px;border-radius:8px;cursor:pointer;font-weight:700}
+.mrow .mrem{background:#fdecec;border:none;color:#b02a2a;width:34px;height:34px;border-radius:8px;cursor:pointer;font-weight:700;justify-self:stretch}
 .mrow .mrem:hover{background:#f8d7d7}
 .addmember{background:#eef7f1;border:1px dashed #1A6B3C;color:#1A6B3C;border-radius:8px;padding:9px 12px;font-weight:700;font-size:12.5px;cursor:pointer;width:100%;margin-top:2px}
 .addmember:hover{background:#e2f0e8}
 @media(max-width:640px){.mrow{grid-template-columns:1fr 1fr}.mrow .memail{grid-column:1/-1}.mrow .mrem{grid-column:1/-1;width:100%}}
+.login-attribution{margin-top:24px;padding-top:16px;border-top:1px solid var(--line);text-align:center;color:var(--muted);font-size:12px;line-height:1.55}.login-attribution strong{display:block;color:var(--brand);font-size:13px}.version-badge{display:inline-block;margin-top:6px;padding:3px 10px;border-radius:99px;background:#eef7f1;border:1px solid #cfe6d9;color:#1a623b;font-weight:800;font-size:10.5px;letter-spacing:.04em}
 
 </style>
 </head>
@@ -454,6 +455,7 @@ button,textarea,input,select{font-family:inherit}
           <button class="demo-btn" onclick="quickTeacherLogin('Profa. Coordenadora','DEMO2025')">Dashboard demo</button>
         </div>
       </div>
+      <div class="login-attribution">Desenvolvido por<strong>Profa. Dra. Carla Simone Castro</strong><span class="version-badge">VERSÃO 6.0 · CICLO DE SEIS FASES</span></div>
     </div>
   </div>
 
