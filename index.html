@@ -633,7 +633,7 @@ button,textarea,input,select{font-family:inherit}
 
 <script>
 /* ============================ CONFIG ============================ */
-const CONFIG={useSupabase:true,supabaseUrl:'https://vhpqncvvzwoowhbmlkrm.supabase.co',supabaseAnonKey:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZocHFuY3Z2endvb3doYm1sa3JtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODcwNTY3NTIsImV4cCI6MjEwMjYzMjc1Mn0.Sv8yTQHgZsCV2m2qKmkSsMZnwQH561hQ6kCwDWPxuWg',aiEvalEndpoint:'',pisoEtapa:60,pisoGeral:60};
+const CONFIG={useSupabase:true,supabaseUrl:'https://vhpqncvvzwoowhbmlkrm.supabase.co',supabaseAnonKey:'sb_publishable_RQU1poSEx2EluMP7EOfWFg_QKwxtldb',aiEvalEndpoint:'',pisoEtapa:60,pisoGeral:60};
 /* SQL: create table respostas_teste(id uuid primary key default gen_random_uuid(),
    turma text, aluno_id text, aluno_nome text, etapa int default 0, completo boolean default false,
    score int default 0, dados jsonb default '{}', atualizado_em timestamptz default now(),
@@ -1786,7 +1786,7 @@ function closeAI(){document.getElementById('aiModal').classList.remove('open');}
 function rubricaResumo(d){const o=scoreOverall(d,STEPS);return 'índice '+o.indice+', completude '+o.eixos.completude+', fundamentação '+o.eixos.fundamentacao+', calibração '+o.eixos.calibracao+', coerência '+o.eixos.coerencia;}
 async function secureAIAnalysis(team,role,password){
   if(!supa||!CONFIG.supabaseUrl)throw new Error('Análise por IA disponível apenas com o Supabase configurado.');
-  const url=CONFIG.supabaseUrl.replace(/\/$/,'')+'/functions/v1/analyze';
+  const url=CONFIG.aiEvalEndpoint||'/api/analyze';
   const resp=await fetch(url,{method:'POST',headers:{'content-type':'application/json','Authorization':'Bearer '+CONFIG.supabaseAnonKey},
     body:JSON.stringify({codigo:currentClass,senha:password,papel:role,equipe_nome:team.name,proposta:proposalText(team.data),rubrica:rubricaResumo(team.data)})});
   const data=await resp.json().catch(()=>({error:'resposta inválida'}));

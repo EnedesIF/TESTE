@@ -8,14 +8,13 @@ protegidos** (LGPD). Siga na ordem.
 > - **Vercel** hospeda o `index.html` (site estático).
 > - **Supabase** guarda turmas, equipes e respostas, e protege os contatos.
 > - A **senha da turma** controla quem entra (RLS no servidor).
-> - A **Edge Function** roda a análise OpenAI sem expor a chave no navegador.
+> - A rota **`/api/analyze` do Vercel** roda a análise OpenAI sem expor a chave no navegador.
 
 ---
 
 ## Pré-requisitos
 - Conta no **GitHub**, no **Vercel** e no **Supabase** (todas têm plano gratuito).
-- Para a IA do aluno: a **CLI do Supabase** (passo 4). É opcional — o resto
-  funciona sem ela.
+- Para a IA: uma chave OpenAI configurada como variável de ambiente do Vercel.
 
 ---
 
@@ -77,39 +76,19 @@ E confirme que a linha do SDK do Supabase está **descomentada** no `<head>`:
 
 ---
 
-## Passo 4 — IA segura via Edge Function
-Este passo ativa a análise por IA para **alunos e professor(a)** sem expor
-nenhuma chave no navegador. A interface chama apenas a função segura no
-Supabase, que valida a senha da turma antes de consultar a OpenAI.
+## Passo 4 — IA segura via rota do Vercel
+O arquivo `api/analyze.js` recebe a solicitação de **alunos e professor(a)**,
+valida a senha da turma no Supabase e só então consulta a OpenAI. A chave nunca
+chega ao navegador.
 
-**4.1 Instalar a CLI do Supabase** (uma vez):
-- **Mac:** `brew install supabase/tap/supabase`
-- **Windows:** `scoop install supabase` (ou baixe o instalador no GitHub do Supabase)
-- **Linux:** veja as instruções em https://supabase.com/docs/guides/cli
-
-**4.2 Conectar ao seu projeto:**
-```bash
-supabase login
-supabase link --project-ref SEU_REF
-```
-> O `SEU_REF` é o trecho da URL do projeto (ex.: em `https://abcd1234.supabase.co`, o ref é `abcd1234`).
-
-**4.3 Guardar a chave OpenAI como secret** (nunca no código):
-```bash
-supabase secrets set OPENAI_API_KEY=sua_chave_openai
-# opcional: modelo econômico e adequado para pareceres curtos
-supabase secrets set OPENAI_MODEL=gpt-4o-mini
-```
-> `SUPABASE_URL` e `SUPABASE_SERVICE_ROLE_KEY` normalmente já ficam disponíveis
-> para a função; se necessário, defina-os também com `supabase secrets set`.
-
-**4.4 Publicar a função** (a pasta `supabase/functions/analyze` já está no pacote):
-```bash
-supabase functions deploy analyze
-```
+1. No Vercel, abra o projeto → **Settings → Environment Variables**.
+2. Crie `OPENAI_API_KEY` com a sua chave OpenAI, aplicando-a em **Production**, 
+   **Preview** e **Development**.
+3. Opcionalmente, crie `OPENAI_MODEL` com o valor `gpt-4o-mini`.
+4. Faça um novo deploy, ou envie um novo commit para o GitHub.
 
 Pronto. No diagnóstico do aluno e no painel docente aparece o botão **"Analisar
-com IA"**, que chama essa função. A chave OpenAI **nunca** vai para o navegador.
+com IA"**, que chama `/api/analyze`. A chave OpenAI **nunca** vai para o navegador.
 
 ---
 
