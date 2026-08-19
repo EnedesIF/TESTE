@@ -492,7 +492,7 @@ button,textarea,input,select{font-family:inherit}
       <h1>O que torna o seu lançamento realmente único?</h1>
       <p>Use a metodologia TESTE para transformar dados de mercado e comportamento do consumidor em uma estratégia defensável de lançamento imobiliário — do público ao pós-venda.</p>
       <button class="start-btn" onclick="nextPage()">Começar</button>
-      <div class="meta">5 etapas · Target → Explorar → Soluções → Testar → Escalar</div>
+      <div class="meta">6 fases · Contexto → Target → Explorar → Soluções → Testar → Escalar</div>
     </div>
   </div>
 
@@ -549,8 +549,9 @@ button,textarea,input,select{font-family:inherit}
   <div class="page" id="page3">
     <div class="card method">
       <h2 class="section-title">Como funciona a metodologia TESTE</h2>
-      <p class="section-sub">Cinco etapas que conectam inteligência de mercado, comportamento do consumidor e experimentação.</p>
+      <p class="section-sub">Seis fases que conectam contexto, inteligência de mercado, comportamento do consumidor e experimentação.</p>
       <div class="letter-row">
+        <div class="lcard"><span class="big">C</span><small>CONTEXTO</small></div>
         <div class="lcard lc-t"><span class="big">T</span><small>TARGET</small></div>
         <div class="lcard lc-e1"><span class="big">E</span><small>EXPLORAR</small></div>
         <div class="lcard lc-s"><span class="big">S</span><small>SOLUÇÕES</small></div>
@@ -558,6 +559,7 @@ button,textarea,input,select{font-family:inherit}
         <div class="lcard lc-e2"><span class="big">E</span><small>ESCALAR</small></div>
       </div>
       <div class="explain">
+        <div class="exp"><h4>C — Contexto</h4><p>Registre produto, praça, estágio, concorrência, VGV e meta comercial. Esta é a base factual da proposta.</p></div>
         <div class="exp"><h4>T — Target</h4><p>Defina o público e o comportamento a influenciar. Use o gerador de perfil psicográfico para ir além da demografia.</p></div>
         <div class="exp"><h4>E — Explorar</h4><p>Mapeie barreiras, dados e a jornada. Onde a experiência tem mais impacto — stand, decorado, tour, portal?</p></div>
         <div class="core">"Eu quero uma nova experiência com a sua marca."</div>
@@ -748,6 +750,11 @@ const STEPS=[
 }
 ];
 const QMAP={};STEPS.forEach(s=>s.questions.forEach(q=>QMAP[q.id]=q));
+const CONTEXT_FIELDS=['nomeProduto','conceito','tipoProduto','totalUnidades','metragem','areaLazer','servicosFacilidades','praca','estagio','ticket','vgv','vso','concorrentes'];
+const CONTEXT_PHASE={id:'contexto',letter:'C',name:'CONTEXTO',questions:CONTEXT_FIELDS.map(id=>({id,type:'text',label:id==='nomeProduto'?'Produto / empreendimento':id==='conceito'?'Conceito central':id==='tipoProduto'?'Tipo do produto':id==='totalUnidades'?'Torres / unidades':id==='metragem'?'Metragem média':id==='areaLazer'?'Área de lazer':id==='servicosFacilidades'?'Serviços e facilidades':id==='praca'?'Praça / região':id==='estagio'?'Estágio comercial':id==='ticket'?'Ticket médio da praça':id==='vgv'?'VGV alvo':id==='vso'?'Meta de VSO':'Concorrentes diretos'}))};
+const PHASES=[CONTEXT_PHASE,...STEPS];
+function phaseScore(data,phase){if(phase.id==='contexto'){const c=stepCompletion(phase);return {score:c.total?Math.round((c.done/c.total)*100):0,nbets:0};}return scoreStep(data,STEPS,phase.id);}
+function currentPhaseCount(data){return PHASES.filter(phase=>phaseScore(data,phase).score>0).length;}
 
 /* ============================ PERFIL PSICOGRÁFICO ============================ */
 const PSY_AXES=[
@@ -851,7 +858,7 @@ const BRIEFINGS=[
 const INSTRUCOES_HTML=`
 <div class="instr">
 <h4>O que é a metodologia TESTE</h4>
-<p>Um framework de 5 etapas para transformar dados de mercado e comportamento do consumidor em uma estratégia defensável: <b>T</b>arget → <b>E</b>xplorar → <b>S</b>oluções → <b>T</b>estar → <b>E</b>scalar.</p>
+<p>Um framework de 6 fases para transformar dados de mercado e comportamento do consumidor em uma estratégia defensável: <b>C</b>ontexto → <b>T</b>arget → <b>E</b>xplorar → <b>S</b>oluções → <b>T</b>estar → <b>E</b>scalar.</p>
 <h4>Como funciona cada escolha (importante!)</h4>
 <p>Cada opção que você seleciona vira uma <b>aposta fundamentada</b>. Para cada escolha, preencha:</p>
 <ul>
@@ -862,6 +869,7 @@ const INSTRUCOES_HTML=`
 <p>Escolha <b>sem evidência não pontua</b> e não deixa avançar. Toque no <b>?</b> ao lado de cada pergunta para a orientação específica.</p>
 <h4>O que fazer em cada etapa</h4>
 <ul>
+<li><b>Contexto</b> — registre o produto, praça, concorrência, VGV e meta comercial que sustentam as escolhas seguintes.</li>
 <li><b>Target</b> — defina o público, gere o perfil psicográfico e o job que o imóvel resolve.</li>
 <li><b>Explorar</b> — mapeie barreiras, dados disponíveis e a jornada de decisão.</li>
 <li><b>Soluções</b> — escolha gatilhos, diferenciação e ativos de experiência.</li>
@@ -930,7 +938,7 @@ const CASES=[
 
 /* ============================ ESTADO ============================ */
 let DATABASE={classes:{'DEMO2025':{name:'Turma Demo 2025',teacher:'Coordenação',teams:{}}}};
-let currentUser=null,currentClass=null,currentTeamId=null,currentTeamName=null,currentPage=0,currentStep=0,gameData={},supa=null,currentClassPass=null,currentProfPass=null,persistTimer=null,studentDataHydrated=false,saveState={status:'sync',at:null};
+let currentUser=null,currentClass=null,currentTeamId=null,currentTeamName=null,currentPage=0,currentStep=0,gameData={},supa=null,currentClassPass=null,currentProfPass=null,persistTimer=null,studentDataHydrated=false,isRestoringRemote=false,saveState={status:'sync',at:null};
 
 /* ============================ PERSISTÊNCIA ============================ */
 function initSupabase(){if(CONFIG.useSupabase&&window.supabase&&CONFIG.supabaseUrl&&CONFIG.supabaseAnonKey){
@@ -985,13 +993,13 @@ function renderStudentDashboard(){
   const host=document.getElementById('studentLiveDash');if(!host||!gameData)return;
   const overall=scoreOverall(gameData,STEPS),bets=allBets(gameData,STEPS);
   const grounded=bets.filter(b=>evValid(b.ev)&&LEX.grounded.test(b.ev)).length;
-  const activeStages=STEPS.filter(s=>scoreStep(gameData,STEPS,s.id).score>0).length;
+  const activeStages=currentPhaseCount(gameData);
   const statusMap={sync:{cls:'sync',icon:'✓',text:saveState.at?'Salvo às '+new Date(saveState.at).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}):'Tudo salvo'},wait:{cls:'wait',icon:'◌',text:'Salvando alterações…'},fail:{cls:'fail',icon:'!',text:'Verifique a conexão'}};
   const sv=statusMap[saveState.status]||statusMap.sync;
-  const colors=['#8e44ad','#2E75B6','#e84393','#d35400','#1A6B3C'];
-  const cards=STEPS.map((s,i)=>{const stepScore=scoreStep(gameData,STEPS,s.id).score;const c=stepCompletion(s);return '<div class="stage-card" style="--stage:'+colors[i]+'"><span>'+s.letter+'</span><div><b>'+s.name+'</b><small>'+stepScore+'/100 · '+c.done+'/'+c.total+' itens</small></div></div>';}).join('');
-  const completions=STEPS.map(s=>{const c=stepCompletion(s),ok=c.done===c.total;return '<div class="completion-chip '+(ok?'ok':'warn')+'"><strong>'+s.letter+' · '+s.name+' · '+c.done+'/'+c.total+'</strong>'+(ok?'Pronta para a banca.':'Falta: '+(c.pending.slice(0,2).join(' · ')||'refinar evidências')+(c.pending.length>2?'…':''))+'</div>';}).join('');
-  host.innerHTML='<div class="live-dash-head"><div><h3>Radar da proposta</h3><p>Leitura em tempo real da robustez, das evidências e da coerência do seu plano.</p></div><span class="save-pill '+(isTeamLocked()?'sync':sv.cls)+'">'+(isTeamLocked()?'▣ Dossiê encerrado':sv.icon+' '+sv.text)+'</span></div><div class="live-metrics"><div class="live-metric lm-score"><div class="lm-label">Robustez</div><div class="lm-value">'+overall.indice+'</div><div class="lm-sub">de 100 pontos</div></div><div class="live-metric lm-evidence"><div class="lm-label">Evidências</div><div class="lm-value">'+grounded+'/'+bets.length+'</div><div class="lm-sub">com dado citado</div></div><div class="live-metric lm-coherence"><div class="lm-label">Coerência</div><div class="lm-value">'+overall.eixos.coerencia+'</div><div class="lm-sub">estratégia ↔ teste</div></div><div class="live-metric lm-progress"><div class="lm-label">Etapas</div><div class="lm-value">'+activeStages+'/5</div><div class="lm-sub">com proposta iniciada</div></div></div><div class="stage-health">'+cards+'</div><div class="completion-strip">'+completions+'</div>';
+  const colors=['#087E8B','#8e44ad','#2E75B6','#e84393','#d35400','#1A6B3C'];
+  const cards=PHASES.map((s,i)=>{const stepScore=phaseScore(gameData,s).score;const c=stepCompletion(s);return '<div class="stage-card" style="--stage:'+colors[i]+'"><span>'+s.letter+'</span><div><b>'+s.name+'</b><small>'+stepScore+'/100 · '+c.done+'/'+c.total+' itens</small></div></div>';}).join('');
+  const completions=PHASES.map(s=>{const c=stepCompletion(s),ok=c.done===c.total;return '<div class="completion-chip '+(ok?'ok':'warn')+'"><strong>'+s.letter+' · '+s.name+' · '+c.done+'/'+c.total+'</strong>'+(ok?'Pronta para a banca.':'Falta: '+(c.pending.slice(0,2).join(' · ')||'refinar evidências')+(c.pending.length>2?'…':''))+'</div>';}).join('');
+  host.innerHTML='<div class="live-dash-head"><div><h3>Radar da proposta</h3><p>Leitura em tempo real da robustez, das evidências e da coerência do seu plano.</p></div><span class="save-pill '+(isTeamLocked()?'sync':sv.cls)+'">'+(isTeamLocked()?'▣ Dossiê encerrado':sv.icon+' '+sv.text)+'</span></div><div class="live-metrics"><div class="live-metric lm-score"><div class="lm-label">Robustez</div><div class="lm-value">'+overall.indice+'</div><div class="lm-sub">de 100 pontos</div></div><div class="live-metric lm-evidence"><div class="lm-label">Evidências</div><div class="lm-value">'+grounded+'/'+bets.length+'</div><div class="lm-sub">com dado citado</div></div><div class="live-metric lm-coherence"><div class="lm-label">Coerência</div><div class="lm-value">'+overall.eixos.coerencia+'</div><div class="lm-sub">estratégia ↔ teste</div></div><div class="live-metric lm-progress"><div class="lm-label">Fases</div><div class="lm-value">'+activeStages+'/6</div><div class="lm-sub">com dossiê iniciado</div></div></div><div class="stage-health">'+cards+'</div><div class="completion-strip">'+completions+'</div>';
 }
 async function fetchClassStudents(cc){
   if(supa){try{const {data,error}=await supa.rpc('listar_equipes_prof',{p_codigo:cc,p_senha_prof:currentProfPass});
@@ -1172,7 +1180,7 @@ function validateContext(){
   const con=document.getElementById('conceito').value.trim();
   if(!nome||!con)return alert('Preencha ao menos o nome do produto e o conceito central.');
   if(looksInvalid(nome)||looksInvalid(con)){if(!confirm('O nome do produto ou o conceito parecem incompletos (ex.: "dd", "xxx"). Deseja continuar mesmo assim?'))return;}
-  collectFields();showPage(2);
+  collectFields();gameData.currentPhase=1;persistStudent();showPage(2);
 }
 
 /* ---- Render das etapas ---- */
@@ -1289,7 +1297,7 @@ function showStep(n){
   document.getElementById('progressFill').style.width=(((n+1)/STEPS.length)*100)+'%';
   document.getElementById('prevStepBtn').disabled=n===0;
   document.getElementById('nextStepBtn').textContent=n===STEPS.length-1?'Finalizar →':'Próxima →';
-  currentStep=n;collectFields();persistStudent();updateStepQuality(STEPS[n].id);if(STEPS[n].id==='testar')updateCoherence();renderStudentDashboard();window.scrollTo({top:0,behavior:'smooth'});
+  currentStep=n;gameData.currentPhase=n+2;collectFields();persistStudent();updateStepQuality(STEPS[n].id);if(STEPS[n].id==='testar')updateCoherence();renderStudentDashboard();window.scrollTo({top:0,behavior:'smooth'});
 }
 function validateCurrentStep(silent){
   const s=STEPS[currentStep];
@@ -1309,6 +1317,7 @@ function validateCurrentStep(silent){
 
 /* ---- coleta / restauração ---- */
 function collectFields(){
+  if(isRestoringRemote)return; // não coleta placeholders vazios enquanto aplica o dossiê remoto
   document.querySelectorAll('#page2 input,#page2 textarea,#page2 select').forEach(el=>{if(el.id)gameData[el.id]=el.value;});
   STEPS.forEach(s=>{s.questions.forEach(q=>{if(q.type==='select'||q.type==='text'){const el=document.getElementById(q.id);if(el)gameData[q.id]=el.value;}});
     const r=document.getElementById(s.id+'_reason');if(r)gameData[s.id+'_reason']=r.value;});
@@ -1317,9 +1326,12 @@ function collectFields(){
 function autoSave(){collectFields();persistStudent();}
 function loadGameData(){
   const team=getTeam();gameData=(team&&team.data)?team.data:{};
-  syncUIFromData();
-  if(gameData.currentStep!==undefined){currentStep=gameData.currentStep;showStep(currentStep);}
-  if(gameData.currentPage!==undefined)currentPage=gameData.currentPage;
+  isRestoringRemote=true;
+  try{
+    syncUIFromData();
+    if(gameData.currentStep!==undefined){currentStep=gameData.currentStep;showStep(currentStep);}
+    if(gameData.currentPage!==undefined)currentPage=gameData.currentPage;
+  }finally{isRestoringRemote=false;}
 }
 function syncUIFromData(){
   Object.keys(gameData).forEach(k=>{const el=document.getElementById(k);
@@ -1533,7 +1545,7 @@ function finishGame(){
 }
 function requestLock(){
   if(isTeamLocked())return;
-  if(!gameData.completed){alert('Finalize as cinco etapas antes de solicitar o encerramento.');return;}
+  if(!gameData.completed){alert('Finalize as seis fases antes de solicitar o encerramento.');return;}
   gameData.lockRequestedAt=gameData.lockRequestedAt||new Date().toISOString();persistStudent();renderDiagnosis();alert('Solicitação registrada. O(a) professor(a) pode encerrar o dossiê no painel da turma.');
 }
 function openCommitteePresentation(){
@@ -1556,7 +1568,7 @@ function buildProposalHTML(){
   const hip=(g.testar_hyp_if||g.testar_hyp_then||g.testar_hyp_why)?
     ('SE '+(g.testar_hyp_if||'…')+' ENTÃO '+(g.testar_hyp_then||'…')+' PORQUE '+(g.testar_hyp_why||'…')):'';
   return '<h3>Proposta preliminar — '+nome+praca+'</h3>'+
-    '<p class="psub">Síntese automática cruzando as suas escolhas nas 5 etapas. Use como rascunho da proposta e refine.</p>'+
+    '<p class="psub">Síntese automática cruzando as suas escolhas nas 6 fases. Use como rascunho da proposta e refine.</p>'+
     (g.psicoProfile?row('Perfil psicográfico:','<b>'+g.psicoProfile.title+'</b>'):'')+
     ((g.persona_idade||g.persona_ocupacao||g.persona_estilo||g.persona_valores||g.persona_canais)?
       row('Persona:',[g.persona_idade&&('Idade '+g.persona_idade),g.target_q3&&('Renda '+g.target_q3),g.persona_ocupacao,g.persona_estilo,g.persona_valores,g.persona_canais].filter(Boolean).join(' · ')):'')+
@@ -1644,12 +1656,12 @@ function chainMapSVG(g){
 function heatmapSVG(students){
   const teams=students.filter(s=>s.data);
   if(!teams.length)return '<p class="asub">Sem equipes com dados.</p>';
-  const rowH=26,left=120,top=24,colW=60,w=left+colW*STEPS.length+10,h=top+rowH*teams.length+8;
+  const rowH=26,left=120,top=24,colW=60,w=left+colW*PHASES.length+10,h=top+rowH*teams.length+8;
   let s='<svg viewBox="0 0 '+w+' '+h+'" style="width:'+w+'px;max-width:100%;height:auto">';
-  STEPS.forEach((st,c)=>{s+='<text x="'+(left+colW*c+(colW-4)/2)+'" y="'+(top-8)+'" font-size="11" fill="#5b6572" text-anchor="middle" font-weight="800">'+st.letter+'</text>';});
+  PHASES.forEach((st,c)=>{s+='<text x="'+(left+colW*c+(colW-4)/2)+'" y="'+(top-8)+'" font-size="11" fill="#5b6572" text-anchor="middle" font-weight="800">'+st.letter+'</text>';});
   teams.forEach((tm,r)=>{const y=top+rowH*r;
     s+='<text x="0" y="'+(y+rowH/2+3)+'" font-size="10" fill="#3a4552">'+esc(trunc(tm.name,16))+'</text>';
-    STEPS.forEach((st,c)=>{const v=scoreStep(tm.data,STEPS,st.id).score,x=left+colW*c;
+    PHASES.forEach((st,c)=>{const v=phaseScore(tm.data,st).score,x=left+colW*c;
       s+='<rect x="'+x+'" y="'+y+'" width="'+(colW-4)+'" height="'+(rowH-4)+'" rx="4" fill="'+heatColor(v)+'"/>';
       s+='<text x="'+(x+(colW-4)/2)+'" y="'+(y+rowH/2+3)+'" font-size="9.5" fill="#fff" text-anchor="middle" font-weight="700">'+v+'</text>';});});
   s+='</svg>';return s;
@@ -1691,7 +1703,7 @@ function renderDiagnosis(){
     html+='<div class="eval"><h4>'+step.letter+' — '+step.name+'<span class="steptag '+(okS?'ok':'bad')+'">'+(okS?'aprovada':'reveja')+'</span></h4><div class="bar"><div class="track"><div class="fill" style="width:'+r.score+'%"></div></div><div class="sc">'+r.score+'/100</div></div><p><span class="chip-view">completude '+r.comp+'</span> <span class="chip-view">fundamentação '+r.fund+'</span> <span class="chip-view">calibração '+r.cal+'</span></p></div>';});
   if(supa&&CONFIG.supabaseUrl)html+='<div style="text-align:center;margin-top:6px"><button class="ai-btn" onclick="analyzeMyTeam()">\ud83e\udd16 Analisar minha proposta com IA</button></div>';
   document.getElementById('evaluationSections').innerHTML=html;
-  const st=document.getElementById('submissionStatus');if(st)st.innerHTML=isTeamLocked()?'<strong>Dossiê encerrado pelo(a) professor(a).</strong> A versão atual fica preservada para apresentação e PDF.':(gameData.lockRequestedAt?'<strong>Encerramento solicitado em '+new Date(gameData.lockRequestedAt).toLocaleString('pt-BR')+'.</strong> O(a) professor(a) poderá bloquear novas alterações no painel.':(gameData.submittedAt?'<strong>Proposta entregue em '+new Date(gameData.submittedAt).toLocaleString('pt-BR')+'.</strong> Você ainda pode solicitar o encerramento definitivo.':'Conclua as cinco etapas para gerar a entrega executiva.'));
+  const st=document.getElementById('submissionStatus');if(st)st.innerHTML=isTeamLocked()?'<strong>Dossiê encerrado pelo(a) professor(a).</strong> A versão atual fica preservada para apresentação e PDF.':(gameData.lockRequestedAt?'<strong>Encerramento solicitado em '+new Date(gameData.lockRequestedAt).toLocaleString('pt-BR')+'.</strong> O(a) professor(a) poderá bloquear novas alterações no painel.':(gameData.submittedAt?'<strong>Proposta entregue em '+new Date(gameData.submittedAt).toLocaleString('pt-BR')+'.</strong> Você ainda pode solicitar o encerramento definitivo.':'Conclua as seis fases para gerar a entrega executiva.'));
   applyLockedState();
 }
 function restartGame(){
@@ -1863,7 +1875,8 @@ async function updateDashboard(){
   if(!students.length){grid.innerHTML='<div class="empty">Nenhuma equipe registrada ainda nesta turma.</div>';return;}
   students.sort((a,b)=>(b.score||0)-(a.score||0)).forEach(s=>{
     const online=now-new Date(s.lastActive).getTime()<300000;
-    const dots=STEPS.map((st,i)=>'<div class="dot '+(i<s.currentStep?'done':i===s.currentStep?'cur':'')+'">'+st.letter+'</div>').join('');
+    const phase=(s.data&&s.data.currentPhase)||Math.min((s.currentStep||0)+2,6);
+    const dots=PHASES.map((st,i)=>'<div class="dot '+(i+1<phase?'done':i+1===phase?'cur':'')+'">'+st.letter+'</div>').join('');
     const o=s.data?scoreOverall(s.data,STEPS):{indice:0,eixos:{completude:0,fundamentacao:0,calibracao:0,coerencia:0}};
     const bets=s.data?allBets(s.data,STEPS):[];const semEv=bets.filter(b=>!(b.ev||'').trim()).length;
     const invalid=bets.filter(b=>(b.ev||'').trim()&&!evValid(b.ev)).length;
@@ -1874,7 +1887,7 @@ async function updateDashboard(){
     const card=document.createElement('div');card.className='scard';card.onclick=()=>showStudentDetails(s);
     card.innerHTML='<div class="sn">'+s.name+' <span class="chip-view">'+nMem+' membro(s)</span></div>'+
       '<div class="dots">'+dots+'</div>'+
-      '<div class="stt">'+(online?'🟢 Online':'⚪ Offline')+' · Etapa '+Math.min(s.currentStep+1,5)+'/5 · Índice '+o.indice+'/100'+
+      '<div class="stt">'+(online?'🟢 Online':'⚪ Offline')+' · Fase '+phase+'/6 · Índice '+o.indice+'/100'+
       (semEv?' · <b style="color:var(--warn)">'+semEv+' aposta(s) sem evidência</b>':(s.completed?' · ✅ Finalizado':''))+'</div>'+
       '<div class="teixos">'+eixMini+'</div>'+
       (flags.length?'<div class="tflags">'+flags.join('')+'</div>':'')+
@@ -1898,7 +1911,7 @@ async function exportClassData(){
   students.forEach(s=>{const d=s.data||{};const o=scoreOverall(d,STEPS);const c=v=>(Array.isArray(v)?v.join(' | '):(v||'')).toString().replace(/;/g,',');
     const nomes=(s.members||[]).map(m=>m.nome).join(' | ');const emails=(s.members||[]).map(m=>m.email).join(' | ');const tels=(s.members||[]).map(m=>m.tel).join(' | ');
     const semEv=allBets(d,STEPS).filter(b=>!(b.ev||'').trim()).length;
-    csv+=[c(s.name),c(nomes),c(emails),c(tels),Math.min(s.currentStep+1,5)+'/5',s.completed?'Finalizado':'Andamento',o.indice,o.eixos.completude,o.eixos.fundamentacao,o.eixos.calibracao,o.eixos.coerencia,semEv,c(d.nomeProduto),c(d.praca),new Date(s.lastActive).toLocaleString('pt-BR')].join(';')+'\n';});
+    csv+=[c(s.name),c(nomes),c(emails),c(tels),((d.currentPhase||Math.min((s.currentStep||0)+2,6))+'/6'),s.completed?'Finalizado':'Andamento',o.indice,o.eixos.completude,o.eixos.fundamentacao,o.eixos.calibracao,o.eixos.coerencia,semEv,c(d.nomeProduto),c(d.praca),new Date(s.lastActive).toLocaleString('pt-BR')].join(';')+'\n';});
   const blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'});
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='turma_'+currentClass+'_equipes.csv';a.click();URL.revokeObjectURL(a.href);
 }
@@ -1918,7 +1931,7 @@ function exportToPDF(){
     T('Aluno(a): '+(currentUser.name||'—'),11);
     T('Turma: '+(currentUser.classCode||'—')+'   ·   Data: '+new Date().toLocaleDateString('pt-BR'),11);y+=2;
     const pdfScore=scoreOverall(gameData,STEPS),pdfBets=allBets(gameData,STEPS),pdfGrounded=pdfBets.filter(b=>evValid(b.ev)&&LEX.grounded.test(b.ev)).length;
-    const pdfMetrics=[['Robustez',pdfScore.indice,'#166534'],['Evidências',pdfGrounded+'/'+pdfBets.length,'#1d4ed8'],['Coerência',pdfScore.eixos.coerencia,'#7e22ce'],['Etapas',STEPS.filter(s=>scoreStep(gameData,STEPS,s.id).score>0).length+'/5','#c2410c']];
+    const pdfMetrics=[['Robustez',pdfScore.indice,'#166534'],['Evidências',pdfGrounded+'/'+pdfBets.length,'#1d4ed8'],['Coerência',pdfScore.eixos.coerencia,'#7e22ce'],['Fases',currentPhaseCount(gameData)+'/6','#c2410c']];
     const metricW=(W-2*M-9)/4;pdfMetrics.forEach((m,i)=>{const x=M+i*(metricW+3),hex=m[2].slice(1);doc.setFillColor(parseInt(hex.slice(0,2),16),parseInt(hex.slice(2,4),16),parseInt(hex.slice(4,6),16));doc.roundedRect(x,y,metricW,19,3,3,'F');doc.setTextColor(255,255,255);doc.setFontSize(7);doc.setFont(undefined,'bold');doc.text(m[0].toUpperCase(),x+4,y+6);doc.setFontSize(13);doc.text(String(m[1]),x+4,y+15);});
     y+=25;
     T('CONTEXTO DO PROJETO',13,true,brand);
