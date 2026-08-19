@@ -922,7 +922,7 @@ const CASES=[
 
 /* ============================ ESTADO ============================ */
 let DATABASE={classes:{'DEMO2025':{name:'Turma Demo 2025',teacher:'Coordenação',teams:{}}}};
-let currentUser=null,currentClass=null,currentTeamId=null,currentTeamName=null,currentPage=0,currentStep=0,gameData={},supa=null,currentClassPass=null,currentProfPass=null,persistTimer=null,saveState={status:'sync',at:null};
+let currentUser=null,currentClass=null,currentTeamId=null,currentTeamName=null,currentPage=0,currentStep=0,gameData={},supa=null,currentClassPass=null,currentProfPass=null,persistTimer=null,studentDataHydrated=false,saveState={status:'sync',at:null};
 
 /* ============================ PERSISTÊNCIA ============================ */
 function initSupabase(){if(CONFIG.useSupabase&&window.supabase&&CONFIG.supabaseUrl&&CONFIG.supabaseAnonKey){
@@ -935,6 +935,7 @@ function getTeam(){if(!currentClass||!currentTeamId)return null;
   return mem||loadTeamRecord(currentClass,currentTeamId);}
 async function persistStudent(){
   if(!currentUser||currentUser.type!=='student')return;
+  if(!studentDataHydrated)return; // nunca permite que cache local antigo sobrescreva o dossiê remoto
   if(!gameData||Object.keys(gameData).length===0)return; // nunca grava vazio por cima
   setSaveState('wait');
   let team=getTeam();if(!team)return;
@@ -985,6 +986,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   if(saved){currentUser=JSON.parse(saved);currentClass=currentUser.classCode;
     if(currentUser.type==='student'){currentTeamId=currentUser.teamId;currentTeamName=currentUser.teamName;currentClassPass=currentUser.pass||null;
       if(supa&&currentClassPass){resumeStudentFromServer();}
+      else if(supa){localStorage.removeItem('testeUser');currentUser=currentClass=currentTeamId=currentTeamName=null;}
       else{const t=loadTeamRecord(currentClass,currentTeamId);
         if(t){DATABASE.classes[currentClass]=DATABASE.classes[currentClass]||{name:'Turma '+currentClass,teams:{}};DATABASE.classes[currentClass].teams=DATABASE.classes[currentClass].teams||{};DATABASE.classes[currentClass].teams[currentTeamId]=t;}
         startGame();}}
@@ -994,6 +996,7 @@ document.addEventListener('DOMContentLoaded',()=>{
 
 /* ============================ LOGIN ============================ */
 async function resumeStudentFromServer(){
+  studentDataHydrated=false;
   try{
     const {data,error}=await supa.rpc('carregar_equipe',{p_codigo:currentClass,p_senha_aluno:currentClassPass,p_equipe_id:currentTeamId});
     if(error)throw error;
@@ -1001,7 +1004,8 @@ async function resumeStudentFromServer(){
     const team={id:currentTeamId,name:(row&&row.equipe_nome)||currentTeamName,members:(row&&row.membros)||[],data:(row&&row.dados)||{},completed:!!(row&&row.completo),score:(row&&row.score)||0,currentStep:(row&&row.etapa)||0,lastActive:(row&&row.atualizado_em)||new Date().toISOString()};
     DATABASE.classes[currentClass]={name:'Turma '+currentClass,teams:{}};DATABASE.classes[currentClass].teams[currentTeamId]=team;
     currentTeamName=team.name;
-  }catch(e){console.warn('resume falhou',e);}
+    studentDataHydrated=true;
+  }catch(e){console.warn('resume falhou',e);localStorage.removeItem('testeUser');currentUser=currentClass=currentTeamId=currentTeamName=null;return;}
   startGame();
 }
 function switchTab(t){document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x.dataset.tab===t));if(t==='student')ensureMembers();
@@ -1056,6 +1060,7 @@ async function loginStudent(){
       const team={id:teamIdS,name:currentTeamName,members:(row&&row.membros)||members,data:(row&&row.dados)||{},completed:!!(row&&row.completo),score:(row&&row.score)||0,currentStep:(row&&row.etapa)||0,lastActive:(row&&row.atualizado_em)||new Date().toISOString()};
       DATABASE.classes[cc]={name:'Turma '+cc,teams:{}};DATABASE.classes[cc].teams[teamIdS]=team;
       currentUser={type:'student',name:mName,email:mEmail,teamId:teamIdS,teamName:currentTeamName,classCode:cc,pass:pass};
+      studentDataHydrated=true;
       localStorage.setItem('testeUser',JSON.stringify(currentUser));
       startGame();return;
     }catch(e){const m=(e&&e.message)||String(e);return alert(/SENHA/i.test(m)?'Senha da turma inválida.':'Não foi possível entrar: '+m);}
@@ -1071,6 +1076,7 @@ async function loginStudent(){
   DATABASE.classes[cc].teams[teamId]=team;
   currentTeamName=team.name;
   currentUser={type:'student',name:mName,email:mEmail,teamId,teamName:team.name,classCode:cc};
+  studentDataHydrated=true;
   localStorage.setItem('testeUser',JSON.stringify(currentUser));
   saveTeamRecord(team);startGame();
 }
@@ -1107,7 +1113,7 @@ async function loginTeacher(){
 }
 function logout(){
   localStorage.removeItem('testeUser');closeDrawer();
-  currentUser=currentClass=currentTeamId=currentTeamName=currentClassPass=currentProfPass=null;currentPage=currentStep=0;gameData={};
+  currentUser=currentClass=currentTeamId=currentTeamName=currentClassPass=currentProfPass=null;studentDataHydrated=false;currentPage=currentStep=0;gameData={};
   if(showDashboard._t){clearInterval(showDashboard._t);showDashboard._t=null;}
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.getElementById('topbar').classList.add('hidden');
