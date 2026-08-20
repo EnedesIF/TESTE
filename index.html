@@ -370,6 +370,8 @@ button,textarea,input,select{font-family:inherit}
 .pf label{display:block;font-size:12.5px;font-weight:700;margin-bottom:5px}
 .pf input,.pf select{width:100%;padding:10px;border:1px solid var(--line);border-radius:9px;font-size:14px;background:#fff}
 .pf input:focus,.pf select:focus{outline:none;border-color:var(--brand-2);box-shadow:0 0 0 3px rgba(46,117,182,.1)}
+.pf textarea{width:100%;min-height:74px;padding:10px;border:1px solid var(--line);border-radius:9px;font-size:14px;resize:vertical;background:#fff}.pf textarea:focus{outline:none;border-color:var(--brand-2);box-shadow:0 0 0 3px rgba(46,117,182,.1)}
+.persona-lab{margin-top:18px;border:1px solid #b7d4ef;background:linear-gradient(135deg,#edf7ff,#f8fcff);border-radius:13px;padding:16px}.persona-lab h5{color:var(--brand-2);font-size:1em;margin-bottom:5px}.persona-lab p{font-size:12.5px;color:#40556a;margin-bottom:12px}.persona-lab .lab-note{padding:10px 12px;border-radius:9px;background:#fff;border:1px solid #dce9f4;font-size:12px;color:var(--muted);margin-bottom:12px}.persona-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.persona-actions .nav-btn{padding:10px 16px;font-size:13px}.persona-actions .ghost{font-size:12.5px}.persona-result{margin-top:15px}.persona-empty{border:1px dashed #b7d4ef;border-radius:10px;padding:13px;color:#587086;background:#fff;font-size:12.5px}.persona-result-card{background:#fff;border:1px solid #cfe2f2;border-radius:14px;padding:18px}.persona-head{display:grid;grid-template-columns:90px 1fr;gap:16px;align-items:center;margin-bottom:16px}.persona-avatar{width:90px;height:90px;border-radius:50%;overflow:hidden;background:linear-gradient(135deg,#2e75b6,#1a6b3c);display:flex;align-items:center;justify-content:center;color:#fff;font-size:2em;font-weight:900;border:3px solid #e7f2fb}.persona-avatar img{width:100%;height:100%;object-fit:cover}.persona-kicker{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--brand-2);font-weight:800}.persona-name{font-size:1.28em;font-weight:900;color:#1d3c58;margin:2px 0}.persona-summary{font-size:13px;color:#40556a}.persona-confidence{display:inline-flex;gap:6px;align-items:center;border-radius:20px;padding:4px 10px;font-size:11px;font-weight:800;margin-top:7px}.persona-confidence.exploratoria{background:#fff4e5;color:#8a5a00}.persona-confidence.ancorada{background:#edf5ff;color:#1d5c93}.persona-confidence.validada{background:#eef7f1;color:#1c6b41}.persona-columns{display:grid;grid-template-columns:1fr 1fr;gap:12px}.persona-block{border:1px solid #e4edf5;border-radius:10px;padding:12px;background:#fbfdff}.persona-block.full{grid-column:1/-1}.persona-block h6{font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--brand-2);margin-bottom:7px}.persona-block p,.persona-block li{font-size:12.5px;color:#3d5164}.persona-block ul{margin:0 0 0 17px}.persona-block li{margin-bottom:4px}.persona-disclaimer{font-size:11px;color:var(--muted);margin-top:12px;line-height:1.45}.persona-image-note{font-size:10px;color:var(--muted);text-align:center;margin-top:5px}.persona-loading{font-size:12.5px;color:var(--brand-2);font-weight:700;padding:10px 0}@media(max-width:640px){.persona-head{grid-template-columns:68px 1fr}.persona-avatar{width:68px;height:68px}.persona-columns{grid-template-columns:1fr}.persona-block.full{grid-column:auto}}
 .mxleg{margin:12px 0 0;padding-left:0;list-style:none;columns:2;column-gap:20px;font-size:12px;color:#3a4552}
 .mxleg li{margin-bottom:5px;break-inside:avoid}
 .mxn{display:inline-flex;width:18px;height:18px;border-radius:50%;color:#fff;font-size:10.5px;font-weight:800;align-items:center;justify-content:center;margin-right:6px;vertical-align:middle}
@@ -387,6 +389,7 @@ button,textarea,input,select{font-family:inherit}
 .presentation-modal{position:fixed;inset:0;z-index:70;background:rgba(16,24,40,.82);display:none;align-items:center;justify-content:center;padding:20px}.presentation-modal.open{display:flex}.presentation-shell{width:min(1080px,100%);max-height:94vh;overflow:auto;background:#fff;border-radius:20px;box-shadow:0 22px 60px rgba(0,0,0,.3);padding:30px;position:relative}.presentation-close{position:absolute;right:18px;top:16px;border:none;background:#f1f5f9;color:#334155;border-radius:50%;width:34px;height:34px;font-size:18px;cursor:pointer}.presentation-head{padding:8px 46px 22px 0;border-bottom:3px solid var(--brand)}.presentation-head .eyebrow{font-size:11px;font-weight:900;letter-spacing:.12em;color:var(--brand-2);text-transform:uppercase}.presentation-head h2{font-size:clamp(1.55rem,4vw,2.35rem);color:#163329;margin:7px 0}.presentation-head p{color:var(--muted)}.presentation-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:18px;margin-top:22px}.presentation-card{border:1px solid #dfe6ed;border-radius:14px;padding:18px;background:#fff}.presentation-card h3{font-size:13px;color:var(--brand);text-transform:uppercase;letter-spacing:.06em;margin-bottom:9px}.presentation-card p{font-size:14px;line-height:1.55;color:#344054}.presentation-score{border-radius:14px;padding:20px;background:linear-gradient(135deg,#166534,#22a06b);color:#fff}.presentation-score .n{font-size:3.6rem;font-weight:900;line-height:1}.presentation-score small{display:block;margin-top:5px;opacity:.9}.presentation-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:20px}@media(max-width:700px){.presentation-grid{grid-template-columns:1fr}.presentation-shell{padding:22px}.completion-chip{min-width:calc(50% - 8px)}}
 .ai-btn{background:#7a3fa0;color:#fff;border:none;border-radius:16px;padding:6px 12px;font-weight:700;font-size:12px;cursor:pointer;margin-top:8px}
 .ai-btn:hover{background:#653488}
+.gameboard{margin:16px 0 20px;border:1px solid #d9c7eb;background:linear-gradient(135deg,#fbf8ff,#f5fbff);border-radius:16px;padding:16px}.gameboard.hidden{display:none}.game-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:12px}.game-head h3{color:#5d257f;font-size:1.05em}.game-head p{font-size:12px;color:var(--muted);margin-top:3px}.game-score-chip{padding:7px 10px;border-radius:14px;background:#fff;border:1px solid #decfee;color:#5d257f;font-size:11.5px;font-weight:800;white-space:nowrap}.game-rank{display:grid;grid-template-columns:34px 1fr auto;gap:9px;align-items:center;padding:9px 0;border-top:1px solid #e7def0}.game-rank:first-of-type{border-top:0}.game-rank.me{margin:0 -8px;padding:9px 8px;border-radius:9px;background:#f1e9fa}.game-pos{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:#ece6f3;color:#6a4382;font-size:12px;font-weight:900}.game-rank:nth-of-type(2) .game-pos{background:#f8df80;color:#725400}.game-team{font-size:13px;font-weight:800;color:#32465a}.game-meta{font-size:11px;color:var(--muted);margin-top:2px}.game-points{text-align:right;font-size:14px;font-weight:900;color:#5d257f}.game-points small{display:block;color:var(--muted);font-size:10px;font-weight:600}.game-privacy{font-size:10.5px;color:#687789;margin-top:10px}.game-controls{border:1px solid #d9c7eb;background:#fbf8ff;border-radius:12px;padding:14px;margin:0 0 16px}.game-controls h4{color:#5d257f;margin-bottom:4px}.game-controls p{font-size:12px;color:var(--muted);margin-bottom:10px}.game-toggles{display:flex;gap:9px;flex-wrap:wrap}.game-toggle{display:flex;gap:7px;align-items:center;background:#fff;border:1px solid #e1d8ea;border-radius:9px;padding:8px 10px;font-size:12px;font-weight:700;color:#4a3d54}.game-toggle input{width:auto}.stage-ai-card{border:1px solid #dac9ea;background:#fcf9ff;border-radius:11px;padding:12px 14px;margin:12px 0 4px}.stage-ai-card h5{font-size:13px;color:#67318c;margin-bottom:4px}.stage-ai-card p{font-size:12px;color:var(--muted);margin-bottom:9px}.stage-ai-card .ai-stage-score{display:inline-block;padding:4px 9px;border-radius:12px;background:#f1e9fa;color:#67318c;font-size:11px;font-weight:900;margin-bottom:8px}.stage-ai-card ul{margin:5px 0 8px 16px}.stage-ai-card li{font-size:12px;color:#405060;margin-bottom:3px}.stage-ai-card .ai-stage-action{font-size:12px;font-weight:800;color:#1a623b}.stage-ai-submit{background:#67318c;color:#fff;border:none;border-radius:9px;padding:9px 12px;font-size:12px;font-weight:800;cursor:pointer}.stage-ai-submit:hover{background:#552475}.stage-ai-submit:disabled{opacity:.55;cursor:not-allowed}.review-ai-btn{background:#fff;color:#67318c;border:1px solid #d9c7eb;border-radius:9px;padding:6px 9px;font-size:11px;font-weight:800;cursor:pointer;margin-top:8px}
 .aimodal{position:fixed;inset:0;background:rgba(15,25,40,.5);z-index:990;display:none;align-items:center;justify-content:center;padding:20px}
 .aimodal.open{display:flex}
 .aibox{background:#fff;border-radius:16px;max-width:620px;width:100%;max-height:86vh;overflow-y:auto;padding:24px;box-shadow:var(--shadow)}
@@ -482,6 +485,7 @@ button,textarea,input,select{font-family:inherit}
         <div class="stat"><div class="num" id="completedStudents">0</div><div class="cap">Finalizaram</div></div>
         <div class="stat"><div class="num" id="averageScore">0</div><div class="cap">Média (índice)</div></div>
       </div>
+      <div id="gameControls"></div>
       <div class="agg" id="aggPanel"></div>
       <div class="students" id="studentsGrid"></div>
     </div>
@@ -582,7 +586,8 @@ button,textarea,input,select{font-family:inherit}
 		    <div class="progress"><i id="progressFill"></i></div>
 		    <div class="lock-notice hidden" id="lockNotice" role="status"></div>
 		    <section class="live-dash" id="studentLiveDash" aria-live="polite"></section>
-	    <div class="steps" id="stepsTabs"></div>
+		    <section class="gameboard hidden" id="studentGameboard" aria-live="polite"></section>
+		    <div class="steps" id="stepsTabs"></div>
 	    <div id="stepsHost"></div>
 	    <div class="nav">
 	      <button class="nav-btn ghost" id="prevStepBtn" onclick="previousStep()" disabled>← Anterior</button>
@@ -784,18 +789,67 @@ function personaCard(){
   const ages=['','18\u201324','25\u201334','35\u201344','45\u201354','55\u201364','65+'];
   const opt=ages.map(a=>'<option value="'+a+'">'+(a||'\u2014')+'</option>').join('');
   return `<div class="persona">
-    <h4>\ud83d\udc64 Persona detalhada</h4>
-    <p class="pdesc">Detalhe quem \u00e9 a pessoa por tr\u00e1s do p\u00fablico. Alimenta a proposta e a an\u00e1lise final.</p>
+    <h4>\ud83d\udc64 Persona estratégica auditável</h4>
+    <p class="pdesc">Registre o segmento e a evidência disponível. A IA gera uma persona fictícia, separando fatos, inferências psicográficas e hipóteses a validar.</p>
     <div class="pgrid">
       <div class="pf"><label>Faixa et\u00e1ria</label><select id="persona_idade" onchange="setPersona('persona_idade')">${opt}</select></div>
       <div class="pf"><label>Ocupa\u00e7\u00e3o / profiss\u00e3o</label><input id="persona_ocupacao" oninput="setPersona('persona_ocupacao')" placeholder="Ex: servidor(a) p\u00fablico, aut\u00f4nomo(a)"></div>
       <div class="pf"><label>Estilo de vida</label><input id="persona_estilo" oninput="setPersona('persona_estilo')" placeholder="Ex: rotina, hobbies, prioridades"></div>
       <div class="pf"><label>Valores</label><input id="persona_valores" oninput="setPersona('persona_valores')" placeholder="Ex: seguran\u00e7a, status, sustentabilidade"></div>
       <div class="pf full"><label>Canais que frequenta</label><input id="persona_canais" oninput="setPersona('persona_canais')" placeholder="Ex: Instagram, portais, corretor, indica\u00e7\u00e3o"></div>
+      <div class="pf"><label>Fonte ou estudo utilizado</label><input id="persona_fonte" oninput="setPersona('persona_fonte')" placeholder="Ex: survey próprio, Secovi, entrevistas, CRM"></div>
+      <div class="pf"><label>Amostra / recorte</label><input id="persona_amostra" oninput="setPersona('persona_amostra')" placeholder="Ex: 12 entrevistas · Goiânia · 2026"></div>
+      <div class="pf full"><label>O que a evidência mostra</label><textarea id="persona_evidencias" oninput="setPersona('persona_evidencias')" placeholder="Registre números, citações ou achados observados. Ex.: 8 de 12 entrevistados priorizaram segurança da parcela."></textarea></div>
+    </div>
+    <div class="persona-lab">
+      <h5>Base metodológica: valores + intenção de compra</h5>
+      <p>A síntese usa os constructos de valores de Schwartz e intenção de compra da Teoria do Comportamento Planejado, adaptados ao contexto imobiliário. Ela não diagnostica pessoas nem transforma hipótese em fato.</p>
+      <div class="lab-note" id="personaEvidenceStatus">Preencha fonte, amostra e evidência para elevar a robustez da persona.</div>
+      <div class="persona-actions"><button type="button" class="nav-btn" onclick="generateStrategicPersona()">Gerar persona com IA</button><button type="button" class="nav-btn ghost" onclick="generatePersonaImage()">Gerar imagem ilustrativa</button></div>
+      <div class="persona-result" id="personaAIOut"></div>
     </div>
   </div>`;
 }
-function setPersona(id){const el=document.getElementById(id);if(el){gameData[id]=el.value;persistStudent();}}
+function setPersona(id){const el=document.getElementById(id);if(el){gameData[id]=el.value;renderStrategicPersona();queuePersistStudent();}}
+function personaEvidenceState(d=gameData){
+  const source=String(d.persona_fonte||'').trim(),sample=String(d.persona_amostra||'').trim(),evidence=String(d.persona_evidencias||'').trim();
+  const n=(source?1:0)+(sample?1:0)+(evidence?1:0);
+  const field=/\b(entrevista|survey|pesquisa|respondente|amostra|crm|question[aá]rio|dados)\b/i.test((source+' '+sample+' '+evidence));
+  const score=Math.min(100,n*22+(field?24:0)+(evidence.length>=70?10:0));
+  const level=field&&n===3&&score>=70?'validada':n>=2?'ancorada':'exploratoria';
+  const label={exploratoria:'Exploratória — hipótese inicial',ancorada:'Ancorada em evidências',validada:'Validada no segmento estudado'}[level];
+  return {score,level,label,source,sample,evidence};
+}
+function personaInput(){return {segmento:gameData.target_q1||[],momento:gameData.target_q2||[],renda:gameData.target_q3||'',job:gameData.target_q4||[],barreiras:gameData.target_q5||[],indicadores:gameData.target_q6||[],idade:gameData.persona_idade||'',ocupacao:gameData.persona_ocupacao||'',estilo:gameData.persona_estilo||'',valores:gameData.persona_valores||'',canais:gameData.persona_canais||'',fonte:gameData.persona_fonte||'',amostra:gameData.persona_amostra||'',evidencias:gameData.persona_evidencias||'',psico:gameData.psico||{}};}
+function personaTextList(items){return (items||[]).map(x=>'<li>'+esc(typeof x==='string'?x:(x.statement||x.text||''))+'</li>').join('')||'<li>Não informado.</li>';}
+function renderStrategicPersona(){
+  const state=personaEvidenceState(),status=document.getElementById('personaEvidenceStatus'),host=document.getElementById('personaAIOut');
+  if(status)status.innerHTML='<b>'+state.label+' · '+state.score+'/100.</b> '+(state.source?'Fonte: '+esc(state.source)+'. ':'')+(state.sample?'Recorte: '+esc(state.sample)+'. ':'')+'A IA só pode apresentar como evidência aquilo que a equipe registrou.';
+  if(!host)return;
+  const p=gameData.personaIA;if(!p){host.innerHTML='<div class="persona-empty">Ainda não há persona gerada. Registre o segmento e as evidências; depois gere uma síntese que diferenciará dados, inferências e hipóteses de validação.</div>';return;}
+  const name=esc(p.nome||'Persona do segmento'),headline=esc(p.titulo||'Síntese estratégica do público'),summary=esc(p.resumo||'');
+  const avatar=p.imagemData?'<img src="'+p.imagemData+'" alt="Imagem ilustrativa da persona fictícia">':'<span>'+name.charAt(0).toUpperCase()+'</span>';
+  const values=personaTextList(p.valores_prioritarios),facts=personaTextList(p.evidencias),inferences=personaTextList(p.inferencias),tests=personaTextList(p.hipoteses_validacao);
+  const needs=personaTextList(p.necessidades),barriers=personaTextList(p.barreiras),journey=personaTextList(p.jornada);
+  const conf=p.confianca||{};const level=conf.nivel||state.level;const label=conf.rotulo||state.label;const score=Number.isFinite(+conf.score)?conf.score:state.score;
+  host.innerHTML='<div class="persona-result-card"><div class="persona-head"><div><div class="persona-avatar">'+avatar+'</div>'+(p.imagemData?'<div class="persona-image-note">Imagem ilustrativa</div>':'')+'</div><div><div class="persona-kicker">Persona estratégica auditável</div><div class="persona-name">'+name+'</div><div class="persona-summary">'+headline+' · '+summary+'</div><span class="persona-confidence '+esc(level)+'">Confiança: '+esc(label)+' · '+Math.max(0,Math.min(100,score))+'/100</span></div></div><div class="persona-columns"><div class="persona-block"><h6>O que sabemos</h6><ul>'+facts+'</ul></div><div class="persona-block"><h6>O que inferimos</h6><ul>'+inferences+'</ul></div><div class="persona-block"><h6>Valores e motivações</h6><ul>'+values+'</ul></div><div class="persona-block"><h6>Necessidades e barreiras</h6><ul>'+needs+barriers+'</ul></div><div class="persona-block full"><h6>Jornada provável de decisão</h6><ul>'+journey+'</ul></div><div class="persona-block full"><h6>O que validar em campo</h6><ul>'+tests+'</ul></div></div><p class="persona-disclaimer">A persona é uma composição fictícia do segmento. “Inferências” não são fatos; use as hipóteses de validação nas fases Explorar e Testar. A imagem não representa pessoa real nem constitui evidência.</p></div>';
+}
+async function personaRequest(tipo){
+  if(!supa||!CONFIG.supabaseUrl)throw new Error('A persona por IA exige o Supabase configurado.');
+  const resp=await fetch('/api/persona',{method:'POST',headers:{'content-type':'application/json','Authorization':'Bearer '+CONFIG.supabaseAnonKey},body:JSON.stringify({tipo,codigo:currentClass,senha:currentClassPass,papel:'aluno',equipe_nome:currentTeamName,target:personaInput(),contexto:{produto:gameData.nomeProduto||'',conceito:gameData.conceito||'',praca:gameData.praca||'',tipo:gameData.tipoProduto||'',ticket:gameData.ticket||''},persona:gameData.personaIA||null})});
+  const data=await resp.json().catch(()=>({error:'Resposta inválida da IA.'}));if(!resp.ok||data.error)throw new Error(data.error||('HTTP '+resp.status));return data;
+}
+async function generateStrategicPersona(){
+  const host=document.getElementById('personaAIOut');if(host)host.innerHTML='<div class="persona-loading">Organizando evidências, inferências e hipóteses de validação…</div>';
+  try{const out=await personaRequest('persona');gameData.personaIA={...(out.persona||{}),geradaEm:new Date().toISOString()};persistStudent();renderStrategicPersona();}
+  catch(e){if(host)host.innerHTML='<div class="persona-empty" style="border-color:#f0c8c5;color:#b02a2a"><b>Não foi possível gerar a persona.</b><br>'+esc((e&&e.message)||String(e))+'</div>';}
+}
+async function generatePersonaImage(){
+  if(!gameData.personaIA){alert('Gere primeiro a persona estratégica.');return;}
+  const host=document.getElementById('personaAIOut');if(host)host.innerHTML='<div class="persona-loading">Gerando imagem ilustrativa da persona fictícia…</div>';
+  try{const out=await personaRequest('imagem');gameData.personaIA={...gameData.personaIA,imagemData:out.imagemData||''};persistStudent();renderStrategicPersona();}
+  catch(e){renderStrategicPersona();alert('Não foi possível gerar a imagem: '+((e&&e.message)||String(e)));}
+}
 function onPsico(){gameData.psico=gameData.psico||{};PSY_AXES.forEach(a=>{const el=document.getElementById('psico_'+a.id);if(el)gameData.psico[a.id]=+el.value;});}
 function onPsicoInput(){onPsico();queuePersistStudent();}
 function buildPsicoProfile(v){
@@ -940,7 +994,8 @@ const CASES=[
 
 /* ============================ ESTADO ============================ */
 let DATABASE={classes:{'DEMO2025':{name:'Turma Demo 2025',teacher:'Coordenação',teams:{}}}};
-let currentUser=null,currentClass=null,currentTeamId=null,currentTeamName=null,currentPage=0,currentStep=0,gameData={},supa=null,currentClassPass=null,currentProfPass=null,persistTimer=null,studentDataHydrated=false,isRestoringRemote=false,saveState={status:'sync',at:null};
+const GAME_DEFAULTS={placar_liberado:true,anonimizar:false,ia_etapa_liberada:true,peso_ia:20};
+let currentUser=null,currentClass=null,currentTeamId=null,currentTeamName=null,currentPage=0,currentStep=0,gameData={},supa=null,currentClassPass=null,currentProfPass=null,persistTimer=null,studentDataHydrated=false,isRestoringRemote=false,saveState={status:'sync',at:null},gameSettings={...GAME_DEFAULTS};
 
 /* ============================ PERSISTÊNCIA ============================ */
 function initSupabase(){if(CONFIG.useSupabase&&window.supabase&&CONFIG.supabaseUrl&&CONFIG.supabaseAnonKey){
@@ -958,7 +1013,8 @@ async function persistStudent(){
   if(!gameData||Object.keys(gameData).length===0)return; // nunca grava vazio por cima
   setSaveState('wait');
   let team=getTeam();if(!team)return;
-  team.data=gameData;team.score=gameData.finalScore||team.score||0;team.completed=!!gameData.completed;team.currentStep=currentStep;team.lastActive=new Date().toISOString();
+  const liveScore=scoreOverall(gameData,STEPS).indice;gameData.gameScore=liveScore;
+  team.data=gameData;team.score=gameData.finalScore||liveScore;team.completed=!!gameData.completed;team.currentStep=currentStep;team.lastActive=new Date().toISOString();
   DATABASE.classes[currentClass]=DATABASE.classes[currentClass]||{name:'Turma '+currentClass,teams:{}};
   DATABASE.classes[currentClass].teams=DATABASE.classes[currentClass].teams||{};
   DATABASE.classes[currentClass].teams[currentTeamId]=team;
@@ -1003,6 +1059,9 @@ function renderStudentDashboard(){
   const completions=PHASES.map(s=>{const c=stepCompletion(s),ok=c.done===c.total;return '<div class="completion-chip '+(ok?'ok':'warn')+'"><strong>'+s.letter+' · '+s.name+' · '+c.done+'/'+c.total+'</strong>'+(ok?'Pronta para a banca.':'Falta: '+(c.pending.slice(0,2).join(' · ')||'refinar evidências')+(c.pending.length>2?'…':''))+'</div>';}).join('');
   host.innerHTML='<div class="live-dash-head"><div><h3>Radar da proposta</h3><p>Leitura em tempo real da robustez, das evidências e da coerência do seu plano.</p></div><span class="save-pill '+(isTeamLocked()?'sync':sv.cls)+'">'+(isTeamLocked()?'▣ Dossiê encerrado':sv.icon+' '+sv.text)+'</span></div><div class="live-metrics"><div class="live-metric lm-score"><div class="lm-label">Robustez</div><div class="lm-value">'+overall.indice+'</div><div class="lm-sub">de 100 pontos</div></div><div class="live-metric lm-evidence"><div class="lm-label">Evidências</div><div class="lm-value">'+grounded+'/'+bets.length+'</div><div class="lm-sub">com dado citado</div></div><div class="live-metric lm-coherence"><div class="lm-label">Coerência</div><div class="lm-value">'+overall.eixos.coerencia+'</div><div class="lm-sub">estratégia ↔ teste</div></div><div class="live-metric lm-progress"><div class="lm-label">Fases</div><div class="lm-value">'+activeStages+'/6</div><div class="lm-sub">com dossiê iniciado</div></div></div><div class="stage-health">'+cards+'</div><div class="completion-strip">'+completions+'</div>';
 }
+function gameScore(d){const base=scoreOverall(d||{},STEPS).indice;const evals=Object.values((d&&d.iaEtapas)||{});const ai=evals.length?Math.round(evals.reduce((sum,e)=>sum+Number(e.teacherScore??e.score??0),0)/evals.length):0;const weight=Math.max(0,Math.min(40,Number(gameSettings.peso_ia??20)));return {base,ai,weight,total:Math.round(base*(100-weight)/100+ai*weight/100),avaliadas:evals.length};}
+async function loadStudentGameSettings(){if(!supa||!currentClassPass)return {...GAME_DEFAULTS};try{const {data,error}=await supa.rpc('config_jogo_aluno',{p_codigo:currentClass,p_senha_aluno:currentClassPass});if(error)throw error;gameSettings={...GAME_DEFAULTS,...(data||{})};return gameSettings;}catch(e){console.warn('config jogo aluno',e);return gameSettings;}}
+async function refreshStudentGameboard(){const host=document.getElementById('studentGameboard');if(!host||!currentUser||currentUser.type!=='student')return;await loadStudentGameSettings();if(!gameSettings.placar_liberado){host.classList.add('hidden');return;}if(!supa||!currentClassPass){host.classList.remove('hidden');host.innerHTML='<div class="game-head"><div><h3>🏁 Placar da turma</h3><p>Disponível quando a turma estiver conectada ao Supabase.</p></div></div>';return;}try{const {data,error}=await supa.rpc('placar_turma',{p_codigo:currentClass,p_senha_aluno:currentClassPass});if(error)throw error;const rows=(data||[]).map(r=>({...r,pontos:Number(r.pontos||0)})).sort((a,b)=>b.pontos-a.pontos||String(a.equipe_nome).localeCompare(String(b.equipe_nome)));const mineScore=gameScore(gameData);host.classList.remove('hidden');host.innerHTML='<div class="game-head"><div><h3>🏁 Placar da turma</h3><p>Competição saudável: progresso e pontos, sem revelar respostas estratégicas.</p></div><span class="game-score-chip">Sua composição: '+mineScore.total+'/100</span></div>'+(!rows.length?'<p class="game-privacy">Aguardando as primeiras equipes.</p>':rows.map((r,i)=>'<div class="game-rank '+(r.equipe_id===currentTeamId?'me':'')+'"><span class="game-pos">'+(i+1)+'</span><div><div class="game-team">'+esc(r.equipe_id===currentTeamId?'Sua equipe':r.equipe_nome)+'</div><div class="game-meta">Fase '+Math.min(6,Math.max(1,Number(r.fase||1)))+'/6 · '+Number(r.etapas_ia||0)+' avaliação(ões) de IA</div></div><div class="game-points">'+r.pontos+'<small>pontos</small></div></div>').join(''))+'<div class="game-privacy">A pontuação combina rubrica objetiva e feedback formativo por IA. Você vê somente indicadores agregados das outras equipes.</div>';}catch(e){console.warn('placar turma',e);host.classList.remove('hidden');host.innerHTML='<div class="game-head"><div><h3>🏁 Placar da turma</h3><p>O placar será atualizado quando a conexão estiver disponível.</p></div></div>';}}
 async function fetchClassStudents(cc){
   if(supa){try{const {data,error}=await supa.rpc('listar_equipes_prof',{p_codigo:cc,p_senha_prof:currentProfPass});
     if(error)throw error;const out={};(data||[]).forEach(r=>out[r.equipe_id]={name:r.equipe_nome,id:r.equipe_id,members:r.membros||[],currentStep:r.etapa||0,completed:!!r.completo,score:r.score||0,data:r.dados||{},lockedAt:r.bloqueado_em||null,lastActive:r.atualizado_em});return out;}catch(e){console.warn('listar_equipes_prof',e);return {};}}
@@ -1167,7 +1226,8 @@ function startGame(){
   document.getElementById('topbar').classList.remove('hidden');
   document.getElementById('consultFab').classList.remove('hidden');
   document.getElementById('userDisplay').textContent=(currentTeamName||'—')+' · '+currentUser.name;
-  loadGameData();applyLockedState();showPage(currentPage||0);
+  loadGameData();applyLockedState();showPage(currentPage||0);refreshStudentGameboard();
+  if(startGame._gameTimer)clearInterval(startGame._gameTimer);startGame._gameTimer=setInterval(()=>{if(currentUser&&currentUser.type==='student')refreshStudentGameboard();},20000);
 }
 function showPage(n){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
@@ -1231,7 +1291,7 @@ function buildStepsUI(){
     const r=document.createElement('div');r.className='reason';
     r.innerHTML='<label>Justificativa estratégica da etapa (opcional, mas conta pontos)</label><textarea id="'+s.id+'_reason" placeholder="Por que essas escolhas? Conecte com os dados de mercado e o comportamento do consumidor."></textarea>';
     const rta=r.querySelector('textarea');rta.oninput=()=>{gameData[s.id+'_reason']=rta.value;queuePersistStudent();};rta.onblur=persistStudent;
-    body.appendChild(r);host.appendChild(body);
+    body.appendChild(r);const ai=document.createElement('div');ai.className='stage-ai-card';ai.id='stageAI_'+s.id;body.appendChild(ai);host.appendChild(body);
     s.questions.filter(q=>q.type==='chips').forEach(renderChips);
   });
 }
@@ -1299,7 +1359,7 @@ function showStep(n){
   document.getElementById('progressFill').style.width=(((n+1)/STEPS.length)*100)+'%';
   document.getElementById('prevStepBtn').disabled=n===0;
   document.getElementById('nextStepBtn').textContent=n===STEPS.length-1?'Finalizar →':'Próxima →';
-  currentStep=n;gameData.currentPhase=n+2;collectFields();persistStudent();updateStepQuality(STEPS[n].id);if(STEPS[n].id==='testar')updateCoherence();renderStudentDashboard();window.scrollTo({top:0,behavior:'smooth'});
+  currentStep=n;gameData.currentPhase=n+2;collectFields();persistStudent();updateStepQuality(STEPS[n].id);if(STEPS[n].id==='target')renderStrategicPersona();renderStageAICard(STEPS[n]);if(STEPS[n].id==='testar')updateCoherence();renderStudentDashboard();window.scrollTo({top:0,behavior:'smooth'});
 }
 function validateCurrentStep(silent){
   const s=STEPS[currentStep];
@@ -1340,6 +1400,7 @@ function syncUIFromData(){
     if(el&&!Array.isArray(gameData[k])&&typeof gameData[k]!=='object'&&'value'in el)el.value=gameData[k];});
   if(gameData.psico)PSY_AXES.forEach(a=>{const el=document.getElementById('psico_'+a.id);if(el&&gameData.psico[a.id]!==undefined)el.value=gameData.psico[a.id];});
   if(gameData.psicoGenerated){const o=document.getElementById('psicoOut');if(o)generatePsico(true);}
+  renderStrategicPersona();
   STEPS.forEach(s=>s.questions.forEach(q=>{if(q.type==='chips')renderChips(q);else{updateQCount(q);toggleFilled(q);}}));
   STEPS.forEach(s=>updateStepQuality(s.id));updateCoherence();renderStudentDashboard();
 }
@@ -1782,7 +1843,7 @@ function switchDrawerTab(tab){
 function refreshAIStatus(){const el=document.getElementById('aiStatus');if(!el)return;
   el.innerHTML=supa?'<span style="color:#1c6b41">✓ Pronto para a Edge Function segura. Se a análise falhar, confirme os segredos e a publicação da função no Supabase.</span>':'<span style="color:#8a5a00">Configure o Supabase para ativar a análise segura.</span>';}
 function proposalText(d){const j=id=>Array.isArray(d[id])?d[id].join(', '):(d[id]||'\u2014');
-  const persona=[d.persona_idade&&('Idade: '+d.persona_idade),d.target_q3&&('Renda: '+d.target_q3),d.persona_ocupacao&&('Ocupa\u00e7\u00e3o: '+d.persona_ocupacao),d.persona_estilo&&('Estilo: '+d.persona_estilo),d.persona_valores&&('Valores: '+d.persona_valores),d.persona_canais&&('Canais: '+d.persona_canais)].filter(Boolean).join('; ');
+  const persona=[d.personaIA&&d.personaIA.nome&&('Persona IA: '+d.personaIA.nome),d.persona_idade&&('Idade: '+d.persona_idade),d.target_q3&&('Renda: '+d.target_q3),d.persona_ocupacao&&('Ocupa\u00e7\u00e3o: '+d.persona_ocupacao),d.persona_estilo&&('Estilo: '+d.persona_estilo),d.persona_valores&&('Valores: '+d.persona_valores),d.persona_canais&&('Canais: '+d.persona_canais)].filter(Boolean).join('; ');
   const hip=d.testar_hyp_if?('SE '+d.testar_hyp_if+' ENT\u00c3O '+(d.testar_hyp_then||'\u2026')+' PORQUE '+(d.testar_hyp_why||'\u2026')):'\u2014';
   return 'Produto: '+(d.nomeProduto||'\u2014')+' ('+(d.praca||'\u2014')+')\n'+
     'Conceito: '+(d.conceito||'\u2014')+'\n'+
@@ -1799,6 +1860,9 @@ function buildAIPrompt(team){const d=team.data||{};const o=scoreOverall(d,STEPS)
 function openAIModal(title,inner){document.getElementById('aiTitle').textContent='An\u00e1lise IA \u2014 '+title;document.getElementById('aiBody').innerHTML=inner;document.getElementById('aiModal').classList.add('open');}
 function closeAI(){document.getElementById('aiModal').classList.remove('open');}
 function rubricaResumo(d){const o=scoreOverall(d,STEPS);return 'índice '+o.indice+', completude '+o.eixos.completude+', fundamentação '+o.eixos.fundamentacao+', calibração '+o.eixos.calibracao+', coerência '+o.eixos.coerencia;}
+function stageSnapshot(step){const answers=step.questions.map(q=>({pergunta:q.label,resposta:q.type==='chips'?{selecoes:gameData[q.id]||[],evidencias:gameData[q.id+'_bets']||{}}:(gameData[q.id]||'')}));return {etapa:step.id,nome:step.name,justificativa:gameData[step.id+'_reason']||'',respostas:answers,contexto:{produto:gameData.nomeProduto||'',conceito:gameData.conceito||'',praca:gameData.praca||'',target:gameData.target_q1||[]},rubrica:'completude '+phaseScore(gameData,step).score+'/100; '+rubricaResumo(gameData)};}
+function renderStageAICard(step){const host=document.getElementById('stageAI_'+step.id);if(!host)return;const feedback=((gameData.iaEtapas||{})[step.id])||null;if(!gameSettings.ia_etapa_liberada){host.innerHTML='<h5>🤖 Feedback formativo da etapa</h5><p>Este recurso será liberado pela professora durante a dinâmica.</p>';return;}if(!feedback){host.innerHTML='<h5>🤖 Feedback formativo da etapa</h5><p>Quando considerar a etapa pronta, envie-a para uma leitura crítica. A IA avalia qualidade, evidência e coerência; ela não altera sua resposta.</p><button type="button" class="stage-ai-submit" onclick="submitStageForAI(\''+step.id+'\')">Submeter '+step.name+' para feedback</button>';return;}const strengths=(feedback.forcas||[]).map(x=>'<li>'+esc(x)+'</li>').join(''),gaps=(feedback.lacunas||[]).map(x=>'<li>'+esc(x)+'</li>').join('');const score=feedback.teacherScore??feedback.score??0;host.innerHTML='<h5>🤖 Feedback formativo — '+esc(step.name)+'</h5><span class="ai-stage-score">'+score+'/100 · '+esc(feedback.teacherStatus==='revisada'?'revisado pela professora':'leitura da IA')+'</span><ul>'+strengths+gaps+'</ul><div class="ai-stage-action">Próxima melhoria: '+esc(feedback.proxima_acao||'Revise a coerência entre evidência e escolha.')+'</div><button type="button" class="review-ai-btn" onclick="submitStageForAI(\''+step.id+'\')">Solicitar nova leitura</button>';}
+async function submitStageForAI(stepId){const step=STEPS.find(s=>s.id===stepId);if(!step)return;if(!supa||!currentClassPass){alert('O feedback por IA exige a turma conectada ao Supabase.');return;}const host=document.getElementById('stageAI_'+stepId);if(host)host.innerHTML='<h5>🤖 Feedback formativo</h5><p>IA analisando a etapa…</p>';try{const resp=await fetch('/api/stage-feedback',{method:'POST',headers:{'content-type':'application/json','Authorization':'Bearer '+CONFIG.supabaseAnonKey},body:JSON.stringify({codigo:currentClass,senha:currentClassPass,papel:'aluno',equipe_nome:currentTeamName,etapa:stepId,conteudo:stageSnapshot(step)})});const out=await resp.json().catch(()=>({error:'Resposta inválida da IA.'}));if(!resp.ok||out.error)throw new Error(out.error||('HTTP '+resp.status));gameData.iaEtapas=gameData.iaEtapas||{};gameData.iaEtapas[stepId]={...out.feedback,submittedAt:new Date().toISOString(),teacherStatus:'pendente'};persistStudent();renderStageAICard(step);renderStudentDashboard();refreshStudentGameboard();}catch(e){if(host)host.innerHTML='<h5>🤖 Feedback formativo</h5><p style="color:#b02a2a">Não foi possível avaliar esta etapa: '+esc((e&&e.message)||String(e))+'</p>';}}
 async function secureAIAnalysis(team,role,password){
   if(!supa||!CONFIG.supabaseUrl)throw new Error('Análise por IA disponível apenas com o Supabase configurado.');
   const url=CONFIG.aiEvalEndpoint||'/api/analyze';
@@ -1873,6 +1937,7 @@ async function updateDashboard(){
   document.getElementById('completedStudents').textContent=students.filter(s=>s.completed).length;
   document.getElementById('averageScore').textContent=students.length?Math.round(students.reduce((a,s)=>a+(s.score||0),0)/students.length):0;
   document.getElementById('aggPanel').innerHTML=buildTurmaVisions(students);
+  renderTeacherGameControls();
   const grid=document.getElementById('studentsGrid');grid.innerHTML='';
   if(!students.length){grid.innerHTML='<div class="empty">Nenhuma equipe registrada ainda nesta turma.</div>';return;}
   students.sort((a,b)=>(b.score||0)-(a.score||0)).forEach(s=>{
@@ -1886,14 +1951,15 @@ async function updateDashboard(){
     const flags=[];if(invalid)flags.push('<span class="tflag bad">'+invalid+' evid. inv\u00e1lida(s)</span>');if(abaixo)flags.push('<span class="tflag bad">abaixo do piso</span>');if(semEv)flags.push('<span class="tflag warn">'+semEv+' sem evid.</span>');if(s.lockedAt)flags.push('<span class="tflag">dossiê encerrado</span>');else if(s.data&&s.data.lockRequestedAt)flags.push('<span class="tflag warn">solicitou encerramento</span>');
     const eixMini=[['Compl.',o.eixos.completude],['Fund.',o.eixos.fundamentacao],['Calib.',o.eixos.calibracao],['Coer.',o.eixos.coerencia]].map(e=>'<span class="chip-view">'+e[0]+' '+e[1]+'</span>').join(' ');
     const nMem=(s.members&&s.members.length)||0;
+    const g=gameScore(s.data||{});const reviews=Object.values((s.data&&s.data.iaEtapas)||{}).length;
     const card=document.createElement('div');card.className='scard';card.onclick=()=>showStudentDetails(s);
     card.innerHTML='<div class="sn">'+s.name+' <span class="chip-view">'+nMem+' membro(s)</span></div>'+
       '<div class="dots">'+dots+'</div>'+
       '<div class="stt">'+(online?'🟢 Online':'⚪ Offline')+' · Fase '+phase+'/6 · Índice '+o.indice+'/100'+
       (semEv?' · <b style="color:var(--warn)">'+semEv+' aposta(s) sem evidência</b>':(s.completed?' · ✅ Finalizado':''))+'</div>'+
-      '<div class="teixos">'+eixMini+'</div>'+
+      '<div class="teixos">'+eixMini+' <span class="chip-view">Game '+g.total+' · IA '+reviews+'</span></div>'+
       (flags.length?'<div class="tflags">'+flags.join('')+'</div>':'')+
-      '<div class="tmembers">'+(s.members||[]).map(m=>m.nome).join(', ')+'</div>'+      (s.data?'<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"><button class="ai-btn" onclick="event.stopPropagation();analyzeTeam(\''+s.id+'\')">🤖 Analisar com IA</button><button class="nav-btn ghost" onclick="event.stopPropagation();openTeamPresentation(\''+s.id+'\')">Comitê</button><button class="nav-btn '+(s.lockedAt?'ghost':'')+'" onclick="event.stopPropagation();toggleTeamLock(\''+s.id+'\','+(s.lockedAt?'false':'true')+')">'+(s.lockedAt?'Reabrir':'Encerrar')+'</button></div>':'');
+      '<div class="tmembers">'+(s.members||[]).map(m=>m.nome).join(', ')+'</div>'+      (s.data?'<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"><button class="ai-btn" onclick="event.stopPropagation();analyzeTeam(\''+s.id+'\')">🤖 Analisar com IA</button>'+(reviews?'<button class="review-ai-btn" onclick="event.stopPropagation();teacherReviewAI(\''+s.id+'\')">Revisar pontos IA</button>':'')+'<button class="nav-btn ghost" onclick="event.stopPropagation();openTeamPresentation(\''+s.id+'\')">Comitê</button><button class="nav-btn '+(s.lockedAt?'ghost':'')+'" onclick="event.stopPropagation();toggleTeamLock(\''+s.id+'\','+(s.lockedAt?'false':'true')+')">'+(s.lockedAt?'Reabrir':'Encerrar')+'</button></div>':'');
     grid.appendChild(card);});
 }
 async function toggleTeamLock(teamId,shouldLock){
@@ -1907,6 +1973,10 @@ function showStudentDetails(s){const d=s.data||{};const o=scoreOverall(d,STEPS);
   const mem=(s.members||[]).map(m=>'• '+m.nome+' · '+(m.tel||'')+' · '+(m.email||'')).join('\n')||'—';
   const bets=allBets(d,STEPS);const semEv=bets.filter(b=>!(b.ev||'').trim()).length;
   alert('EQUIPE: '+s.name+'\n\nMembros:\n'+mem+'\n\nÍndice: '+o.indice+'/100\nCompletude '+o.eixos.completude+' · Fundamentação '+o.eixos.fundamentacao+' · Calibração '+o.eixos.calibracao+' · Coerência '+o.eixos.coerencia+'\nApostas sem evidência: '+semEv+'\nProduto: '+(d.nomeProduto||'—')+'\nPerfil: '+((d.psicoProfile&&d.psicoProfile.title)||'—'));}
+async function loadTeacherGameSettings(){if(!supa||!currentProfPass)return gameSettings;try{const {data,error}=await supa.rpc('config_jogo_prof',{p_codigo:currentClass,p_senha_prof:currentProfPass});if(error)throw error;gameSettings={...GAME_DEFAULTS,...(data||{})};return gameSettings;}catch(e){console.warn('config jogo professor',e);return gameSettings;}}
+function renderTeacherGameControls(){const host=document.getElementById('gameControls');if(!host||!currentUser||currentUser.type!=='teacher')return;host.innerHTML='<div class="game-controls"><h4>🏁 Modo game da turma</h4><p>O placar mostra somente indicadores agregados; respostas e evidências seguem privadas. A professora mantém o controle final das avaliações de IA.</p><div class="game-toggles"><label class="game-toggle"><input type="checkbox" '+(gameSettings.placar_liberado?'checked':'')+' onchange="saveGameSettings({placar_liberado:this.checked})"> Placar visível aos grupos</label><label class="game-toggle"><input type="checkbox" '+(gameSettings.anonimizar?'checked':'')+' onchange="saveGameSettings({anonimizar:this.checked})"> Anonimizar outros grupos</label><label class="game-toggle"><input type="checkbox" '+(gameSettings.ia_etapa_liberada?'checked':'')+' onchange="saveGameSettings({ia_etapa_liberada:this.checked})"> Liberar feedback por IA</label></div></div>';}
+async function saveGameSettings(patch){if(!supa||!currentProfPass){alert('Os controles do modo game exigem o Supabase configurado.');return;}const next={...gameSettings,...patch};try{const {data,error}=await supa.rpc('salvar_config_jogo',{p_codigo:currentClass,p_senha_prof:currentProfPass,p_config:next});if(error)throw error;gameSettings={...GAME_DEFAULTS,...(data||next)};renderTeacherGameControls();}catch(e){alert('Não foi possível atualizar o modo game: '+((e&&e.message)||String(e)));}}
+async function teacherReviewAI(teamId){if(!supa||!currentProfPass)return;const stage=prompt('Qual etapa deseja revisar?\nUse: target, explorar, solucoes, testar ou escala.');if(!stage)return;const team=(await fetchClassStudents(currentClass))[teamId];const current=((team&&team.data&&team.data.iaEtapas)||{})[stage];if(!current)return alert('Essa equipe ainda não possui avaliação de IA para a etapa indicada.');const proposed=prompt('Pontuação da IA: '+current.score+'\nDigite a pontuação final da professora (0 a 100):',String(current.teacherScore??current.score));if(proposed===null)return;const score=Math.max(0,Math.min(100,Number(proposed)));if(Number.isNaN(score))return alert('Informe um número de 0 a 100.');try{const {error}=await supa.rpc('revisar_ia_etapa',{p_codigo:currentClass,p_senha_prof:currentProfPass,p_equipe_id:teamId,p_etapa:stage,p_score:Math.round(score)});if(error)throw error;await updateDashboard();}catch(e){alert('Não foi possível revisar a pontuação: '+((e&&e.message)||String(e)));}}
 async function exportClassData(){
   const students=Object.values(await fetchClassStudents(currentClass));
   let csv='Equipe;Membros;Emails;Telefones;Etapa;Status;Indice;Completude;Fundamentacao;Calibracao;Coerencia;ApostasSemEvidencia;Produto;Praca;Atualizado\n';
