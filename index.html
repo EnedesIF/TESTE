@@ -1100,9 +1100,9 @@ async function resumeStudentFromServer(){
     const team={id:currentTeamId,name:(row&&row.equipe_nome)||currentTeamName,members:(row&&row.membros)||[],data:(row&&row.dados)||{},completed:!!(row&&row.completo),score:(row&&row.score)||0,currentStep:(row&&row.etapa)||0,lockedAt:(row&&row.bloqueado_em)||null,lastActive:(row&&row.atualizado_em)||new Date().toISOString()};
     DATABASE.classes[currentClass]={name:'Turma '+currentClass,teams:{}};DATABASE.classes[currentClass].teams[currentTeamId]=team;
     currentTeamName=team.name;
-    studentDataHydrated=true;
   }catch(e){console.warn('resume falhou',e);localStorage.removeItem('testeUser');currentUser=currentClass=currentTeamId=currentTeamName=null;return;}
   startGame();
+  studentDataHydrated=true;
 }
 function switchTab(t){document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x.dataset.tab===t));if(t==='student')ensureMembers();
   document.getElementById('studentForm').classList.toggle('active',t==='student');
@@ -1156,9 +1156,9 @@ async function loginStudent(){
       const team={id:teamIdS,name:currentTeamName,members:(row&&row.membros)||members,data:(row&&row.dados)||{},completed:!!(row&&row.completo),score:(row&&row.score)||0,currentStep:(row&&row.etapa)||0,lastActive:(row&&row.atualizado_em)||new Date().toISOString()};
       DATABASE.classes[cc]={name:'Turma '+cc,teams:{}};DATABASE.classes[cc].teams[teamIdS]=team;
       currentUser={type:'student',name:mName,email:mEmail,teamId:teamIdS,teamName:currentTeamName,classCode:cc,pass:pass};
-      studentDataHydrated=true;
+      studentDataHydrated=false;
       localStorage.setItem('testeUser',JSON.stringify(currentUser));
-      startGame();return;
+      startGame();studentDataHydrated=true;return;
     }catch(e){const m=(e&&e.message)||String(e);return alert(/SENHA/i.test(m)?'Senha da turma inválida.':'Não foi possível entrar: '+m);}
   }
   if(!DATABASE.classes[cc])DATABASE.classes[cc]={name:'Turma '+cc,teacher:'Professor(a)',teams:{}};
