@@ -410,7 +410,9 @@ button,textarea,input,select{font-family:inherit}
 .addmember{background:#eef7f1;border:1px dashed #1A6B3C;color:#1A6B3C;border-radius:8px;padding:9px 12px;font-weight:700;font-size:12.5px;cursor:pointer;width:100%;margin-top:2px}
 .addmember:hover{background:#e2f0e8}
 @media(max-width:640px){.mrow{grid-template-columns:1fr 1fr}.mrow .memail{grid-column:1/-1}.mrow .mrem{grid-column:1/-1;width:100%}}
-.login-attribution{margin-top:24px;padding-top:16px;border-top:1px solid var(--line);text-align:center;color:var(--muted);font-size:12px;line-height:1.55}.login-attribution strong{display:block;color:var(--brand);font-size:13px}.version-badge{display:inline-block;margin-top:6px;padding:3px 10px;border-radius:99px;background:#eef7f1;border:1px solid #cfe6d9;color:#1a623b;font-weight:800;font-size:10.5px;letter-spacing:.04em}
+	.login-attribution{margin-top:24px;padding-top:16px;border-top:1px solid var(--line);text-align:center;color:var(--muted);font-size:12px;line-height:1.55}.login-attribution strong{display:block;color:var(--brand);font-size:13px}.version-badge{display:inline-block;margin-top:6px;padding:3px 10px;border-radius:99px;background:#eef7f1;border:1px solid #cfe6d9;color:#1a623b;font-weight:800;font-size:10.5px;letter-spacing:.04em}
+	/* ===== central pedagógica da tela inicial ===== */
+	.welcome-guide{margin:0 0 22px;border:1px solid #d7e5df;border-radius:13px;background:linear-gradient(135deg,#f7fcf9,#f6f9fd);overflow:hidden}.welcome-guide summary{cursor:pointer;list-style:none;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;color:var(--brand);font-size:13.5px;font-weight:800}.welcome-guide summary::-webkit-details-marker{display:none}.welcome-guide summary::after{content:'+';width:24px;height:24px;border-radius:50%;display:grid;place-items:center;background:#e7f4ec;color:var(--brand);font-size:17px;line-height:1}.welcome-guide[open] summary::after{content:'−'}.welcome-guide .welcome-inner{padding:0 16px 16px}.welcome-guide .welcome-lead{font-size:12.5px;color:#415061;margin-bottom:13px}.welcome-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.welcome-card{background:#fff;border:1px solid #e1e9e4;border-radius:10px;padding:12px}.welcome-card.full{grid-column:1/-1}.welcome-card h4{font-size:12px;color:var(--brand);margin-bottom:6px}.welcome-card p,.welcome-card li{font-size:11.5px;color:#4d5b68;line-height:1.45}.welcome-card ul{margin:0 0 0 16px}.welcome-card li{margin-bottom:3px}.teste-roadmap{display:grid;grid-template-columns:repeat(6,1fr);gap:5px;margin-top:8px}.teste-roadmap span{font-size:9.5px;font-weight:800;text-align:center;color:#fff;padding:6px 2px;border-radius:7px}.rm-c{background:#34495e}.rm-t{background:var(--t)}.rm-e{background:var(--e1)}.rm-s{background:var(--s)}.rm-test{background:var(--t2)}.rm-scale{background:var(--e2)}.brief-challenge{background:linear-gradient(135deg,#153c2a,#1a6b3c);border-color:#153c2a}.brief-challenge h4,.brief-challenge p,.brief-challenge li{color:#fff}.brief-challenge .scenario-tag{display:inline-block;border:1px solid rgba(255,255,255,.35);border-radius:99px;padding:3px 8px;font-size:9.5px;font-weight:800;letter-spacing:.06em;margin-bottom:7px}.brief-challenge .scenario-question{font-weight:800;font-size:12px;margin-top:9px;color:#d6f3df}.phase-prompts{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin:0;padding:0;list-style:none}.phase-prompts li{border:1px solid #e1e9e4;border-radius:8px;padding:8px;background:#fbfdfc;font-size:10.8px;line-height:1.35}.phase-prompts b{display:block;color:var(--brand);font-size:10px;text-transform:uppercase;letter-spacing:.04em;margin-bottom:2px}@media(max-width:520px){.welcome-grid{grid-template-columns:1fr}.welcome-card.full{grid-column:auto}.teste-roadmap{grid-template-columns:repeat(3,1fr)}.phase-prompts{grid-template-columns:1fr 1fr}.welcome-guide summary{font-size:12.5px}}
 
 </style>
 </head>
@@ -425,10 +427,42 @@ button,textarea,input,select{font-family:inherit}
 
   <!-- LOGIN -->
   <div class="login-wrap" id="loginSection">
-    <div class="login-card">
-      <h2>Metodologia TESTE</h2>
-      <p class="lead">Ferramenta aplicada de inteligência de mercado e comportamento do consumidor para construir soluções estratégicas no mercado imobiliário.</p>
-      <div class="tabs">
+	    <div class="login-card">
+	      <h2>Metodologia TESTE</h2>
+	      <p class="lead">Ferramenta aplicada de inteligência de mercado e comportamento do consumidor para construir soluções estratégicas no mercado imobiliário.</p>
+	      <details class="welcome-guide">
+	        <summary>Antes de entrar: entenda a metodologia, os insights e o mini-briefing</summary>
+	        <div class="welcome-inner">
+	          <p class="welcome-lead">Esta é uma atividade de decisão. A equipe parte de contexto e evidências, constrói uma proposta, testa suas hipóteses e defende uma decisão de escala.</p>
+	          <div class="welcome-grid">
+	            <div class="welcome-card full">
+	              <h4>Como funciona o ciclo TESTE</h4>
+	              <div class="teste-roadmap"><span class="rm-c">Contexto</span><span class="rm-t">Target</span><span class="rm-e">Explorar</span><span class="rm-s">Soluções</span><span class="rm-test">Testar</span><span class="rm-scale">Escalar</span></div>
+	              <p style="margin-top:8px">Cada fase deve fortalecer a próxima. Não há boa solução sem um público claro; não há teste útil sem uma hipótese; não há escala sem evidência e condições operacionais.</p>
+	            </div>
+	            <div class="welcome-card">
+	              <h4>Três insights para começar bem</h4>
+	              <ul><li>Separem fatos, indícios e suposições.</li><li>Escrevam para decidir, não para preencher campos.</li><li>Registrem fontes, entrevistas e sinais de mercado.</li></ul>
+	            </div>
+	            <div class="welcome-card">
+	              <h4>Como a equipe será avaliada</h4>
+	              <ul><li>Completude e qualidade das evidências.</li><li>Coerência entre as seis fases.</li><li>Capacidade de testar e revisar a proposta.</li></ul>
+	            </div>
+	            <div class="welcome-card full brief-challenge">
+	              <div class="scenario-tag">DESAFIO SIMULADO · LANÇAMENTO 60+</div>
+	              <h4>Mini-briefing: viver bem depois dos 60</h4>
+	              <p>Uma incorporadora adquiriu uma área de 8.400 m² próxima a parque, hospital, comércio de conveniência e serviços. A diretoria quer lançar um residencial para pessoas 60+ que desejam manter autonomia, vida social e vínculo com a cidade — <b>não</b> uma instituição de cuidados ou um “produto de idosos”.</p>
+	              <p>O terreno comporta até 168 unidades entre 58 m² e 92 m². O desafio é equilibrar acessibilidade, segurança, bem-estar, áreas de convivência, serviços opcionais e uma faixa de preço compatível com compradores que valorizam patrimônio, mas são sensíveis ao custo total de morar. A marca precisa provar que conhece o público e não está apenas aplicando estereótipos.</p>
+	              <p class="scenario-question">Decisão de comitê: qual proposta de produto deve ser lançada, para qual segmento prioritário, com quais evidências e sob quais condições de validação?</p>
+	            </div>
+	            <div class="welcome-card full">
+	              <h4>Perguntas que orientarão o desafio nas seis fases</h4>
+	              <ul class="phase-prompts"><li><b>Contexto</b>Qual praça, concorrência, ticket e condições urbanas tornam o lançamento viável?</li><li><b>Target</b>Quem é o público prioritário? Quais necessidades são comprovadas e quais são hipóteses?</li><li><b>Explorar</b>Que barreiras afastam esse público: medo de perda de autonomia, custo, localização, imagem ou rotina?</li><li><b>Soluções</b>Que produto, serviços e experiência respondem às tensões sem infantilizar ou medicalizar a moradia?</li><li><b>Testar</b>Qual hipótese crítica deve ser testada primeiro, com quem e por qual evidência de sucesso?</li><li><b>Escalar</b>Em que condições a solução deve ganhar escala, ser ajustada ou não avançar?</li></ul>
+	            </div>
+	          </div>
+	        </div>
+	      </details>
+	      <div class="tabs">
         <button class="tab active" data-tab="student" onclick="switchTab('student')">Aluno(a)</button>
         <button class="tab" data-tab="teacher" onclick="switchTab('teacher')">Professor(a)</button>
       </div>
