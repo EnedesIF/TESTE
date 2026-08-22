@@ -1267,7 +1267,12 @@ function startGame(){
   document.getElementById('topbar').classList.remove('hidden');
   document.getElementById('consultFab').classList.remove('hidden');
   document.getElementById('userDisplay').textContent=(currentTeamName||'—')+' · '+currentUser.name;
-  loadGameData();applyLockedState();showPage(currentPage||0);refreshStudentGameboard();
+  loadGameData();
+  // O diagnóstico é um destino explícito: reabrir uma equipe deve sempre devolver
+  // a turma ao ciclo de trabalho, mesmo se uma sessão antiga registrou a página final.
+  const savedPage=Number(gameData.currentPage);
+  currentPage=Number.isFinite(savedPage)&&savedPage>=0&&savedPage<=2?savedPage:2;
+  applyLockedState();showPage(currentPage);refreshStudentGameboard();
   if(startGame._gameTimer)clearInterval(startGame._gameTimer);startGame._gameTimer=setInterval(()=>{if(currentUser&&currentUser.type==='student')refreshStudentGameboard();},20000);
 }
 function showPage(n){
