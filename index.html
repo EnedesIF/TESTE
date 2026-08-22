@@ -1263,6 +1263,7 @@ function logout(){
   currentUser=currentClass=currentTeamId=currentTeamName=currentClassPass=currentProfPass=null;studentDataHydrated=false;currentPage=currentStep=0;gameData={};
   if(showDashboard._t){clearInterval(showDashboard._t);showDashboard._t=null;}
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  const courseNav=document.getElementById('courseNav');if(courseNav)courseNav.classList.add('hidden');
   document.getElementById('topbar').classList.add('hidden');
   document.getElementById('consultFab').classList.add('hidden');
   document.getElementById('loginSection').classList.remove('hidden');
@@ -1300,9 +1301,10 @@ function syncCourseNavigation(){
   if(!visible)return;
   nav.querySelectorAll('.course-nav-btn').forEach(btn=>btn.classList.toggle('active',Number(btn.dataset.page)===currentPage));
 }
-function goToContext(){collectFields();persistStudent();showPage(1);}
-function goToStages(){collectFields();persistStudent();showPage(3);showStep(Math.max(0,Math.min(STEPS.length-1,Number(currentStep)||0)));}
-function goToDiagnosis(){collectFields();persistStudent();renderDiagnosis();showPage(4);}
+function canUseStudentNavigation(){if(currentUser&&currentUser.type==='student')return true;if(currentUser&&currentUser.type==='teacher')showDashboard();return false;}
+function goToContext(){if(!canUseStudentNavigation())return;collectFields();persistStudent();showPage(1);}
+function goToStages(){if(!canUseStudentNavigation())return;collectFields();persistStudent();showPage(3);showStep(Math.max(0,Math.min(STEPS.length-1,Number(currentStep)||0)));}
+function goToDiagnosis(){if(!canUseStudentNavigation())return;collectFields();persistStudent();renderDiagnosis();showPage(4);}
 function validateContext(){
   const nome=document.getElementById('nomeProduto').value.trim();
   const con=document.getElementById('conceito').value.trim();
@@ -1960,6 +1962,7 @@ async function showDashboard(){
   document.getElementById('loginSection').classList.add('hidden');
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.getElementById('dashboard').classList.add('active');
+  syncCourseNavigation();
   document.getElementById('topbar').classList.remove('hidden');
   document.getElementById('consultFab').classList.remove('hidden');
   document.getElementById('userDisplay').textContent=currentUser.name+' · '+currentUser.classCode;
