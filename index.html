@@ -363,6 +363,7 @@ button,textarea,input,select{font-family:inherit}
 
 /* ===== v8: persona, matriz numerada, IA ===== */
 .persona{border:1px solid #d9e6f2;background:#f6fafd;border-radius:14px;padding:20px;margin-bottom:22px}
+.concept-summary{margin:18px 0;border:1px solid #cfe2d8;border-radius:15px;background:linear-gradient(135deg,#f5fbf7,#fbfdfc);padding:18px}.concept-summary h3{color:var(--brand);font-size:1.08em;margin-bottom:5px}.concept-summary .concept-kicker{color:#1a6b3c;font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase}.concept-summary p{color:#40556a;line-height:1.58;margin:9px 0}.concept-pill-row{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}.concept-pill{font-size:11px;padding:5px 9px;border-radius:20px;background:#fff;border:1px solid #d6e5dc;color:#28543a;font-weight:700}.visual-board{margin-top:18px;border-top:1px solid #e3eaf0;padding-top:16px}.visual-board h3{color:#1d3c58;margin-bottom:6px}.visual-board .visual-note{font-size:12px;color:var(--muted);margin-bottom:12px}.visual-hero{border-radius:14px;overflow:hidden;border:1px solid #cfe1ee;background:#f5faff;margin:12px 0}.visual-hero img{display:block;width:100%;max-height:360px;object-fit:cover}.visual-caption{padding:10px 12px;background:#fff;color:#536779;font-size:11px;line-height:1.4}.visual-actions{display:flex;gap:8px;flex-wrap:wrap}.visual-status{font-size:12px;color:var(--brand-2);font-weight:700;margin-top:8px}
 .persona h4{color:var(--brand-2);font-size:1.12em;margin-bottom:4px}
 .persona .pdesc{font-size:12.5px;color:var(--muted);margin-bottom:16px}
 .pgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
@@ -639,13 +640,14 @@ button,textarea,input,select{font-family:inherit}
       </div>
       <p class="diag-note">Índice gerado por <strong>rubrica automática</strong> (amplitude das escolhas, uso de dados e profundidade das justificativas). Apoio de revisão — não substitui a avaliação do(a) professor(a).</p>
       <div class="proposal" id="proposalBox"></div>
+      <div id="conceptSynthesis"></div>
       <div id="evaluationSections"></div>
 	      <div class="submission-status" id="submissionStatus"></div>
       <div class="export">
         <h3 style="margin-bottom:6px">Exportar relatório</h3>
         <p class="section-sub" style="margin-bottom:14px">Projeto completo com perfil, escolhas, proposta e diagnóstico.</p>
         <button class="export-btn" onclick="exportToPDF()">Baixar PDF</button>
-	        <button class="committee-btn" id="committeeBtn" onclick="openCommitteePresentation()">Apresentar ao comitê</button>
+        <button class="committee-btn" id="committeeBtn" onclick="openVisualPresentation()">Apresentação visual</button>
 	        <button class="submit-btn" id="lockRequestBtn" onclick="requestLock()">Solicitar encerramento ao professor</button>
         <button class="restart" onclick="restartGame()">Recomeçar</button>
       </div>
@@ -1657,6 +1659,13 @@ function openCommitteePresentation(){
   document.getElementById('presentationModal').classList.add('open');
 }
 function closeCommitteePresentation(){document.getElementById('presentationModal').classList.remove('open');}
+function phaseText(id){const phase=PHASES.find(p=>p.id===id);const c=phase?stepCompletion(phase):{done:0,total:0};return c.done+'/'+c.total+' itens';}
+function conceptData(){const g=gameData||{},joinQ=id=>(g[id]||[]).map(x=>typeof x==='string'?x:(x.text||'')).filter(Boolean).join(' · ');const name=g.nomeProduto||'Projeto imobiliário';const audience=joinQ('target_q1')||'público em definição';const job=joinQ('target_q4')||'necessidade a validar';const barrier=joinQ('target_q5')||joinQ('explorar_q1')||'barreiras a aprofundar';const solution=joinQ('solucoes_q1')||g.conceito||'solução em definição';const validation=[joinQ('testar_q1'),g.testar_q4].filter(Boolean).join(' · ')||'experimento a estruturar';const scale=joinQ('escala_q1')||'condições de escala a avaliar';return {name,audience,job,barrier,solution,validation,scale,text:`${name} é uma proposta de ${g.tipoProduto||'produto imobiliário'} para ${audience}, em ${g.praca||'praça a definir'}. O conceito combina ${g.conceito||solution}. A oportunidade nasce da necessidade de ${job}; a principal tensão identificada é ${barrier}. A proposta prioriza ${solution}, será validada por ${validation} e só deve escalar mediante ${scale}.`};}
+function renderConceptSynthesis(){const host=document.getElementById('conceptSynthesis');if(!host)return;const c=conceptData();gameData.sinteseExecutiva={...c,updatedAt:new Date().toISOString()};host.innerHTML='<section class="concept-summary"><div class="concept-kicker">Síntese executiva do conceito</div><h3>'+esc(c.name)+'</h3><p>'+esc(c.text)+'</p><div class="concept-pill-row"><span class="concept-pill">Target · '+esc(phaseText('target'))+'</span><span class="concept-pill">Explorar · '+esc(phaseText('explorar'))+'</span><span class="concept-pill">Soluções · '+esc(phaseText('solucoes'))+'</span><span class="concept-pill">Testar · '+esc(phaseText('testar'))+'</span><span class="concept-pill">Escalar · '+esc(phaseText('escala'))+'</span></div><div class="visual-actions" style="margin-top:14px"><button type="button" class="nav-btn" onclick="saveConceptSynthesis()">Salvar síntese no dossiê</button><button type="button" class="nav-btn ghost" onclick="openVisualPresentation()">Abrir apresentação visual</button></div></section>';}
+function saveConceptSynthesis(){renderConceptSynthesis();persistStudent();alert('Síntese executiva salva no dossiê.');}
+function openVisualPresentation(){openCommitteePresentation();appendVisualPresentation();}
+function appendVisualPresentation(){const host=document.getElementById('presentationBody');if(!host)return;const c=conceptData(),visual=(gameData.apresentacaoVisual||{}).hero;let html='<section class="visual-board"><h3>Universo visual do projeto</h3><p class="visual-note">Gere uma imagem ilustrativa a partir do conceito, público e experiência proposta. Ela não representa projeto arquitetônico executivo nem pessoa real.</p>';if(visual&&visual.imagemData)html+='<div class="visual-hero"><img src="'+visual.imagemData+'" alt="Imagem ilustrativa do conceito '+esc(c.name)+'"><div class="visual-caption">'+esc(visual.legenda||'Imagem conceitual gerada a partir dos dados do projeto.')+'</div></div>';html+='<div class="visual-actions"><button class="nav-btn" type="button" onclick="generateProjectVisual()">'+(visual&&visual.imagemData?'Gerar nova imagem conceitual':'Gerar imagem conceitual')+'</button><button class="nav-btn ghost" type="button" onclick="saveConceptSynthesis()">Salvar síntese</button></div><div class="visual-status" id="projectVisualStatus"></div></section>';host.insertAdjacentHTML('beforeend',html);}
+async function generateProjectVisual(){const status=document.getElementById('projectVisualStatus');if(status)status.textContent='Gerando ilustração conceitual do projeto…';try{const c=conceptData();const resp=await fetch('/api/project-visual',{method:'POST',headers:{'content-type':'application/json','Authorization':'Bearer '+CONFIG.supabaseAnonKey},body:JSON.stringify({codigo:currentClass,senha:currentClassPass,equipe_nome:currentTeamName,conceito:{titulo:c.name,texto:c.text,produto:gameData.tipoProduto||'',praca:gameData.praca||'',publico:c.audience,diferenciais:c.solution}})});const out=await resp.json().catch(()=>({error:'Resposta inválida do servidor.'}));if(!resp.ok||out.error)throw new Error(out.error||('HTTP '+resp.status));gameData.apresentacaoVisual={hero:{imagemData:out.imagemData,legenda:out.legenda||'Imagem conceitual do projeto.'},updatedAt:new Date().toISOString()};persistStudent();openVisualPresentation();}catch(e){if(status)status.textContent='Não foi possível gerar a imagem agora: '+(e.message||String(e));}}
 async function openTeamPresentation(teamId){
   const teams=await fetchClassStudents(currentClass),team=teams[teamId];if(!team){alert('Equipe não encontrada.');return;}
   const original=gameData;gameData=team.data||{};openCommitteePresentation();gameData=original;
@@ -1786,7 +1795,7 @@ function renderDiagnosis(){
   const o=scoreOverall(gameData,STEPS);gameData.finalScore=o.indice;gameData.eixos=o.eixos;
   document.getElementById('overallScore').textContent=o.indice;
   document.getElementById('scoreTier').textContent=o.indice>=75?'Estratégia robusta':o.indice>=50?'Boa base — refinar':'Precisa aprofundar';
-  document.getElementById('proposalBox').innerHTML=buildProposalHTML();
+  document.getElementById('proposalBox').innerHTML=buildProposalHTML();renderConceptSynthesis();
   const eixDefs=[['completude','Completude','As escolhas têm evidência preenchida?'],['fundamentacao','Fundamentação','A evidência cita dados do briefing/mercado?'],['calibracao','Calibração','Impacto e confiança bem calibrados (sem "tudo 5")?'],['coerencia','Coerência da cadeia','Público → solução → teste conversam entre si?']];
   const pisoG=CONFIG.pisoGeral||60;const aprov=o.indice>=pisoG;
   let html='<div class="verdict '+(aprov?'ok':'bad')+'">'+(aprov?('\u2713 Aprovado pela rubrica \u2014 '+o.indice+' \u2265 piso '+pisoG):('\u25b2 Abaixo do piso \u2014 '+o.indice+' < '+pisoG+' \u00b7 reveja antes de finalizar'))+'</div>';
